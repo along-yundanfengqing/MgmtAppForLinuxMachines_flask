@@ -1,0 +1,17 @@
+###################################################################
+# PLEASE ADD LOGIN CREDENTIALS FOR SSH ACCESS
+# FORMAT: 
+#   IP_ADDRESS,USERNAME,PASSWORD     # password authentication
+#   IP_ADDRESS,USERNAME              # ssh-key based authentication
+##################################################################
+
+172.30.0.1,ubuntu,ubuntu
+172.30.0.2,ubuntu,ubuntu
+172.30.0.3,centos,centos
+172.30.0.4,debian,debian
+172.30.0.5,centos,centos
+172.30.0.6,ubuntu,ubuntu
+172.30.0.7,debian,debian
+172.30.0.8,ubuntu,ubuntu
+172.30.0.9,ubuntu,ubuntu
+172.30.0.10,centos,centos

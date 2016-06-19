@@ -1,0 +1,121 @@
+version: '2'
+services:
+ db:
+  image: yugokato/mongodb:3.2
+  container_name: mongo
+  hostname: mongo
+  networks:
+    mynetwork:
+      ipv4_address: 172.30.0.99
+  ports:
+   - "27017:27017"
+  privileged: true
+
+ vm01:
+  image: yugokato/ubuntu_template
+  container_name: vm01
+  hostname: vm01
+  networks:
+    mynetwork:
+      ipv4_address: 172.30.0.1
+  privileged: true
+  stdin_open: true
+
+ vm02:
+  image: yugokato/ubuntu_template
+  container_name: vm02
+  hostname: vm02
+  networks:
+    mynetwork:
+      ipv4_address: 172.30.0.2
+  privileged: true
+  stdin_open: true
+
+ vm03:
+  image: yugokato/centos_template
+  container_name: vm03
+  hostname: vm03
+  networks:
+    mynetwork:
+      ipv4_address: 172.30.0.3
+  privileged: true
+  stdin_open: true
+
+ vm04:
+  image: yugokato/debian_template
+  container_name: vm04
+  hostname: vm04
+  networks:
+    mynetwork:
+      ipv4_address: 172.30.0.4
+  privileged: true
+  stdin_open: true
+
+ vm05:
+  image: yugokato/centos_template
+  container_name: vm05
+  hostname: vm05
+  networks:
+    mynetwork:
+      ipv4_address: 172.30.0.5
+  privileged: true
+  stdin_open: true
+
+ vm06:
+  image: yugokato/ubuntu_template
+  container_name: vm06
+  hostname: vm06
+  networks:
+    mynetwork:
+      ipv4_address: 172.30.0.6
+  privileged: true
+  stdin_open: true
+
+ vm07:
+  image: yugokato/debian_template
+  container_name: vm07
+  hostname: vm07
+  networks:
+    mynetwork:
+      ipv4_address: 172.30.0.7
+  privileged: true
+  stdin_open: true
+
+ vm08:
+  image: yugokato/ubuntu_template
+  container_name: vm08
+  hostname: vm08
+  networks:
+    mynetwork:
+      ipv4_address: 172.30.0.8
+  privileged: true
+  stdin_open: true
+
+ vm09:
+  image: yugokato/ubuntu_template
+  container_name: vm09
+  hostname: vm09
+  networks:
+    mynetwork:
+      ipv4_address: 172.30.0.9
+  privileged: true
+  stdin_open: true
+
+ vm10:
+  image: yugokato/centos_template
+  container_name: vm10
+  hostname: vm10
+  networks:
+    mynetwork:
+      ipv4_address: 172.30.0.10
+  privileged: true
+  stdin_open: true
+
+networks:
+  mynetwork:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.30.0.0/16
+        gateway: 172.30.0.254
