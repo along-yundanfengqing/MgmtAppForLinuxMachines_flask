@@ -3,53 +3,69 @@ Management Application for Linux Machines
 
 ## Table of Contents
 1. [Introduction](#1-introduction)
-2. [Install packages](#2-install-packages)
-3. [Try it out](#3-try-it-out)
-    - [With test infrastructure for a demo (Docker containers)](#1-if-you-run-with-the-test-docker-environment)
+2. [Supported environment](#2-supported-environment) 
+3. [Install packages](#3-install-packages)
+4. [Try it out](#4-try-it-out)
+    - [With test infrastructure with Docker containers (Demo purpose only)](#1-with-the-test-docker-environment-demo-purpose-only)
     - [With your own infrastructure](#2-if-you-run-with-your-own-infrastructure)
-4. [Documentation](#4-documentation)
+5. [Documentation](#5-documentation)
 
 
 <br>
 ## 1. Introduction
-This program is a simple management application for Linux machines (Physical/Virtual) that automatically and periodically collects basic machine data via SSH including some performance data (CPU, Memory, Disk), and lets administrators view them from the management portal (GUI).  
-By using this application, administrators can manage their Linux machines (Ubuntu, Debian, CentOS etc.) on Docker containers, AWS cloud, and/or on-premise physical/virtual environment from the central management portal without manually logging in to each machine from the console.
+This program is a simple management application for Linux machines that automatically and periodically collects basic machine data including some performance data (CPU, Memory, Disk) via SSH, and lets administrators view them on the management portal (GUI). As it was developed with an approach of Responsive Web Design, administrators can access to the GUI from any devices such as laptops, tablets, and mobile phones.  
+By using this application, administrators can manage their varied Linux machines (Ubuntu, Debian, CentOS etc.) on Docker containers, AWS cloud, and/or on-premise physical/virtual environment from the central management portal without manually logging in to each machine from the console.
 
 ![Program Overview](static/images/ProgramOverview.png)  
 
-For more details, please see the documentation [here](#4-documentation).  
+For more details, please see the demo documentation [here](#5-documentation).  
 All features are demonstrated with screenshots in the document.
 
 **Key Features**
-- Manage linux machines on Docker containers, AWS cloud, and/or on-premise environment
-- Present basic machine data on the central management portal 
+- Manage Linux machines on Docker containers, AWS cloud, and/or on-premise environment
+- Provide an optimal viewing and interaction experience to varied devices such as laptops, tablets, and mobile devices
+- Present basic machine data on the central management portal  
    (Hostname, IP Address, MAC Address, OS/Version, uptime, CPU load, memory usage, disk usage) 
 - Register/Delete machines to be managed from GUI and/or a text file 
 - Track machine status and display it with icons 
 - Incident alarms with icons when a reachability to machines is lost 
 - Export machine data as a JSON file 
 - Expose machine data via RESTful API (JSON) 
-- SSH access to machines from web browsers (provided by an external python application)
+- SSH access to machines from web browsers (*Only for local machine setup)   
 
-## 2. Install packages
-This program supports only Python 2.x on Linux or OS X. Python 3.x and Windows are not supported.  
+
+**Technology Stack**  
+- Python programming 
+- Flask web framework
+- HTML/CSS + Twitter bootstrap
+- MongoDB
+- Docker containers (Docker Engine + Docker Compose)
+- Bash shell script
+
+
+## 2. Supported environment
+This program supports only Python 2.x on Linux or OS X platforms.  
+Python 3.x and Windows platforms are not supported.  
+
+## 3. Install packages
+
 Following python modules are required to run this program.
 - flask
 - pymongo
 - pexpect
-- butterfly(optional)
+- butterfly (Optional)
 
 To install:
 
 ```
-$ pip install flask pymongo pexpect butterfly
+$ sudo pip install flask pymongo pexpect butterfly
 ```
 
 > [Butterfly](https://github.com/paradoxxxzero/butterfly) is an xterm compatible external terminal application that runs in your browser.  
-> If you don't install it, the program will not provide the feature of browser-based terminal access.  
+> Current release supports the integration with butterfly only on the local machine setup environment. It does not work when you install the program on a remote server.
 
 
-## 3. Try it out
+## 4. Try it out
 This program requires any physical/virtual infrastructure with Linux machines to be managed, and a MongoDB server for storing the machine data.   
 You can execute the program either by:
 
@@ -65,7 +81,7 @@ You can execute the program either by:
 >Using the docker test environment will be much simple and easier.
 
 
-### (1) If you run with the test docker environment
+### (1) With test infrastructure with Docker containers (Demo purpose only)
 #### Step 1. Install docker on your machine 
 
 To deploy the test environment, Docker Engine and Docker Compose are required.
@@ -82,6 +98,11 @@ To deploy the test environment, Docker Engine and Docker Compose are required.
 - Install Docker Compose  
     https://docs.docker.com/compose/install/
 
+- Create a Docker group and add your user  
+    https://docs.docker.com/engine/installation/linux/ubuntulinux/#create-a-docker-group
+
+        $ sudo groupadd docker
+        $ sudo usermod -aG docker USERNAME
 
 
 #### Step 2. Run docker_setup.sh  
@@ -96,9 +117,9 @@ $ ./docker_setup.sh
 
 
 #### Step 3. Access to web server from your web browser
-Access to `http://ipaddress:5000` from any web browser.  
+Access to `http://IPADDRESS:5000` from any web browser.  
 
->If you execute the program on your local machine, _ipaddress_ is localhost or 127.0.0.1
+>If you execute the program on your local machine, _IPADDRESS_ is localhost or 127.0.0.1
 
 <br>
 **Test containers to be deployed**  
@@ -129,7 +150,7 @@ The shell script shutdowns and deletes all containers and settings on your local
 
 
 
-### (2) If you run with your own infrastructure
+### (2) With your own infrastructure
 1. Prepare a MongoDB server which can be accessed from the machine this program will be executed
 2. Prepare your infrastructure with linux servers and/or virtual machines (SSH access must be permitted on each machine)   
     If you manage EC2 instances on AWS, please place .pem file under ~/.ssh/ and run below command.
@@ -142,14 +163,16 @@ The shell script shutdowns and deletes all containers and settings on your local
         $ cd ~/PATH_TO_THE_PROGRAM_DIRECTORY
         $ python main.py        
 
+> You will be asked to enter the IP addres of your MongoDB server
+
 5. Access to `http://IPADDRESS:5000` from any web browser  
 
 >If you execute on your local machine, _IPADDRESS_ is localhost or 127.0.0.1.  
 >The program will ask you to enter the IP address of your MongoDB Server at the beginning
 
 
-## 4. Documentation
-See the documentation [here](https://1drv.ms/b/s!AkRAr6rw0sUWgR3_lrl7csNBX2Ie) for more details.  
+## 5. Documentation
+See the demo documentation [here](https://1drv.ms/b/s!AkRAr6rw0sUWgR3_lrl7csNBX2Ie) for more details.  
 All features are demonstrated with screenshots.
 
 
