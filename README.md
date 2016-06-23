@@ -172,7 +172,7 @@ The shell script shutdowns and deletes all containers and settings on your local
 
 
 ## 5. Documentation
-See the demo documentation [here](https://1drv.ms/b/s!AkRAr6rw0sUWgR3_lrl7csNBX2Ie) for more details.  
+See the demo documentation [here](https://1drv.ms/b/s!AkRAr6rw0sUWgShAMcE-nZJyUIz5) for more details.  
 All features are demonstrated with screenshots.
 
 
