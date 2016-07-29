@@ -65,7 +65,7 @@ def showTop():
     now = datetime.now()
     return render_template('Top.html', vms=vms, now=now, butterfly=butterfly)
 
-# Register a new mathine
+# Register a new machine
 @app.route('/register', methods=['GET','POST'])
 def addVM(error1="", error2="", error3=""):
     if request.method == 'POST':
