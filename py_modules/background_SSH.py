@@ -29,7 +29,7 @@ class SSHThread(threading.Thread):
         self.db = db
         self.login = login
     def run(self):
-        s = pxssh.pxssh(timeout=5)
+        s = pxssh.pxssh(timeout=30)
         ipaddr = self.login[0].strip()
         username = self.login[1].strip()
         try:
@@ -40,7 +40,7 @@ class SSHThread(threading.Thread):
         # Attempt SSH access
         try:
             if password:    # for password authentication
-                s.login(ipaddr, username, password, login_timeout=5)
+                s.login(ipaddr, username, password, login_timeout=30)
             else:           # for SSH-key based authentication
                 s.login(ipaddr, username)
         # SSH login failure
