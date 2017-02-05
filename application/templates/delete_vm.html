@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %} Delete Machines {% endblock %}
+
+{% block content %}
+      <div class="row">
+        <div class="col-md-12-flash">
+          {% with messages = get_flashed_messages() %}
+            {% if messages %}
+              <p class=flashes>
+              {% for message in messages %}
+                {{ message }}
+              {% endfor %}
+              </p>
+            {% endif %}
+          {% endwith %}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <h2> Delete Machines</h2>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <p>Please select machines which you would like to delete from the list.</p>
+          <br>
+          <form action="{{url_for('delete_vm')}}" method='POST'>
+            <div class="form-group">
+              <label for="InputIPAddress">List of current machines</label>
+              {% for vm in vms %}
+                {% if vm['AWS'] == True %}
+                  <p><input type="checkbox" name = "checkbox" value="{{ vm['IP Address']}}">  {{vm['Hostname']}}: {{ vm['IP Address']}} (AWS)</p>
+                {% else %}
+                  <p><input type="checkbox" name = "checkbox" value="{{ vm['IP Address']}}">  {{vm['Hostname']}}: {{ vm['IP Address']}}</p>
+                {% endif %}
+              {% endfor %}
+              <p>
+              <button type="submit" class="btn btn-primary">Delete</button>
+            </div>
+          </form>
+        </div>
+      </div>
+{% endblock %}
+  </body>
+</html>

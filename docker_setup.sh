@@ -21,7 +21,7 @@ if [ "$OSTYPE" == "Darwin" ]; then
     echo
     echo -e "${BLUE}*** DONE ***${NC}"
     echo
-    python main.py 172.30.0.99
+    python run.py
 EOF
 
 # For Linux
@@ -37,7 +37,7 @@ else
     echo
     echo -e "${BLUE}*** DONE ***${NC}"
     echo
-    python main.py 172.30.0.99
+    python run.py
 fi
 
 ##################################################

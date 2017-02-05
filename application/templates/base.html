@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% block meta %}{% endblock %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.css') }}">
+    <title>{% block title %}{% endblock %}</title>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-1.12.0.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+  </head>
+
+
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <a href = "{{url_for('show_top')}}">
+            <img src="{{url_for('static', filename='images/home.jpg')}}" >
+          </a>
+        </div>
+        <div class="col-md-6 text-right text-uppercase">
+          <h1>Management Portal For Linux Machines</h1>
+          <h4>version 1.1</h4>
+        </div>
+      </div>
+      <hr>
+
+      {% block content %}
+      {% endblock %}
+
+    </div>
+
+      {% block modal %}
+      {% endblock %}
+      
+  </body>
+</html>
