@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 import re
 from application import app
@@ -86,7 +87,7 @@ class FileIO(object):
 
                 if "\n" in output[-1]:
                     output[-1] = output[-1].strip()
-                
+
                 f.writelines(output)
 
         except Exception as e:

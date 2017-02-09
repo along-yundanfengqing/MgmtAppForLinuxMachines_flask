@@ -20,7 +20,7 @@ class DBManager(object):
     def __connect_db(self):
         try:
             print("Checking the connectivity to the database(%s)...." % self.__database_ip),
-            uri = "mongodb://%s:%s" % (self.__database_ip, self.__port)
+            uri = "mongodb://%s:%d" % (self.__database_ip, self.__port)
             client = pymongo.MongoClient(uri, serverSelectionTimeoutMS=3000)
             mongo_db = pymongo.database.Database(client, self.__database_name)
             if client.server_info():
@@ -28,7 +28,7 @@ class DBManager(object):
                 return mongo_db
         except Exception:
             print
-            print("ERROR: Unable to connect to %s" % self.__dbserver_ip)
+            print("ERROR: Unable to connect to %s" % self.__database_ip)
             sys.exit(3)
 
     def find(self, *args):
@@ -45,7 +45,7 @@ class DBManager(object):
 
     def remove(self, del_ip_list):
         return self.db.collection.remove({'IP Address': {'$in': del_ip_list}})
- 
+
     def delete_one(self, *args):
         return self.db.collection.delete_one(*args)
 
@@ -118,7 +118,8 @@ class DBManager(object):
     def check_mismatch(self):
         docs = self.find({}, {'_id': 0, 'IP Address': 1, 'Hostname': 1})
         for doc in docs:
-            if FileIO.exists_in_file(doc['IP Address']):
+            ipaddr = doc['IP Address']
+            if FileIO.exists_in_file(ipaddr):
                 continue
             else:
-                self.delete_one({'IP Address': doc['IP Address']})
+                self.delete_one({'IP Address': ipaddr})

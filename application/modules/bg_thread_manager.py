@@ -6,7 +6,7 @@ from datetime import datetime
 # my modules
 from application.modules.file_io import FileIO
 from application.modules.ssh_thread import SSHThread
-from application import mongo
+from application import app, mongo
 
 
 class BackgroundThreadManager(object):
@@ -22,8 +22,9 @@ class BackgroundThreadManager(object):
     def __repeat_bg_thread(cls):
         try:
             cls.__start_ssh_threads()
-            # loop the background thread every 30 seconds
-            th = threading.Timer(30, cls.__repeat_bg_thread)
+            # loop the background thread (default = every 30 seconds)
+            timer = app.config['BG_THREAD_TIMER']
+            th = threading.Timer(timer, cls.__repeat_bg_thread)
             th.daemon = True
             th.start()
         except Exception:

@@ -21,7 +21,7 @@ class AppManager(object):
 
     def del_vm(self, del_ip_list):
         mongo.remove(del_ip_list)
-        FileIO.del_vm_from_file(del__iplist)
+        FileIO.del_vm_from_file(del_ip_list)
 
     def export_json(self, filename, doc):
         BASE_DIR = os.getcwd()
