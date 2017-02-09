@@ -1,10 +1,11 @@
-# Statement for enabling the development environment
+# Flask app
 DEBUG = True
-
-# Secret key for signing cookies
 SECRET_KEY = "super_secret_key"
 
 # MongoDB
-DATABASE_SERVER_IP = "172.30.0.99"
-DATABASE_NAME = "LinuxServer"
+MONGO_HOST = "172.30.0.99"
+MONGO_PORT = "27017"
+MONGO_DATABASE_NAME = "LinuxServer"
 COLLECTION_NAME = "vm"
+
+LOGIN_FILENAME = "login.txt"

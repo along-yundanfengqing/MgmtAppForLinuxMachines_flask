@@ -1,22 +1,15 @@
 # -*- coding: utf-8 -*-
+import logging
 from flask import Flask
+app = Flask(__name__)
+app.config.from_object('config')
 from application.modules.db_manager import DBManager
 
 
-def create_app():
-    my_app = Flask(__name__)
-    my_app.config.from_object('config')
-    my_mongo = DBManager(
-        my_app.config['DATABASE_SERVER_IP'],
-        my_app.config['DATABASE_NAME'],
-        my_app.config['COLLECTION_NAME']
-        )
+print("Starting the program...\n")
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 
-    return my_app, my_mongo
+mongo = DBManager(app)
 
-
-# Create Flask app
-app, mongo = create_app()
-
-# Import controller
 from application.modules import controllers
