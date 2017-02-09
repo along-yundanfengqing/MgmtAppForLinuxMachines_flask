@@ -14,6 +14,7 @@ from application.modules.validation import Validation
 
 app_manager = AppManager()
 butterfly = app_manager.check_butterfly()
+login_file = app.config['LOGIN_FILENAME']
 
 # Start background thread
 BackgroundThreadManager.start()
@@ -53,14 +54,14 @@ def add_vm(error1="", error2="", error3=""):
             error2 = "Please enter a valid username"
         if not is_valid_password:
             error3 = "please enter a valid passowrd"
-        if is_duplicate:     # IP Address already exists in login.txt
-            flash('The IP Address "%s" already exists in login.txt' % ipaddr)
+        if is_duplicate:     # IP Address already exists in the login file
+            flash('The IP Address "%s" already exists in %s' % (ipaddr, login_file))
             ipaddr = username = password = error1 = error2 = error3 = ""
 
         # validation = all OK
         elif (not is_duplicate) and is_valid_ipaddr and is_valid_username and is_valid_password:
             if app_manager.add_vm(ipaddr, username, password):
-                flash('Added the new machine with IP Address "%s" to login.txt and to the database. It will be marked as "Unknown" until subsequent ssh access succeeds' % ipaddr)
+                flash('Added the new machine with IP Address "%s" to %s and to the database. It will be marked as "Unknown" until subsequent ssh access succeeds' % (ipaddr, login_file))
             else:
                 flash('Failed to added the new machine with IP Address "%s". ' % ipaddr)
             return redirect(url_for('show_top'))
@@ -86,7 +87,7 @@ def delete_vm():
         if del_list:
             app_manager.del_vm(del_list)
             del_ip = ", ".join([ip for ip in del_list])
-            flash('Deleted the machine with IP Address "%s" from both login.txt and the database' % del_ip)
+            flash('Deleted the machine with IP Address "%s" from both %s and the database' % (del_ip, login_file))
             return redirect(url_for('show_top'))
         else:
             flash('Select machines to delete')
