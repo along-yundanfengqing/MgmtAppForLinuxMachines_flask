@@ -12,7 +12,7 @@ class DBManager(object):
     def __init__(self, app):
         self.__database_name = app.config['MONGO_DATABASE_NAME']
         self.__database_ip = app.config['MONGO_HOST']
-        self.__collection_name = app.config['COLLECTION_NAME']
+        self.__collection_name = app.config['MONGO_COLLECTION_NAME']
         self.__port = app.config['MONGO_PORT']
         self.db = self.__connect_db()
         self.db.collection = self.db[self.__collection_name]
