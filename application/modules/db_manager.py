@@ -33,40 +33,21 @@ class DBManager(object):
 
     def find(self, *args):
         return self.db.collection.find(*args)
-#        if len(args) == 1:
-#            return self.db.collection.find(args[0])
-#        elif len(args) == 2:
-#            return self.db.collection.find(args[0], args[1])
 
     def find_one(self, *args):
         return self.db.collection.find_one(*args)
-#        if len(args) == 1:
-#            return self.db.collection.find_one(args[0])
-#        elif len(args) == 2:
-#            return self.db.collection.find_one(args[0], args[1])
 
     def update(self, *args, **kwargs):
         return self.db.collection.update_one(*args, **kwargs)
-#        if kwargs:
-#            upsert = kwargs.items()[0][0]
-#            flag = kwargs.items()[0][1]
-#            return self.db.collection.update(args[0], args[1], upsert=flag)
-#        return self.db.collection.update_one(args[0], args[1])
 
     def update_one(self, *args, **kwargs):
         return self.db.collection.update_one(*args, **kwargs)
-#        if kwargs:
-#            upsert = kwargs.items()[0][0]
-#            flag = kwargs.items()[0][1]
-#            return self.db.collection.update_one(args[0], args[1], upsert=flag)
-#        return self.db.collection.update_one(args[0], args[1])
 
     def remove(self, del_ip_list):
         return self.db.collection.remove({'IP Address': {'$in': del_ip_list}})
  
     def delete_one(self, *args):
         return self.db.collection.delete_one(*args)
-        #return self.db.collection.delete_one(args[0])
 
     def write_unreachable(self, ipaddr):
         doc = {}

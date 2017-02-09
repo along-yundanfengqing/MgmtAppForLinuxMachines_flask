@@ -126,7 +126,6 @@ def open_terminal():
 def export_json():
     ipaddr = request.form['ipaddr']
     doc = mongo.find_one({'IP Address': ipaddr}, {'_id': 0})
-    #doc = mongo.db.collection.find_one({'IP Address': ipaddr}, {'_id': 0})
 
     if request.method == 'POST':
         filename = request.form['InputFilename']
@@ -144,13 +143,11 @@ def export_json():
 @app.route('/<hostname>.json')
 def show_json_host(hostname):
     doc = mongo.find_one({'Hostname': hostname}, {'_id': 0})
-    #doc = mongo.db.collection.find_one({'Hostname': hostname}, {'_id': 0})
     return jsonify(Data=doc)
 
 # Expose all machines' data via REST API
 @app.route('/json')
 def show_json_all():
     docs = mongo.find({}, {'_id': 0})
-    #docs = mongo.db.collection.find({}, {'_id': 0})
     # return all machines except Hostname = #Unknown
     return jsonify(Data=[doc for doc in docs if doc['Hostname'] != '#Unknown'])
