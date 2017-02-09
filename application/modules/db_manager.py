@@ -26,9 +26,13 @@ class DBManager(object):
             if client.server_info():
                 print("OK")
                 return mongo_db
-        except Exception:
+        except pymongo.errors.ServerSelectionTimeoutError as e:
             print
-            print("ERROR: Unable to connect to %s" % self.__database_ip)
+            print("ERROR: Unable to connect to %s:%s" % (self.__database_ip, self.__port))
+            sys.exit(3)
+        except Exception as e:
+            print
+            print(e.message)
             sys.exit(3)
 
     def find(self, *args):

@@ -27,8 +27,9 @@ class BackgroundThreadManager(object):
             th = threading.Timer(timer, cls.__repeat_bg_thread)
             th.daemon = True
             th.start()
-        except Exception:
+        except Exception as e:
             print("Stopping the program due to the unexpected error...")
+            print(e.message)
             thread.interrupt_main()
 
     @classmethod
@@ -56,4 +57,4 @@ class BackgroundThreadManager(object):
             print("{}: {}".format(datetime.now(), "Completed collecting data and updated the database"))
             print
         else:   # no entry found in login.txt
-            pass
+            return

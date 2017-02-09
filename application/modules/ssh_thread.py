@@ -19,7 +19,7 @@ class SSHThread(threading.Thread):
     __CMD_DISK = "df -Ph"
 
     def __init__(self, ipaddr, username, password):
-        threading.Thread.__init__(self)
+        threading.Thread.__init__(self, name="SSH_" + ipaddr)
         self.__ipaddr = ipaddr
         self.__username = username
         self.__password = password
@@ -32,7 +32,7 @@ class SSHThread(threading.Thread):
             if self.__password:    # for password authentication
                 s.login(self.__ipaddr, self.__username, self.__password, login_timeout=30)
             else:           # for SSH-key based authentication
-                s.login(self.__ipaddr, self.__username)
+                s.login(self.__ipaddr, self.__username, login_timeout=30)
         # SSH login failure
         except (pexpect.exceptions.EOF, pxssh.ExceptionPxssh) as e:
             if e.args[0] == 'password refused':
@@ -49,13 +49,13 @@ class SSHThread(threading.Thread):
             if exists_in_file and exists_in_db:
                 mongo.update_one({'IP Address': self.__ipaddr}, {'$set': {'Status': 'Unreachable'}})
                 mongo.update_one({'IP Address': self.__ipaddr}, {'$inc': {'Fail_count': 1}})
-                return
 
             # If the VM is in login.txt but not registerd in DB, mark it as Unknown with N.A parameters
             # and register it in DB = In case users manually add to login.txt but SSH login to the VM fails
             elif exists_in_file and not exists_in_db:
                 mongo.write_unreachable(self.__ipaddr)
-                return
+
+            return
 
         # After SSH login succeeds: Collect data, parse, and store to DB
         try:
@@ -94,9 +94,11 @@ class SSHThread(threading.Thread):
                 ]
             mongo.write_ok(output_list)
 
-        except Exception:
+        except Exception as e:
             print("!! UNKNOWN ERROR OCCURED DURING THE SSH SESSION !!")
-            raise
+            print(type(e))
+            print(e.message)
+
         finally:
             s.logout()
 

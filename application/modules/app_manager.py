@@ -34,7 +34,8 @@ class AppManager(object):
                 doc['Last Updated'] = str(doc['Last Updated'])
                 json.dump(doc, f, indent=4)
                 return True, JSON_DIR
-        except Exception:
+        except Exception as e:
+            print(e.message)
             return False, None
 
     # kill existing process before opening another butterfly terminal
