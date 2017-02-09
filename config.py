@@ -1,5 +1,6 @@
 # Application
 DEBUG = False
+SECRET_KEY = "super_secret_key"
 APPLICATION_HOST = "127.0.0.1"
 APPLICATION_PORT = 5000
 BG_THREAD_TIMER = 30        # Seconds
