@@ -1,9 +1,9 @@
-#############################################################################
-## PLEASE ADD LOGIN CREDENTIALS FOR SSH ACCESS
-## FORMAT: 
-##   IP_ADDRESS,USERNAME,PASSWORD     # password authentication
-##   IP_ADDRESS,USERNAME              # ssh-key based authentication
-######################################################################
+############################################################################
+# PLEASE ADD LOGIN CREDENTIALS FOR SSH ACCESS
+# FORMAT:
+#   IP_ADDRESS,USERNAME,PASSWORD     # password authentication
+#   IP_ADDRESS,USERNAME              # ssh-key based authentication
+#####################################################################
 
 172.30.0.1,ubuntu,ubuntu
 172.30.0.2,ubuntu,ubuntu
