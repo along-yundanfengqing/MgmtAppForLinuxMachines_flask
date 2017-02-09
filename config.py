@@ -1,5 +1,5 @@
 # Flask app
-DEBUG = True
+DEBUG = False
 SECRET_KEY = "super_secret_key"
 
 # MongoDB
