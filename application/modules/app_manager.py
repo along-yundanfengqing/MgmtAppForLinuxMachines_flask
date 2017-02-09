@@ -1,53 +1,41 @@
 # -*- coding: utf-8 -*-
 import json
 import os
+import pip
 import re
 import signal
 
 # my modules
 from application import mongo
-
-
-BASE_DIR = os.getcwd()
-LOGIN_FILENAME = 'login.txt'
-LOGIN_FILEPATH = os.path.join(BASE_DIR, LOGIN_FILENAME)
+from application.modules.file_io import FileIO
 
 
 class AppManager(object):
     def add_vm(self, ipaddr, username, password):
         try:
-            with open(LOGIN_FILEPATH, 'a+') as f:
-                # add to login.txt
-                if password:    # for password authentication
-                    output = "{}{},{},{}".format("\n", ipaddr, username, password)
-                else:           # for SSH-key based authentication
-                    output = "{}{},{}".format("\n", ipaddr, username)
-                f.writelines(output)        # write to login.txt
-                mongo.write_new(ipaddr)     # write to DB
+            FileIO.add_vm_to_file(ipaddr, username, password)   # write to login.txt
+            mongo.write_new(ipaddr)     # write to DB
             return True
-
-        except Exception as e:
-            print(e)
+        except Exception:
             return False
 
-    def del_vm(self, del_list):
-        # delete from DB
-        for ipaddr in del_list:
-            mongo.delete_one({'IP Address': ipaddr})
-        # delete from login.txt
-            output = []
-            with open(LOGIN_FILEPATH, 'r') as f:
-                PATTERN = re.compile(r"^%s," % ipaddr)
-                for line in f.readlines():
-                    if re.match(PATTERN, line):
-                        continue
-                    else:
-                        output.append(line)
-            with open(LOGIN_FILEPATH, 'w') as f:
-                # strop newline code from the last entry before writing out
-                if "\n" in output[-1]:
-                    output[-1] = output[-1].strip()
-                f.writelines(output)
+    def del_vm(self, del_ip_list):
+        mongo.remove(del_ip_list)
+        FileIO.del_vm_from_file(del__iplist)
+
+    def export_json(self, filename, doc):
+        BASE_DIR = os.getcwd()
+        JSON_FILENAME = filename
+        JSON_DIR = BASE_DIR + "/application/json_files"
+        JSON_FILEPATH = os.path.join(JSON_DIR, JSON_FILENAME)
+
+        try:
+            with open(JSON_FILEPATH, 'w') as f:
+                doc['Last Updated'] = str(doc['Last Updated'])
+                json.dump(doc, f, indent=4)
+                return True, JSON_DIR
+        except Exception:
+            return False, None
 
     # kill existing process before opening another butterfly terminal
     def kill_butterfly(self):
@@ -56,15 +44,28 @@ class AppManager(object):
                 pid = line.split()[0]
                 os.kill(int(pid), signal.SIGHUP)
 
-    def export_json(self, filename, doc):
-        josn_filename = filename
-        json_dir = BASE_DIR + "/application/json_files"
-        json_filepath = os.path.join(json_dir, josn_filename)
+    # check if .pem file exists under ~/.ssh/
+    def search_pem(self):
+        HOME_DIR = os.getenv("HOME")
+        SSH_DIR = os.path.join(HOME_DIR, '.ssh')
+        ls = os.listdir(SSH_DIR)
+        for item in ls:
+            PATTERN = re.compile(r".*\.pem")
+            if re.search(PATTERN, item.strip()):
+                PEM_PATH = "%s/%s" % (SSH_DIR, item)
+                return PEM_PATH, SSH_DIR
+        # if .pem not exists
+        PEM_PATH = None
+        return PEM_PATH, SSH_DIR
 
-        try:
-            with open(json_filepath, 'w') as f:
-                doc['Last Updated'] = str(doc['Last Updated'])
-                json.dump(doc, f, indent=4)
-                return True, json_dir
-        except Exception as e:
-            return False, None
+    def check_butterfly(self):
+        # Check if butterfly module is installed
+        print("Checking if butterfly module is installed..."),
+        installed_packages = pip.get_installed_distributions()
+        flat_installed_packages = [package.project_name for package in installed_packages]
+        if 'butterfly' in flat_installed_packages:      # Installed
+            print("OK\n")
+            return True
+        else:       # Not installed
+            print("Not Installed\n")
+            return False

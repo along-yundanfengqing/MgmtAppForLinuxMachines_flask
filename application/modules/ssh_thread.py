@@ -6,17 +6,17 @@ from pexpect import pxssh
 
 # my modules
 from application import mongo
-from application.modules import validation
+from application.modules.file_io import FileIO
 
 
 class SSHThread(threading.Thread):
-    __cmd_hostname = "echo $HOSTNAME"
-    __cmd_distribution = "cat /etc/*-release"
-    __cmd_mac = "ip addr"
-    __cmd_uptime = "cat /proc/uptime"
-    __cmd_cpu = "uptime"
-    __cmd_mem = "free -h"
-    __cmd_disk = "df -Ph"
+    __CMD_HOSTNAME = "echo $HOSTNAME"
+    __CMD_DISTRIBUTION = "cat /etc/*-release"
+    __CMD_MAC = "ip addr"
+    __CMD_UPTIME = "cat /proc/uptime"
+    __CMD_CPU_LOAD = "uptime"
+    __CMD_MEMORY = "free -h"
+    __CMD_DISK = "df -Ph"
 
     def __init__(self, ipaddr, username, password):
         threading.Thread.__init__(self)
@@ -41,11 +41,11 @@ class SSHThread(threading.Thread):
                 #print(e)
                 print("Skipped: SSH access to %s failed. Please check network connectivity, or check if ssh service is started on the machine" % self.__ipaddr)
             # Check if the IP Address still exists in login.txt and DB when ssh access failed.
-            exists_in_file = validation.exists_in_file(self.__ipaddr)
+            exists_in_file = FileIO.exists_in_file(self.__ipaddr)
             exists_in_db = mongo.find_one({"IP Address": self.__ipaddr})
 
             # If SSH access failed when the VM exists in both login.txt and DB,
-            # mark it as "Unreachable" and increment the failure count by 1
+            # mark the status as "Unreachable" and increment the failure count by 1
             if exists_in_file and exists_in_db:
                 mongo.update_one({'IP Address': self.__ipaddr}, {'$set': {'Status': 'Unreachable'}})
                 mongo.update_one({'IP Address': self.__ipaddr}, {'$inc': {'Fail_count': 1}})
@@ -60,31 +60,31 @@ class SSHThread(threading.Thread):
         # After SSH login succeeds: Collect data, parse, and store to DB
         try:
             # get OS type and Release
-            output = self.__get_output(SSHThread.__cmd_distribution, s)
+            output = self.__get_output(SSHThread.__CMD_DISTRIBUTION, s)
             os_dist, release = self.__get_os(output)
 
             # get hostname
-            output = self.__get_output(SSHThread.__cmd_hostname, s)
+            output = self.__get_output(SSHThread.__CMD_HOSTNAME, s)
             hostname = self.__get_hostname(output)
 
             # get MAC Addresss
-            output = self.__get_output(SSHThread.__cmd_mac, s)
+            output = self.__get_output(SSHThread.__CMD_MAC, s)
             mac = self.__get_mac(output, self.__ipaddr)
 
             # get uptime
-            output = self.__get_output(SSHThread.__cmd_uptime, s)
+            output = self.__get_output(SSHThread.__CMD_UPTIME, s)
             uptime = self.__get_uptime(output)
 
             # get CPU load average
-            output = self.__get_output(SSHThread.__cmd_cpu, s)
+            output = self.__get_output(SSHThread.__CMD_CPU_LOAD, s)
             cpu_load = self.__get_cpu(output)
 
             # get Memory Usage
-            output = self.__get_output(SSHThread.__cmd_mem, s)
+            output = self.__get_output(SSHThread.__CMD_MEMORY, s)
             memory_usage = self.__get_memory(output)
 
             # get Disk Usage
-            output = self.__get_output(SSHThread.__cmd_disk, s)
+            output = self.__get_output(SSHThread.__CMD_DISK, s)
             disk_usage = self.__get_disk(output)
 
             # Write to DB
@@ -94,12 +94,11 @@ class SSHThread(threading.Thread):
                 ]
             mongo.write_ok(output_list)
 
-            s.logout()
-            return
-        except Exception as e:
-#            print(e)
+        except Exception:
             print("!! UNKNOWN ERROR OCCURED DURING THE SSH SESSION !!")
             raise
+        finally:
+            s.logout()
 
     def __get_output(self, cmd, s):
         s.sendline(cmd)
@@ -117,10 +116,10 @@ class SSHThread(threading.Thread):
         elif "Red Hat" in output:
             os_dist = "Redhat"
         else:
-            os_dist = "Other"
+            os_dist = "Other(Not supported)"
 
         for line in output.splitlines():
-            if os_dist == "Ubuntu" or os_dist == "Debian":
+            if os_dist == "Ubuntu" or os_dist == "Debian" or os_dist == "Redhat":
                 if re.search('VERSION=', line):
                     PATTERN = re.compile(r"VERSION=|\"")
                     release = re.sub(PATTERN, "", line)

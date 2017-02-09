@@ -6,17 +6,16 @@ from flask import flash, jsonify, redirect, render_template, request, url_for
 
 # my modules
 from application import app, mongo
-from application.modules import utilities, validation
 from application.modules.app_manager import AppManager
 from application.modules.bg_thread_manager import BackgroundThreadManager
+from application.modules.file_io import FileIO
+from application.modules.validation import Validation
 
 
-butterfly = utilities.check_butterfly()
 app_manager = AppManager()
-#bg_thread = BackgroundThreadManager()
+butterfly = app_manager.check_butterfly()
 
 # Start background thread
-#bg_thread.start()
 BackgroundThreadManager.start()
 
 
@@ -26,14 +25,13 @@ def show_top():
     docs = mongo.find({}).sort(
         [["Hostname", pymongo.ASCENDING], ["IP Address", pymongo.ASCENDING]]
         )
-
     vms = [doc for doc in docs]
     now = datetime.now()
     return render_template('top.html', vms=vms, now=now, butterfly=butterfly)
 
 # Register a new machine
 @app.route('/register', methods=['GET', 'POST'])
-def add_vm(ipaddr="", username="", password="", error1="", error2="", error3=""):
+def add_vm(error1="", error2="", error3=""):
     if request.method == 'POST':
         ipaddr = request.form['InputIPAddress']
         username = request.form['InputUsername']
@@ -42,10 +40,10 @@ def add_vm(ipaddr="", username="", password="", error1="", error2="", error3="")
             password = None
 
         # validate ip address format and duplication check
-        is_duplicate = validation.exists_in_file(ipaddr)
-        is_valid_ipaddr = validation.is_valid_IPv4(ipaddr)
-        is_valid_username = validation.is_valid_username(username)
-        is_valid_password = validation.is_valid_password(password)
+        is_duplicate = FileIO.exists_in_file(ipaddr)
+        is_valid_ipaddr = Validation.is_valid_ipv4(ipaddr)
+        is_valid_username = Validation.is_valid_username(username)
+        is_valid_password = Validation.is_valid_password(password)
 
         if not is_valid_ipaddr:
             ipaddr = ""
@@ -83,7 +81,8 @@ def delete_vm():
     vms = [doc for doc in docs]
 
     if request.method == 'POST':
-        del_list = request.form.getlist('checkbox')
+        del_list_u = request.form.getlist('checkbox')
+        del_list = map(str, del_list_u)
         if del_list:
             app_manager.del_vm(del_list)
             del_ip = ", ".join([ip for ip in del_list])
@@ -101,11 +100,11 @@ def delete_vm():
 def open_terminal():
     if request.method == 'POST':
         ipaddr = request.form['ipaddr']
-        username = utilities.get_username(ipaddr)
+        username = FileIO.get_username(ipaddr)
         app_manager.kill_butterfly()
         # Check if the ip address is from AWS
-        if validation.is_aws(ipaddr):
-            pem_path, ssh_dir = utilities.search_pem()
+        if Validation.is_aws(ipaddr):
+            pem_path, ssh_dir = app_manager.search_pem()
             if pem_path:
                 subprocess.Popen([
                     "butterfly.server.py", "--unsecure", "--motd=/dev/null",
