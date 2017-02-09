@@ -14,9 +14,9 @@ Management Application for Linux Machines
 <br>
 ## 1. Introduction
 This program is a simple management application for Linux machines that automatically and periodically collects basic machine data including some performance data (CPU, Memory, Disk) via SSH, and lets administrators view them on the management portal (GUI). As it was developed with an approach of Responsive Web Design, administrators can access to the GUI from any devices such as laptops, tablets, and mobile phones.  
-By using this application, administrators can manage their varied Linux machines (Ubuntu, Debian, CentOS etc.) on Docker containers, AWS cloud, and/or on-premise physical/virtual environment from the central management portal without manually logging in to each machine from the console.
+By using this application, administrators can manage their varied Linux machines (Ubuntu, Debian, Red Hat, CentOS etc.) on Docker containers, AWS cloud, and/or on-premise physical/virtual environment from the central management portal without manually logging in to each machine from the console.
 
-![Program Overview](static/images/ProgramOverview.png)  
+![Program Overview](application/static/images/ProgramOverview.png)  
 
 For more details, please see the demo documentation [here](#5-documentation).  
 All features are demonstrated with screenshots in the document.
@@ -137,7 +137,7 @@ Hostname | Container name  | IP Address  | Username | Password | OS/Version
  vm09    | vm09            | 172.30.0.9  | ubuntu   | ubuntu   | Ubuntu 14.04.4
  vm10    | vm10            | 172.30.0.10 | centos   | centos   | CentOS 6.7
  _N.A_   | mongo           | 172.30.0.99 | _N.A_    | _N.A_    | MongoDB 3.2
- \* MongoDB: port = TCP/27017, db = VM, collection = vm
+ \* MongoDB: port = TCP/27017, db = LinuxServer, collection = vm
 
 
 #### Step 4. Destroying the demo environment
@@ -158,10 +158,10 @@ The shell script shutdowns and deletes all containers and settings on your local
         $ ssh-add ~/.ssh/KEY_PAIR_NAME.pem
 
 3. (Optional) Add IP Address, username, password of each Linux machine in "login.txt". You can also operate this step later through GUI 
-4. Start the python program (main.py)
+4. Start the python program (run.py)
 
         $ cd ~/PATH_TO_THE_PROGRAM_DIRECTORY
-        $ python main.py        
+        $ python run.py        
 
 > You will be asked to enter the IP addres of your MongoDB server
 
