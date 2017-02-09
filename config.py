@@ -1,11 +1,12 @@
-# Flask app
+# Application
+LOGIN_FILENAME = "login.txt"
 DEBUG = False
-SECRET_KEY = "super_secret_key"
+APPLICATION_HOST = "127.0.0.1"
+APPLICATION_PORT = 5000
+BG_THREAD_TIMER = 30        # Seconds
 
 # MongoDB
 MONGO_HOST = "172.30.0.99"
-MONGO_PORT = "27017"
+MONGO_PORT = 27017
 MONGO_DATABASE_NAME = "LinuxServer"
 COLLECTION_NAME = "vm"
-
-LOGIN_FILENAME = "login.txt"
