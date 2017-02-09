@@ -1,30 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.css') }}">
-    <title>Delete Machines</title>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-1.12.0.min.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
-  </head>
+{% extends "base.html" %}
+{% block title %} Delete Machines {% endblock %}
 
-
-  <body>
-    <div class="container">
-      <div class="row">
-        <div class="col-md-6">
-          <a href = "{{url_for('showTop')}}">
-            <img src="{{url_for('static', filename='images/home.jpg')}}" >
-          </a>
-        </div>
-        <div class="col-md-6 text-right text-uppercase">
-          <h1>Management Portal For Linux Machines</h1>
-          <h4>version 1.0</h4>
-        </div>
-      </div>
-      <hr>
-
+{% block content %}
       <div class="row">
         <div class="col-md-12-flash">
           {% with messages = get_flashed_messages() %}
@@ -38,19 +15,16 @@
           {% endwith %}
         </div>
       </div>
-      
       <div class="row">
         <div class="col-md-12">
           <h2> Delete Machines</h2>
         </div>
       </div>
-
       <div class="row">
         <div class="col-md-12">
           <p>Please select machines which you would like to delete from the list.</p>
           <br>
-
-          <form action="{{url_for('deleteVM')}}" method='POST'>
+          <form action="{{url_for('delete_vm')}}" method='POST'>
             <div class="form-group">
               <label for="InputIPAddress">List of current machines</label>
               {% for vm in vms %}
@@ -59,17 +33,13 @@
                 {% else %}
                   <p><input type="checkbox" name = "checkbox" value="{{ vm['IP Address']}}">  {{vm['Hostname']}}: {{ vm['IP Address']}}</p>
                 {% endif %}
-              
               {% endfor %}
               <p>
               <button type="submit" class="btn btn-primary">Delete</button>
             </div>
           </form>
-
         </div>
       </div>
-      
-    </div>
-
+{% endblock %}
   </body>
 </html>
