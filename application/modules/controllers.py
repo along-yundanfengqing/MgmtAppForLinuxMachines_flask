@@ -62,6 +62,7 @@ def add_vm(error1="", error2="", error3=""):
         elif (not is_duplicate) and is_valid_ipaddr and is_valid_username and is_valid_password:
             if app_manager.add_vm(ipaddr, username, password):
                 flash('Added the new machine with IP Address "%s" to %s and to the database. It will be marked as "Unknown" until subsequent ssh access succeeds' % (ipaddr, login_file))
+                app.logger.info("- ADDED - %s", ipaddr)
             else:
                 flash('Failed to added the new machine with IP Address "%s". ' % ipaddr)
             return redirect(url_for('show_top'))
@@ -88,6 +89,7 @@ def delete_vm():
             app_manager.del_vm(del_list)
             del_ip = ", ".join([ip for ip in del_list])
             flash('Deleted the machine with IP Address "%s" from both %s and the database' % (del_ip, login_file))
+            app.logger.info("- DELETED-  %s", del_ip)
             return redirect(url_for('show_top'))
         else:
             flash('Select machines to delete')

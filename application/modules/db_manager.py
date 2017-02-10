@@ -10,29 +10,28 @@ from application.modules.validation import Validation
 
 class DBManager(object):
     def __init__(self, app):
+        self.__app = app
         self.__database_name = app.config['MONGO_DATABASE_NAME']
         self.__database_ip = app.config['MONGO_HOST']
         self.__collection_name = app.config['MONGO_COLLECTION_NAME']
         self.__port = app.config['MONGO_PORT']
         self.db = self.__connect_db()
         self.db.collection = self.db[self.__collection_name]
-        
+
     def __connect_db(self):
         try:
-            print("Checking the connectivity to the database(%s)...." % self.__database_ip),
+            self.__app.logger.info("Checking the connectivity to the database(%s)...." % self.__database_ip)
             uri = "mongodb://%s:%d" % (self.__database_ip, self.__port)
             client = pymongo.MongoClient(uri, serverSelectionTimeoutMS=3000)
             mongo_db = pymongo.database.Database(client, self.__database_name)
             if client.server_info():
-                print("OK")
+                self.__app.logger.info("...OK")
                 return mongo_db
         except pymongo.errors.ServerSelectionTimeoutError as e:
-            print
-            print("ERROR: Unable to connect to %s:%s" % (self.__database_ip, self.__port))
+            self.__app.logger.error("Unable to connect to %s:%s" % (self.__database_ip, self.__port))
             sys.exit(3)
         except Exception as e:
-            print
-            print(e.message)
+            self.__app.logger.critical(e.message)
             sys.exit(3)
 
     def find(self, *args):

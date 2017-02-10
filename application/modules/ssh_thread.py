@@ -5,7 +5,7 @@ import threading
 from pexpect import pxssh
 
 # my modules
-from application import mongo
+from application import app, mongo
 from application.modules.file_io import FileIO
 
 
@@ -33,13 +33,15 @@ class SSHThread(threading.Thread):
                 s.login(self.__ipaddr, self.__username, self.__password, login_timeout=30)
             else:           # for SSH-key based authentication
                 s.login(self.__ipaddr, self.__username, login_timeout=30)
+
         # SSH login failure
         except (pexpect.exceptions.EOF, pxssh.ExceptionPxssh) as e:
             if e.args[0] == 'password refused':
-                print("Skipped: SSH access to %s failed. Please check username or passord for login" % self.__ipaddr)
+                app.logger.warning("SSH access to %s failed. Please check username or passord for login" % self.__ipaddr)
+
             else:
-                #print(e)
-                print("Skipped: SSH access to %s failed. Please check network connectivity, or check if ssh service is started on the machine" % self.__ipaddr)
+                app.logger.warning("SSH access to %s failed. Please check network connectivity, or check if ssh service is started on the machine" % self.__ipaddr)
+
             # Check if the IP Address still exists in login.txt and DB when ssh access failed.
             exists_in_file = FileIO.exists_in_file(self.__ipaddr)
             exists_in_db = mongo.find_one({"IP Address": self.__ipaddr})
@@ -95,9 +97,9 @@ class SSHThread(threading.Thread):
             mongo.write_ok(output_list)
 
         except Exception as e:
-            print("!! UNKNOWN ERROR OCCURED DURING THE SSH SESSION !!")
-            print(type(e))
-            print(e.message)
+            app.logger.critical("UNKNOWN ERROR OCCURED DURING THE SSH SESSION")
+            app.logger.critical(type(e))
+            app.logger.critical(e.message)
 
         finally:
             s.logout()

@@ -6,5 +6,6 @@ def main():
     app_port = app.config['APPLICATION_PORT']
     app.run(host=app_host, port=app_port)
 
+
 if __name__ == '__main__':
     main()

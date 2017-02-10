@@ -28,21 +28,20 @@ class BackgroundThreadManager(object):
             th.daemon = True
             th.start()
         except Exception as e:
-            print("Stopping the program due to the unexpected error...")
-            print(e.message)
+            app.logger.critical("Stopping the program due to the unexpected error...")
+            app.logger.critical(e.message)
             thread.interrupt_main()
 
     @classmethod
     def __start_ssh_threads(cls):
+        app.logger.info("Started collecting data via SSH")
         # Check status mismatches between login.txt and DB.
         # Delete entry in DB if the ip is not in login.txt (= Deleted manually by user)
         mongo.check_mismatch()
-        # read login.txt and put credentials into a list
         login_list = FileIO.get_login_list()
 
         if login_list:
             # Assign a thread to each entry
-            print("{}: {}".format(datetime.now(), "Started collecting data via SSH"))
             threads = []
             for i in range(len(login_list)):
                 ipaddr, username, password = login_list[i]
@@ -54,7 +53,6 @@ class BackgroundThreadManager(object):
             for th in threads:
                 th.join()
 
-            print("{}: {}".format(datetime.now(), "Completed collecting data and updated the database"))
-            print
+            app.logger.info("Completed collecting data and updated the database")
         else:   # no entry found in login.txt
             return

@@ -6,7 +6,7 @@ import re
 import signal
 
 # my modules
-from application import mongo
+from application import app, mongo
 from application.modules.file_io import FileIO
 
 
@@ -35,7 +35,7 @@ class AppManager(object):
                 json.dump(doc, f, indent=4)
                 return True, JSON_DIR
         except Exception as e:
-            print(e.message)
+            app.logger.error(e.message)
             return False, None
 
     # kill existing process before opening another butterfly terminal
@@ -61,12 +61,12 @@ class AppManager(object):
 
     def check_butterfly(self):
         # Check if butterfly module is installed
-        print("Checking if butterfly module is installed..."),
+        app.logger.info("Checking if butterfly module is installed...")
         installed_packages = pip.get_installed_distributions()
         flat_installed_packages = [package.project_name for package in installed_packages]
         if 'butterfly' in flat_installed_packages:      # Installed
-            print("OK\n")
+            app.logger.info("...OK")
             return True
         else:       # Not installed
-            print("Not Installed\n")
+            app.logger.warning("...Not Installed")
             return False

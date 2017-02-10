@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 import os
 import re
+
+# my modules
 from application import app
+
 
 class FileIO(object):
     __BASE_DIR = os.getcwd()
@@ -33,10 +36,11 @@ class FileIO(object):
                 return login_list
 
             else:
-                print("ERROR: No entry found in %s" % cls.__LOGIN_FILENAME)
+                app.logger.warning("No entry found in %s" % cls.__LOGIN_FILENAME)
                 return False
+
         except IOError:
-            print("ERROR: Unable to open %s. Please check if the file exists" % cls.__LOGIN_FILENAME)
+            app.logger.error("Unable to open %s. Please check if the file exists" % cls.__LOGIN_FILENAME)
             return False
 
     @classmethod
@@ -46,8 +50,9 @@ class FileIO(object):
                 for line in f.readlines():
                     if line.split(',')[0].strip() == ipaddr:
                         return line.split(',')[1].strip()
+
         except IOError:
-            print("ERROR: Unable to open %s. Please check if the file exists" % cls.__LOGIN_FILENAME)
+            app.logger.error("Unable to open %s. Please check if the file exists" % cls.__LOGIN_FILENAME)
             return False
 
     @classmethod
@@ -59,8 +64,9 @@ class FileIO(object):
                     if re.match(PATTERN, line):
                         return True
                 return False
+
         except IOError:
-            print("ERROR: Unable to open %s. Please check if the file exists" % cls.__LOGIN_FILENAME)
+            app.logger.error("Unable to open %s. Please check if the file exists" % cls.__LOGIN_FILENAME)
             return False
 
     @classmethod
@@ -75,7 +81,7 @@ class FileIO(object):
                 f.writelines(output)        # write to login.txt
 
         except IOError:
-            print("ERROR: Unable to open %s. Please check if the file exists" % cls.__LOGIN_FILENAME)
+            app.logger.error("Unable to open %s. Please check if the file exists" % cls.__LOGIN_FILENAME)
             return False
 
     @classmethod
@@ -97,5 +103,5 @@ class FileIO(object):
                 f.writelines(output)
 
         except IOError:
-            print("ERROR: Unable to open %s. Please check if the file exists" % cls.__LOGIN_FILENAME)
+            app.logger.error("Unable to open %s. Please check if the file exists" % cls.__LOGIN_FILENAME)
             return False
