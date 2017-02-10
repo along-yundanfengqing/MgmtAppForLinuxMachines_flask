@@ -114,6 +114,7 @@ def open_terminal():
                     "--cmd=ssh -i %s %s@%s" % (pem_path, username, ipaddr), "--one-shot"])
             else:
                 flash("SSH access to the AWS instance failed as the program couldn't locate .pem file in %s" % ssh_dir)
+                app.logger.warning("Unable to locate .pem file in ~/.ssh")
 
         else:   # if not AWS
             subprocess.Popen([
