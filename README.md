@@ -41,6 +41,7 @@ All features are demonstrated with screenshots in the document.
 - MongoDB, pymongo
 - Docker containers (Docker Engine + Docker Compose)
 - Bash shell script
+- Selenium WebDriver/TestNG (Test automatinon in Java)
 
 
 ## 2. Supported environment
