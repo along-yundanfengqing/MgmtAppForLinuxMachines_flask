@@ -31,36 +31,36 @@
           <div class="col-xs-4 col-sm-3 col-md-2">
                 {% if vm['OS'] == "Ubuntu" %}
                   {% if vm['Fail_count'] < 2 %}
-                    <img class="img-responsive" src="{{ url_for('static', filename='images/ubuntu.png') }}", data-toggle="modal" data-target="#myModal{{i}}">
+                    <img class="img-responsive" src="{{ url_for('static', filename='images/ubuntu.png') }}", data-toggle="modal" data-target="#myModal_machine_data{{i}}">
                   {% else %}
-                    <img class="img-responsive" src="{{ url_for('static', filename='images/ubuntu_unreachable.png') }}", data-toggle="modal" data-target="#myModal{{i}}">
+                    <img class="img-responsive" src="{{ url_for('static', filename='images/ubuntu_unreachable.png') }}", data-toggle="modal" data-target="#myModal_machine_data{{i}}">
                   {% endif %}
                 {% elif vm['OS'] == "CentOS" %}
                   {% if vm['Fail_count'] < 2 %}
-                    <img class="img-responsive" src="{{ url_for('static', filename='images/centos.png') }}", data-toggle="modal" data-target="#myModal{{i}}">
+                    <img class="img-responsive" src="{{ url_for('static', filename='images/centos.png') }}", data-toggle="modal" data-target="#myModal_machine_data{{i}}">
                   {% else %}
-                    <img class="img-responsive" src="{{ url_for('static', filename='images/centos_unreachable.png') }}", data-toggle="modal" data-target="#myModal{{i}}">
+                    <img class="img-responsive" src="{{ url_for('static', filename='images/centos_unreachable.png') }}", data-toggle="modal" data-target="#myModal_machine_data{{i}}">
                   {% endif %}
                 {% elif vm['OS'] == "Debian" %}
                   {% if vm['Fail_count'] < 2 %}
-                    <img class="img-responsive" src="{{ url_for('static', filename='images/debian.png') }}", data-toggle="modal" data-target="#myModal{{i}}">
+                    <img class="img-responsive" src="{{ url_for('static', filename='images/debian.png') }}", data-toggle="modal" data-target="#myModal_machine_data{{i}}">
                   {% else %}
-                    <img class="img-responsive" src="{{ url_for('static', filename='images/debian_unreachable.png') }}", data-toggle="modal" data-target="#myModal{{i}}">
+                    <img class="img-responsive" src="{{ url_for('static', filename='images/debian_unreachable.png') }}", data-toggle="modal" data-target="#myModal_machine_data{{i}}">
                   {% endif %}
                 {% elif vm['OS'] == "Redhat" %}
                   {% if vm['Fail_count'] < 2 %}
-                    <img class="img-responsive" src="{{ url_for('static', filename='images/redhat.png') }}", data-toggle="modal" data-target="#myModal{{i}}">
+                    <img class="img-responsive" src="{{ url_for('static', filename='images/redhat.png') }}", data-toggle="modal" data-target="#myModal_machine_data{{i}}">
                   {% else %}
-                    <img class="img-responsive" src="{{ url_for('static', filename='images/redhat_unreachable.png') }}", data-toggle="modal" data-target="#myModal{{i}}">
+                    <img class="img-responsive" src="{{ url_for('static', filename='images/redhat_unreachable.png') }}", data-toggle="modal" data-target="#myModal_machine_data{{i}}">
                   {% endif %}
                 {% else %}
-                    <img class="img-responsive" src="{{ url_for('static', filename='images/other.png') }}", data-toggle="modal" data-target="#myModal{{i}}">
+                    <img class="img-responsive" src="{{ url_for('static', filename='images/other.png') }}", data-toggle="modal" data-target="#myModal_machine_data{{i}}">
                 {% endif %}
-            <h4><a href="#" data-toggle="modal" data-target="#myModal{{i}}">{{ vm['Hostname'] }} </a></h4>
+            <h4><a href="#" data-toggle="modal" data-target="#myModal_machine_data{{i}}">{{ vm['Hostname'] }} </a></h4>
             {% if vm['AWS'] == True %}
-              <h5><a href="#" data-toggle="modal" data-target="#myModal{{i}}">{{ vm['IP Address'] }} (AWS) </a></h5>
+              <h5><a href="#" data-toggle="modal" data-target="#myModal_machine_data{{i}}">{{ vm['IP Address'] }} (AWS) </a></h5>
             {% else %}
-              <h5><a href="#" data-toggle="modal" data-target="#myModal{{i}}">{{ vm['IP Address'] }} </a></h5>
+              <h5><a href="#" data-toggle="modal" data-target="#myModal_machine_data{{i}}">{{ vm['IP Address'] }} </a></h5>
             {% endif %}
           </div>
         {% set i = i + 1 %}
@@ -82,7 +82,7 @@
     <!-- For displaying each VM's information  -->
     {% set j = 0 %}
     {% for vm in vms %}
-     <div class="modal fade" id="myModal{{j}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+     <div class="modal fade" id="myModal_machine_data{{j}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
@@ -269,7 +269,7 @@
           </div>
           <div class="modal-footer">
             {% if '#Unknown' not in vm['Hostname'] %}
-            <a class="btn btn-info" href="#" role="button" data-toggle="modal" data-target="#myModal-json{{j}}" data-dismiss="modal">Export as JSON format</a>
+            <a class="btn btn-info" href="#" role="button" data-toggle="modal" data-target="#myModal_export_json{{j}}" data-dismiss="modal">Export as JSON format</a>
             {% endif %}
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
           </div>
@@ -283,7 +283,7 @@
     <!-- Second modal for exporting a JSON file  -->
     {% set k = 0 %}
     {% for vm in vms %}
-     <div class="modal fade" id="myModal-json{{k}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true">
+     <div class="modal fade" id="myModal_export_json{{k}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
