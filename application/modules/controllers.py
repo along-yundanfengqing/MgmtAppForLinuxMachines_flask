@@ -89,7 +89,7 @@ def delete_vm():
             app_manager.del_vm(del_list)
             del_ip = ", ".join([ip for ip in del_list])
             flash('Deleted the machine with IP Address "%s" from both %s and the database' % (del_ip, login_file))
-            app.logger.info("- DELETED-  %s", del_ip)
+            app.logger.info("- DELETED -  %s", del_ip)
             return redirect(url_for('show_top'))
         else:
             flash('Select machines to delete')
@@ -144,10 +144,11 @@ def export_json():
         return redirect(url_for('show_top'))
 
 # Expose each machine's data via REST API
-@app.route('/<hostname>.json')
+@app.route('/<hostname>.json', methods=['GET'])
 def show_json_host(hostname):
     doc = mongo.find_one({'Hostname': hostname}, {'_id': 0})
-    return jsonify(Data=doc)
+    if request.method == 'GET':
+        return jsonify(Data=doc)
 
 # Expose all machines' data via REST API
 @app.route('/json')
@@ -155,3 +156,44 @@ def show_json_all():
     docs = mongo.find({}, {'_id': 0})
     # return all machines except Hostname = #Unknown
     return jsonify(Data=[doc for doc in docs if doc['Hostname'] != '#Unknown'])
+
+# Add machines via RESTful API
+@app.route('/add/<ipaddr>:<username>', defaults={'password': None}, methods=['POST'])
+@app.route('/add/<ipaddr>:<username>:<password>', methods=['POST'])
+def add_vm_api(ipaddr, username, password):
+    error_list = []
+
+    # validate ip address format and duplication check
+    is_duplicate = FileIO.exists_in_file(ipaddr)
+    is_valid_ipaddr = Validation.is_valid_ipv4(ipaddr)
+    is_valid_username = Validation.is_valid_username(username)
+    is_valid_password = Validation.is_valid_password(password)
+
+    if not is_valid_ipaddr:
+        error_list.append("invalid ip address")
+    if not is_valid_username:
+        error_list.append("invalid username")
+    if not is_valid_password:
+        error_list.append("invalid password")
+    if is_duplicate:     # IP Address already exists in the login file
+        error_list.append("ip duplicate")
+
+    # validation = all OK
+    elif (not is_duplicate) and is_valid_ipaddr and is_valid_username and is_valid_password:
+        if app_manager.add_vm(ipaddr, username, password):
+            app.logger.info("- ADDED - %s", ipaddr)
+            return jsonify({'success': True})
+        
+    return jsonify({'success': False, 'reason': error_list}) 
+
+# Delete machines via RESTful API
+@app.route('/delete/<ipaddr>', methods=['DELETE'])
+def delete_vm_api(ipaddr):
+    del_list = filter(lambda x: FileIO.exists_in_file(x), ipaddr.split(","))
+    del_ip_list = ", ".join([ip for ip in del_list])
+    del_result = app_manager.del_vm(del_list)
+    if del_result['ok'] == 1 and del_result['n'] > 0:
+        del_ip_list = ", ".join([ip for ip in del_list])
+        app.logger.info("- DELETED -  %s", del_ip_list)
+        return jsonify({'success': True, 'deleted machines': del_result['n']})
+    return jsonify({'success': False})

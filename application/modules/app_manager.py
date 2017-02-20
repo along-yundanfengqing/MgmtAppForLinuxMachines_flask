@@ -20,8 +20,9 @@ class AppManager(object):
             return False
 
     def del_vm(self, del_ip_list):
-        mongo.remove(del_ip_list)
+        del_result = mongo.remove(del_ip_list)
         FileIO.del_vm_from_file(del_ip_list)
+        return del_result
 
     def export_json(self, filename, doc):
         BASE_DIR = os.getcwd()
