@@ -53,7 +53,7 @@ def add_vm(error1="", error2="", error3=""):
             username = ""
             error2 = "Please enter a valid username"
         if not is_valid_password:
-            error3 = "please enter a valid passowrd"
+            error3 = "Please enter a valid passowrd"
         if is_duplicate:     # IP Address already exists in the login file
             flash('The IP Address "%s" already exists in %s' % (ipaddr, login_file))
             ipaddr = username = password = error1 = error2 = error3 = ""
