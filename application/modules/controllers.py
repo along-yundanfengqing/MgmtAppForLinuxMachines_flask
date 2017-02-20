@@ -194,6 +194,6 @@ def delete_vm_api(ipaddr):
     del_result = app_manager.del_vm(del_list)
     if del_result['ok'] == 1 and del_result['n'] > 0:
         del_ip_list = ", ".join([ip for ip in del_list])
-        app.logger.info("- DELETED -  %s", del_ip_list)
+        app.logger.info("- DELETED - %s", del_ip_list)
         return jsonify({'success': True, 'deleted machines': del_result['n']})
     return jsonify({'success': False})
