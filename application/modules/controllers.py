@@ -155,6 +155,7 @@ def show_json_host(hostname):
     abort(404)
 
 # Expose all machines' data via REST API
+# eg. curl -i http://localhost:5000/api/machines/all
 @app.route('/api/machines', methods=['GET'])
 @app.route('/api/machines/all', methods=['GET'])
 def show_json_all():
