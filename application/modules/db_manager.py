@@ -4,6 +4,7 @@ import sys
 from datetime import datetime
 
 # my modules
+from application.modules.db_cache import DBCache
 from application.modules.file_io import FileIO
 from application.modules.validation import Validation
 
@@ -41,15 +42,19 @@ class DBManager(object):
         return self.db.collection.find_one(*args)
 
     def update(self, *args, **kwargs):
+        DBCache.set_update_flag(True)
         return self.db.collection.update_one(*args, **kwargs)
 
     def update_one(self, *args, **kwargs):
+        DBCache.set_update_flag(True)
         return self.db.collection.update_one(*args, **kwargs)
 
     def remove(self, del_ip_list):
+        DBCache.set_update_flag(True)
         return self.db.collection.remove({'IP Address': {'$in': del_ip_list}})
 
     def delete_one(self, *args):
+        DBCache.set_update_flag(True)
         return self.db.collection.delete_one(*args)
 
     def write_unreachable(self, ipaddr):
@@ -126,3 +131,6 @@ class DBManager(object):
                 continue
             else:
                 self.delete_one({'IP Address': ipaddr})
+                DBCache.set_update_flag(True)
+
+

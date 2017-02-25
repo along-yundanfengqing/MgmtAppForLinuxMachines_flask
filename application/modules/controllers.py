@@ -8,6 +8,7 @@ from flask import abort, flash, jsonify, make_response, redirect, render_templat
 from application import app, mongo
 from application.modules.app_manager import AppManager
 from application.modules.bg_thread_manager import BackgroundThreadManager
+from application.modules.db_cache import DBCache
 from application.modules.file_io import FileIO
 from application.modules.validation import Validation
 
@@ -22,11 +23,21 @@ BackgroundThreadManager.start()
 
 # Top page
 @app.route('/')
-def show_top():
-    docs = mongo.find({}).sort(
-        [["Hostname", pymongo.ASCENDING], ["IP Address", pymongo.ASCENDING]]
-        )
-    vms = [doc for doc in docs]
+def show_top(vms=[]):
+    if DBCache.is_updated():     # Has any update in DB entries
+        docs = mongo.find({}).sort(
+            [["Hostname", pymongo.ASCENDING], ["IP Address", pymongo.ASCENDING]]
+            )
+        vms = [doc for doc in docs]
+        DBCache.update_cache(vms)   # update cache entries
+        app.logger.debug("Data loaded from database")
+
+    else:
+        cache_contents = DBCache.get_cache()
+        if cache_contents:
+            vms = cache_contents    # else: vms = []
+            app.logger.debug("Data loaded from cache")
+
     now = datetime.now()
     return render_template('top.html', vms=vms, now=now, butterfly=butterfly)
 
@@ -89,7 +100,7 @@ def delete_vm():
             app_manager.del_vm(del_list)
             del_ip = ", ".join([ip for ip in del_list])
             flash('Deleted the machine with IP Address "%s" from both %s and the database' % (del_ip, login_file))
-            app.logger.info("- DELETED -  %s", del_ip)
+            app.logger.info("- DELETED - %s", del_ip)
             return redirect(url_for('show_top'))
         else:
             flash('Select machines to delete')
