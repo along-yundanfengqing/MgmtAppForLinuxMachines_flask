@@ -19,7 +19,7 @@ def set_logging():
     logging.basicConfig(format=log_format, level=logging_level)
 
     # error log handler
-    error_log_handler = RotatingFileHandler("log/error.log", maxBytes=logging_max_bytes, backupCount=1)
+    error_log_handler = RotatingFileHandler("application/log/error.log", maxBytes=logging_max_bytes, backupCount=1)
     error_log_handler.setLevel(logging_level_handler)
     error_log_handler.setFormatter(logging.Formatter(log_format))
     app.logger.addHandler(error_log_handler)
