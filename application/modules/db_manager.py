@@ -77,7 +77,7 @@ class DBManager(object):
         else:
             doc['AWS'] = False
         doc['Last Updated'] = datetime.now()
-        self.update({'IP Address': ipaddr, 'Hostname': "#Unknown"} {'$set': doc}, upsert=True)
+        self.update({'IP Address': ipaddr, 'Hostname': "#Unknown"}, {'$set': doc}, upsert=True)
 
     def write_ok(self, output_list):
         ipaddr, hostname, mac, os_dist, release, uptime, cpu_load, memory_usage, disk_usage = output_list

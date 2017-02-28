@@ -269,7 +269,7 @@ def delete_vm_api_01(ipaddresses):
         del_ip_list = ", ".join([ip for ip in del_list])
         app.logger.info("- DELETED - %s", del_ip_list)
         return jsonify({'success': True, 'deleted machines': del_result['n']})
-    return jsonify({'success': False})
+    return jsonify({'success': False, 'deleted machines': del_result['n']})
 
 # Delete machines via RESTful API (by using -d option)
 # eg. curl -H "Content-Type: application/json" -X "DELETE" http://localhost:5000/api/machines/delete -d '{"IP Address": [ "1.1.1.1", "2.2.2.2", "3.3.3.3" ]}'
@@ -291,7 +291,7 @@ def delete_vm_api_02():
         del_ip_list = ", ".join([ip for ip in del_list])
         app.logger.info("- DELETED - %s", del_ip_list)
         return jsonify({'success': True, 'deleted machines': del_result['n']})
-    return jsonify({'success': False})
+    return jsonify({'success': False, 'deleted machines': del_result['n']})
 
 @app.errorhandler(404)
 def not_found(error):
