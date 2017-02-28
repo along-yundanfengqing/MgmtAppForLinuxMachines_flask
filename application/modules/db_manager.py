@@ -10,6 +10,7 @@ from application.modules.validation import Validation
 
 
 class DBManager(object):
+
     def __init__(self, app):
         self.__app = app
         self.__database_name = app.config['MONGO_DATABASE_NAME']
@@ -18,6 +19,7 @@ class DBManager(object):
         self.__port = app.config['MONGO_PORT']
         self.db = self.__connect_db()
         self.db.collection = self.db[self.__collection_name]
+        self.db.collection.create_index([("IP Address", pymongo.ASCENDING), ("Hostname", pymongo.ASCENDING)])
 
     def __connect_db(self):
         try:
@@ -75,7 +77,7 @@ class DBManager(object):
         else:
             doc['AWS'] = False
         doc['Last Updated'] = datetime.now()
-        self.update({'Hostname': "#Unknown", 'IP Address': ipaddr}, {'$set': doc}, upsert=True)
+        self.update({'IP Address': ipaddr, 'Hostname': "#Unknown"} {'$set': doc}, upsert=True)
 
     def write_ok(self, output_list):
         ipaddr, hostname, mac, os_dist, release, uptime, cpu_load, memory_usage, disk_usage = output_list
@@ -97,8 +99,8 @@ class DBManager(object):
             doc['AWS'] = False
         doc['Last Updated'] = datetime.now()
         # Unmark the old Hostname(#Unknown) entry if exists after SSH succeeds
-        if self.find({'Hostname': "#Unknown", 'IP Address': ipaddr}):
-            self.delete_one({'Hostname': "#Unknown", 'IP Address': ipaddr})
+        if self.find({'IP Address': ipaddr, 'Hostname': "#Unknown"}):
+            self.delete_one({'IP Address': ipaddr, 'Hostname': "#Unknown"})
         self.update({'IP Address': ipaddr}, {'$set': doc}, upsert=True)
 
     def write_new(self, ipaddr):
@@ -120,7 +122,7 @@ class DBManager(object):
             doc['AWS'] = False
         doc['Last Updated'] = datetime.now()
         self.update_one(
-            {'Hostname': "#Unknown", 'IP Address': ipaddr},
+            {'IP Address': ipaddr, 'Hostname': "#Unknown"},
             {'$set': doc}, upsert=True)
 
     def check_mismatch(self):
