@@ -26,12 +26,11 @@ All features are demonstrated with screenshots in the document.
 - Supports multiple environment (Docker containers, AWS cloud, and/or on-premise)
 - Supports multiple user devices (laptops, tablets, and mobile devices)
 - Presents basic machine data on the central management portal  
-   (Hostname, IP Address, MAC Address, OS/Version, uptime, CPU load, memory usage, disk usage) 
-- Registers/Deletes managed machines from GUI and/or a text file 
+   (Status, Hostname, IP Address, MAC Address, OS/Version, uptime, CPU load, memory usage, disk usage) 
+- Registers/Deletes managed machines from GUI, a text file, and/or RESTful API
+- Exposes machine data via RESTful API, and/or as JSON files
 - Tracks machine status and display it with icons  
 - Incident alarms with icons   
-- Exports machine data as a JSON file 
-- Exposes machine data via RESTful API (JSON) 
 - SSH access to managed machines from web browsers (*Only for local machine setup)   
 
 
