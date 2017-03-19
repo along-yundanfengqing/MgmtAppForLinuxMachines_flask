@@ -204,7 +204,7 @@ def add_vm_api_01(ipaddr, username, password):
             app.logger.info("- ADDED - %s", ipaddr)
             return jsonify({'success': True})
         
-    return jsonify({'success': False, 'reason': error_list}) 
+    return jsonify({'success': False, 'reason': error_list})
 
 # Add machines via RESTful API (by using -d option)
 # eg. curl -H "Content-Type: application/json" -X "POST" http://localhost:5000/api/machines/add -d '[{"IP Address": "1.1.1.1", "Username": "ubuntu", "Password": "test"}, {"IP Address": "2.2.2.2", "Username": "ubuntu"}]'
@@ -257,7 +257,7 @@ def add_vm_api_02():
             
     if all_success:
         return jsonify({'success': True})
-    return jsonify({'success': False, 'reason': error_list}) 
+    return jsonify({'success': False, 'reason': error_list})
 
 # Delete machines via RESTful API
 # eg. curl -H "Content-Type: application/json" -X "DELETE" http://localhost:5000/api/machines/delete/1.1.1.1
