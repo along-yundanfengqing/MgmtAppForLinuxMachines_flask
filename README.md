@@ -10,8 +10,8 @@ Management Application for Linux Machines
     - [With your own infrastructure](#2-if-you-run-with-your-own-infrastructure)
 5. [Documentation](#5-documentation)
 
-
 <br>
+
 ## 1. Introduction  
 This program is a simple management application for Linux machines which automatically and periodically collects basic system performance data such as CPU, Memory, Disk via SSH. It lets administrators view them on the management portal (GUI). As it was developed with an approach of Responsive Web Design, administrators can access to the GUI from any devices such as laptops, tablets, and mobile phones.  
 By using this application, administrators can manage their varied Linux machines (Ubuntu, Red Hat, Debian, CentOS etc.) on Docker containers, AWS cloud, and/or on-premise physical/virtual environment from the central management portal without manually logging in to each machine from the console.
