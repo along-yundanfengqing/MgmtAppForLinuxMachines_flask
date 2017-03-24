@@ -13,7 +13,7 @@ Management Application for Linux Machines
 <br>
 
 ## 1. Introduction  
-This is a simple full stack web application for manageing Linux machines which:   
+This is a simple full stack web application for managing Linux machines which:   
 1) automatically and periodically collects basic system performance data from varied managed Linux machines,   
 2) lets administrators views the data and machines' status on the management portal (GUI),  
 3) and provides management function through GUI and/or RESTful API interfaces.  
