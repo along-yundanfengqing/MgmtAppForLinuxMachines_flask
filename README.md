@@ -13,7 +13,12 @@ Management Application for Linux Machines
 <br>
 
 ## 1. Introduction  
-This program is a simple management application for Linux machines which automatically and periodically collects basic system performance data such as CPU, Memory, Disk via SSH. It lets administrators view them on the management portal (GUI). As it was developed with an approach of Responsive Web Design, administrators can access to the GUI from any devices such as laptops, tablets, and mobile phones.  
+This is a simple full stack web application for manageing Linux machines which:   
+1) automatically and periodically collects basic system performance data from varied managed Linux machines,   
+2) lets administrators views the data and machines' status on the management portal (GUI),  
+3) and provides management function through GUI and/or RESTful API interfaces.  
+
+As it was developed with an approach of Responsive Web Design, administrators can access to the GUI from any devices such as laptops, tablets, and mobile phones.  
 By using this application, administrators can manage their varied Linux machines (Ubuntu, Red Hat, Debian, CentOS etc.) on Docker containers, AWS cloud, and/or on-premise physical/virtual environment from the central management portal without manually logging in to each machine from the console.
 
 ![Program Overview](application/static/images/ApplicationOverview.png)  
@@ -81,12 +86,14 @@ You can execute the program either by:
 ### [Option 1] Try with test infrastructure with Docker containers (Demo purpose only)
 #### Step 1. Install docker on your machine 
 
-To deploy the test environment, Docker Engine and Docker Compose are required.
+To deploy the test environment on your local machine, Docker Engine and Docker Compose are required.
 
 **For OS X:**   
 - Install Docker toolbox  
     https://www.docker.com/products/docker-toolbox  
 
+> Docker for Mac will not work as it doesn't support IP routing from host to containers  
+> https://docs.docker.com/docker-for-mac/networking/#i-cannot-ping-my-containers
 
 **For Linux:**  
 - Install Docker Engine  
@@ -132,7 +139,7 @@ Hostname | Container name  | IP Address  | Username | Password | OS/Version
  vm08    | vm08            | 172.30.0.8  | ubuntu   | ubuntu   | Ubuntu 14.04.4
  vm09    | vm09            | 172.30.0.9  | ubuntu   | ubuntu   | Ubuntu 14.04.4
  vm10    | vm10            | 172.30.0.10 | centos   | centos   | CentOS 6.7
- _N.A_   | mongo           | 172.30.0.99 | _N.A_    | _N.A_    | MongoDB 3.2
+ _N.A_   | mongo           | 172.30.0.99 | _N.A_    | _N.A_    | MongoDB 3.2  
  \* MongoDB: port = TCP/27017, db = LinuxServer, collection = vm
 
 
