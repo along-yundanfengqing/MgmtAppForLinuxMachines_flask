@@ -140,6 +140,7 @@ Hostname | Container name  | IP Address  | Username | Password | OS/Version
  vm09    | vm09            | 172.30.0.9  | ubuntu   | ubuntu   | Ubuntu 14.04.4
  vm10    | vm10            | 172.30.0.10 | centos   | centos   | CentOS 6.7
  _N.A_   | mongo           | 172.30.0.99 | _N.A_    | _N.A_    | MongoDB 3.2  
+ 
  \* MongoDB: port = TCP/27017, db = LinuxServer, collection = vm
 
 
