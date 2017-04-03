@@ -13,13 +13,13 @@ Management Application for Linux Machines
 <br>
 
 ## 1. Introduction  
-This is a simple full stack web application for managing Linux machines which:   
-1) automatically and periodically collects basic system performance data from varied managed Linux machines,   
-2) lets administrators views the data and machines' status on the management portal (GUI),  
-3) and provides management function through GUI and/or RESTful API interfaces.  
+This is a full stack web application for managing Linux machines which:   
+1) automatically and periodically collects basic system performance data from various remote Linux machines   
+2) presents machine data and status on the central GUI management portal  
+3) provides management functions through GUI and/or RESTful API interfaces  
 
 As it was developed with an approach of Responsive Web Design, administrators can access to the GUI from any devices such as laptops, tablets, and mobile phones.  
-By using this application, administrators can manage their varied Linux machines (Ubuntu, Red Hat, Debian, CentOS etc.) on Docker containers, AWS cloud, and/or on-premise physical/virtual environment from the central management portal without manually logging in to each machine from the console.
+By using this application, administrators can manage their various Linux machines (Ubuntu, Red Hat, Debian, CentOS etc.) on Docker containers, AWS cloud, and/or on-premise physical/virtual environment from the central management portal without manually logging in to each machine from the console.
 
 ![Program Overview](application/static/images/ApplicationOverview.png)  
 
@@ -92,7 +92,7 @@ To deploy the test environment on your local machine, Docker Engine and Docker C
 - Install Docker toolbox  
     https://www.docker.com/products/docker-toolbox  
 
-> Docker for Mac will not work as it doesn't support IP routing from host to containers  
+> Please use Docker toolbox. Docker for Mac will not work as it doesn't support IP routing from a host to containers  
 > https://docs.docker.com/docker-for-mac/networking/#i-cannot-ping-my-containers
 
 **For Linux:**  
