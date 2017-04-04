@@ -162,7 +162,7 @@ def export_json():
 def show_json_host(hostname):
     doc = mongo.find_one({'Hostname': hostname}, {'_id': 0})
     if doc:
-        return jsonify(Data=doc)
+        return jsonify(data=doc)
     abort(404)
 
 # Expose all machines' data via REST API
@@ -170,10 +170,12 @@ def show_json_host(hostname):
 @app.route('/api/machines', methods=['GET'])
 @app.route('/api/machines/all', methods=['GET'])
 def show_json_all():
-    docs = mongo.find({}, {'_id': 0})
+    docs = mongo.find({}, {'_id': 0}).sort(
+            [["Hostname", pymongo.ASCENDING], ["IP Address", pymongo.ASCENDING]]
+            )
     # return all machines except Hostname = #Unknown
     if docs:
-        return jsonify(Data=[doc for doc in docs if doc['Hostname'] != '#Unknown'])
+        return jsonify(data=[doc for doc in docs if doc['Hostname'] != '#Unknown'])
     abort(404)
 
 # Add machines via RESTful API
@@ -202,12 +204,12 @@ def add_vm_api_01(ipaddr, username, password):
     elif (not is_duplicate) and is_valid_ipaddr and is_valid_username and is_valid_password:
         if app_manager.add_vm(ipaddr, username, password):
             app.logger.info("- ADDED - %s", ipaddr)
-            return jsonify({'success': True})
+            return jsonify(result = {'success': True})
         
-    return jsonify({'success': False, 'reason': error_list})
+    return make_response(jsonify(result = {'success': False, 'reason': error_list}), 422)
 
 # Add machines via RESTful API (by using -d option)
-# eg. curl -H "Content-Type: application/json" -X "POST" http://localhost:5000/api/machines/add -d '[{"IP Address": "1.1.1.1", "Username": "ubuntu", "Password": "test"}, {"IP Address": "2.2.2.2", "Username": "ubuntu"}]'
+## eg. curl -H "Content-Type: application/json" -X "POST" http://localhost:5000/api/machines/add -d '[{"IP Address": "1.1.1.1", "Username": "ubuntu", "Password": "test"}, {"IP Address": "2.2.2.2", "Username": "ubuntu"}]'
 @app.route('/api/machines/add', methods=['POST'])
 def add_vm_api_02():
     if not request.get_json():
@@ -217,7 +219,7 @@ def add_vm_api_02():
     if not type(add_machines) == list:
         add_machines = [add_machines]
 
-    error_list = []
+    errors = {}
     all_success = True
     
     for item in add_machines:
@@ -228,8 +230,8 @@ def add_vm_api_02():
         except:
             password = None
 
-        error = {}
-        error[ipaddr] = []
+        
+        errors[ipaddr] = []
 
         # validate ip address format and duplication check
         is_duplicate = FileIO.exists_in_file(ipaddr)
@@ -238,26 +240,26 @@ def add_vm_api_02():
         is_valid_password = Validation.is_valid_password(password)
 
         if not is_valid_ipaddr:
-            error[ipaddr].append("invalid ip address")
+            errors[ipaddr].append("invalid ip address")
         if not is_valid_username:
-            error[ipaddr].append("invalid username")
+            errors[ipaddr].append("invalid username")
         if not is_valid_password:
-            error[ipaddr].append("invalid password")
+            errors[ipaddr].append("invalid password")
         if is_duplicate:     # IP Address already exists in the login file
-            error[ipaddr].append("ip duplicate")
+            errors[ipaddr].append("ip duplicate")
 
         # validation = all OK
         elif (not is_duplicate) and is_valid_ipaddr and is_valid_username and is_valid_password:
+            errors.pop(ipaddr, None)
             if app_manager.add_vm(ipaddr, username, password):
                 app.logger.info("- ADDED - %s", ipaddr)
                 continue
 
-        error_list.append(error)
         all_success = False
             
     if all_success:
-        return jsonify({'success': True})
-    return jsonify({'success': False, 'reason': error_list})
+        return jsonify(result = {'success': True})
+    return make_response(jsonify(result = {'success': False, 'reason': errors}), 422)
 
 # Delete machines via RESTful API
 # eg. curl -H "Content-Type: application/json" -X "DELETE" http://localhost:5000/api/machines/delete/1.1.1.1
@@ -268,8 +270,8 @@ def delete_vm_api_01(ipaddresses):
     if del_result['ok'] == 1 and del_result['n'] > 0:
         del_ip_list = ", ".join([ip for ip in del_list])
         app.logger.info("- DELETED - %s", del_ip_list)
-        return jsonify({'success': True, 'deleted machines': del_result['n']})
-    return jsonify({'success': False, 'deleted machines': del_result['n']})
+        return jsonify(result = {'success': True, 'deleted machines': del_result['n']})
+    return make_response(jsonify(result = {'success': False, 'deleted machines': del_result['n']}), 422)
 
 # Delete machines via RESTful API (by using -d option)
 # eg. curl -H "Content-Type: application/json" -X "DELETE" http://localhost:5000/api/machines/delete -d '{"IP Address": [ "1.1.1.1", "2.2.2.2", "3.3.3.3" ]}'
@@ -290,13 +292,17 @@ def delete_vm_api_02():
     if del_result['ok'] == 1 and del_result['n'] > 0:
         del_ip_list = ", ".join([ip for ip in del_list])
         app.logger.info("- DELETED - %s", del_ip_list)
-        return jsonify({'success': True, 'deleted machines': del_result['n']})
-    return jsonify({'success': False, 'deleted machines': del_result['n']})
+        return jsonify(result = {'success': True, 'deleted machines': del_result['n']})
+    return make_response(jsonify(result = {'success': False, 'deleted machines': del_result['n']}), 422)
 
 @app.errorhandler(404)
 def not_found(error):
-    return make_response(jsonify({'error': error.description}), 404)
+    return make_response(jsonify(result = {'error': error.description}), 404)
 
 @app.errorhandler(400)
 def bad_request(error):
-    return make_response(jsonify({'error': error.description}), 400)
+    return make_response(jsonify(result = {'error': error.description}), 400)
+
+@app.errorhandler(405)
+def not_allowed(error):
+    return make_response(jsonify(result = {'error': error.description}), 405)
