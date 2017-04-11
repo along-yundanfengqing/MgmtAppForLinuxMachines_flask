@@ -204,7 +204,7 @@ def add_vm_api_01(ipaddr, username, password):
     elif (not is_duplicate) and is_valid_ipaddr and is_valid_username and is_valid_password:
         if app_manager.add_vm(ipaddr, username, password):
             app.logger.info("- ADDED - %s", ipaddr)
-            return jsonify(result = {'success': True})
+            return make_response(jsonify(result = {'success': True}), 201)
         
     return make_response(jsonify(result = {'success': False, 'reason': error_list}), 422)
 
@@ -258,7 +258,7 @@ def add_vm_api_02():
         all_success = False
             
     if all_success:
-        return jsonify(result = {'success': True})
+        return make_response(jsonify(result = {'success': True}), 201)
     return make_response(jsonify(result = {'success': False, 'reason': errors}), 422)
 
 # Delete machines via RESTful API
