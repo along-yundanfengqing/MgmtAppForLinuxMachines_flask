@@ -27,6 +27,7 @@ For more details, please see the demo documentation [here](#5-documentation).
 All features are demonstrated with screenshots in the document.
 
 **Key Features**
+- Login verification using salted password hashing
 - Supports multiple Linux distributions (Ubuntu, Red Hat, Debian, and CentOS)
 - Supports multiple environment (Docker containers, AWS cloud, and/or on-premise)
 - Supports multiple user devices (laptops, tablets, and mobile devices)
@@ -55,6 +56,8 @@ Python 3.x and Windows platforms are not supported.
 ## 3. Install packages
 Following python modules are required.
 - flask
+- flask-login
+- flask-wtf
 - pymongo
 - pexpect
 - butterfly (Optional)
@@ -62,7 +65,7 @@ Following python modules are required.
 To install:
 
 ```
-$ sudo pip install flask pymongo pexpect butterfly
+$ sudo pip install flask flask-login flask-wtf pymongo pexpect butterfly
 ```
 
 > [Butterfly](https://github.com/paradoxxxzero/butterfly) is an xterm compatible external terminal application that runs in your browser.  

@@ -3,6 +3,7 @@ import logging
 from flask import Flask
 app = Flask(__name__)
 app.config.from_object('config')
+from flask.ext.login import LoginManager
 from logging.handlers import RotatingFileHandler
 
 # my modules
@@ -32,6 +33,8 @@ def set_logging():
 # STARTING THE PROGRAM
 print("Starting the program...\n")
 set_logging()
+login_manager = LoginManager()
+login_manager.init_app(app)
 mongo = DBManager(app)
 
 from application.modules import controllers

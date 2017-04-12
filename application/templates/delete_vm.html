@@ -1,5 +1,14 @@
 {% extends "base.html" %}
 {% block title %} Delete Machines {% endblock %}
+{% block logout_icon%}
+      <div class="row">
+        <div class="col-md-12 text-right">
+            <a href="{{url_for('logout')}}">
+                <img src="{{url_for('static', filename='images/logout.png')}}" style="width: 5%; height: 5%"> Logout from {{current_user.username}}
+            </a>
+        </div>
+      </div>
+{% endblock %}
 
 {% block content %}
       <div class="row">

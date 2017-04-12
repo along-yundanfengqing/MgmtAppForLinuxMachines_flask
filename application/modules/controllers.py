@@ -3,26 +3,77 @@ import pymongo
 import subprocess
 from datetime import datetime
 from flask import abort, flash, jsonify, make_response, redirect, render_template, request, url_for
+from flask.ext.login import login_user, logout_user, login_required, current_user
+
 
 # my modules
-from application import app, mongo
+from application import app, login_manager, mongo
 from application.modules.app_manager import AppManager
 from application.modules.bg_thread_manager import BackgroundThreadManager
 from application.modules.db_cache import DBCache
 from application.modules.file_io import FileIO
+from application.modules.form import LoginForm
 from application.modules.validation import Validation
+from application.modules.users import User
 
 
 app_manager = AppManager()
 butterfly = app_manager.check_butterfly()
 login_file = app.config['LOGIN_FILENAME']
+login_manager.login_view = "show_login"
 
 # Start background thread
 BackgroundThreadManager.start()
 
 
+@login_manager.user_loader
+def load_user(username):
+    user = mongo.db.users.find_one({"Username": username})
+    if not user:
+        return None
+    return User(user['Username'])
+
+# signup page
+@app.route('/signup', methods=['GET', 'POST'])
+def show_signup():
+    form = LoginForm(request.form)
+    if request.method == 'POST' and form.validate():
+        username = form.username.data
+        password_hash = User.hash_password(form.password.data)
+        if mongo.db.users.find_one({"Username": username}):
+            flash('Username "%s" already exists in the database' % username)
+        else:
+            mongo.db.users.insert_one({"Username": username, "Password": password_hash})
+            flash("Created a user account (%s)" % username)
+            return redirect(url_for('show_login'))
+    return render_template('signup.html')
+
+# login page
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
+def show_login():
+    form = LoginForm(request.form)
+    if request.method == 'POST' and form.validate():
+        user = mongo.db.users.find_one({"Username": form.username.data})
+        if user and User.validate_login(user['Password'], form.password.data):
+            user_obj = User(user['Username'])
+            login_user(user_obj)
+            flash('Logged in successfully as a user "%s"' % current_user.username)
+            return redirect(url_for("show_top"))
+        flash("Username or password is not correct")
+    return render_template('login.html')
+
+# logout
+@app.route('/logout')
+@login_required
+def logout():
+    flash('Logged out from a user "%s"' % current_user.username)
+    logout_user()
+    return redirect(url_for('show_login'))
+
 # Top page
-@app.route('/')
+@app.route('/top')
+@login_required
 def show_top(vms=[]):
     if DBCache.is_updated():     # Has any update in DB entries
         docs = mongo.find({}).sort(
@@ -39,10 +90,11 @@ def show_top(vms=[]):
             app.logger.debug("Data loaded from cache")
 
     now = datetime.now()
-    return render_template('top.html', vms=vms, now=now, butterfly=butterfly)
+    return render_template('top.html', current_user=current_user, vms=vms, now=now, butterfly=butterfly)
 
 # Register a new machine page
 @app.route('/register', methods=['GET', 'POST'])
+@login_required
 def add_vm(error1="", error2="", error3=""):
     if request.method == 'POST':
         ipaddr = request.form['InputIPAddress']
@@ -89,6 +141,7 @@ def add_vm(error1="", error2="", error3=""):
 
 # Delete machines page
 @app.route('/delete', methods=['GET', 'POST'])
+@login_required
 def delete_vm():
     docs = mongo.find({}).sort([["Hostname", pymongo.ASCENDING], ["IP Address", pymongo.ASCENDING]])
     vms = [doc for doc in docs]
@@ -111,6 +164,7 @@ def delete_vm():
 
 # SSH with butterfly application
 @app.route('/terminal', methods=['GET', 'POST'])
+@login_required
 def open_terminal():
     if request.method == 'POST':
         ipaddr = request.form['ipaddr']
@@ -138,6 +192,7 @@ def open_terminal():
 
 # Export JSON files
 @app.route('/export_json', methods=['GET', 'POST'])
+@login_required
 def export_json():
     ipaddr = request.form['ipaddr']
     doc = mongo.find_one({'IP Address': ipaddr}, {'_id': 0})
@@ -154,7 +209,7 @@ def export_json():
         return redirect(url_for('show_top'))
 
 
-######################## RESUful API ######################## 
+######################## RESUful API ########################
 
 # Expose each machine's data via REST API
 # eg. curl -i http://localhost:5000/api/machines/vm01
@@ -204,9 +259,8 @@ def add_vm_api_01(ipaddr, username, password):
     elif (not is_duplicate) and is_valid_ipaddr and is_valid_username and is_valid_password:
         if app_manager.add_vm(ipaddr, username, password):
             app.logger.info("- ADDED - %s", ipaddr)
-            return make_response(jsonify(result = {'success': True}), 201)
-        
-    return make_response(jsonify(result = {'success': False, 'reason': error_list}), 422)
+            return make_response(jsonify(result={'success': True}), 201)
+    return make_response(jsonify(result={'success': False, 'reason': error_list}), 422)
 
 # Add machines via RESTful API (by using -d option)
 ## eg. curl -H "Content-Type: application/json" -X "POST" http://localhost:5000/api/machines/add -d '[{"IP Address": "1.1.1.1", "Username": "ubuntu", "Password": "test"}, {"IP Address": "2.2.2.2", "Username": "ubuntu"}]'
@@ -216,12 +270,12 @@ def add_vm_api_02():
         abort(400)
 
     add_machines = request.get_json()
-    if not type(add_machines) == list:
+    if type(add_machines) != list:
         add_machines = [add_machines]
 
     errors = {}
     all_success = True
-    
+
     for item in add_machines:
         ipaddr = item['IP Address']
         username = item['Username']
@@ -230,7 +284,6 @@ def add_vm_api_02():
         except:
             password = None
 
-        
         errors[ipaddr] = []
 
         # validate ip address format and duplication check
@@ -256,10 +309,10 @@ def add_vm_api_02():
                 continue
 
         all_success = False
-            
+
     if all_success:
-        return make_response(jsonify(result = {'success': True}), 201)
-    return make_response(jsonify(result = {'success': False, 'reason': errors}), 422)
+        return make_response(jsonify(result={'success': True}), 201)
+    return make_response(jsonify(result={'success': False, 'reason': errors}), 422)
 
 # Delete machines via RESTful API
 # eg. curl -H "Content-Type: application/json" -X "DELETE" http://localhost:5000/api/machines/delete/1.1.1.1
@@ -270,8 +323,8 @@ def delete_vm_api_01(ipaddresses):
     if del_result['ok'] == 1 and del_result['n'] > 0:
         del_ip_list = ", ".join([ip for ip in del_list])
         app.logger.info("- DELETED - %s", del_ip_list)
-        return jsonify(result = {'success': True, 'deleted machines': del_result['n']})
-    return make_response(jsonify(result = {'success': False, 'deleted machines': del_result['n']}), 422)
+        return jsonify(result={'success': True, 'deleted machines': del_result['n']})
+    return make_response(jsonify(result={'success': False, 'deleted machines': del_result['n']}), 422)
 
 # Delete machines via RESTful API (by using -d option)
 # eg. curl -H "Content-Type: application/json" -X "DELETE" http://localhost:5000/api/machines/delete -d '{"IP Address": [ "1.1.1.1", "2.2.2.2", "3.3.3.3" ]}'
@@ -282,7 +335,7 @@ def delete_vm_api_02():
     del_list = request.get_json()['IP Address']
 
     # convert to list if the data is not
-    if not type(del_list) == list:
+    if type(del_list) != list:
         del_list = del_list.split()
 
     # filter ip addresses which are not in text file
@@ -292,17 +345,17 @@ def delete_vm_api_02():
     if del_result['ok'] == 1 and del_result['n'] > 0:
         del_ip_list = ", ".join([ip for ip in del_list])
         app.logger.info("- DELETED - %s", del_ip_list)
-        return jsonify(result = {'success': True, 'deleted machines': del_result['n']})
-    return make_response(jsonify(result = {'success': False, 'deleted machines': del_result['n']}), 422)
+        return jsonify(result={'success': True, 'deleted machines': del_result['n']})
+    return make_response(jsonify(result={'success': False, 'deleted machines': del_result['n']}), 422)
 
 @app.errorhandler(404)
 def not_found(error):
-    return make_response(jsonify(result = {'error': error.description}), 404)
+    return make_response(jsonify(result={'error': error.description}), 404)
 
 @app.errorhandler(400)
 def bad_request(error):
-    return make_response(jsonify(result = {'error': error.description}), 400)
+    return make_response(jsonify(result={'error': error.description}), 400)
 
 @app.errorhandler(405)
 def not_allowed(error):
-    return make_response(jsonify(result = {'error': error.description}), 405)
+    return make_response(jsonify(result={'error': error.description}), 405)
