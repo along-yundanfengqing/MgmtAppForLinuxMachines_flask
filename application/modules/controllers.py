@@ -47,7 +47,7 @@ def show_signup():
             app.logger.warning("- ADDED ACCOUNT - %s", username)
             flash("Created a user account (%s)" % username)
             return redirect(url_for('show_login'))
-    return render_template('signup.html')
+    return render_template('signup.html', form=form)
 
 
 # login page
@@ -63,7 +63,7 @@ def show_login():
             flash('Logged in successfully as a user "%s"' % current_user.username)
             return redirect(url_for("show_top"))
         flash("Username or password is not correct")
-    return render_template('login.html')
+    return render_template('login.html', form=form)
 
 
 # logout
