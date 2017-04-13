@@ -5,7 +5,6 @@ from datetime import datetime
 from flask import abort, flash, jsonify, make_response, redirect, render_template, request, url_for
 from flask.ext.login import login_user, logout_user, login_required, current_user
 
-
 # my modules
 from application import app, login_manager, mongo
 from application.modules.app_manager import AppManager
@@ -33,20 +32,23 @@ def load_user(username):
         return None
     return User(user['Username'])
 
+
 # signup page
 @app.route('/signup', methods=['GET', 'POST'])
 def show_signup():
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate():
         username = form.username.data
-        password_hash = User.hash_password(form.password.data)
+        hash_password = User.hash_password(form.password.data)
         if mongo.db.users.find_one({"Username": username}):
             flash('Username "%s" already exists in the database' % username)
         else:
-            mongo.db.users.insert_one({"Username": username, "Password": password_hash})
+            mongo.db.users.insert_one({"Username": username, "Password": hash_password})
+            app.logger.warning("- ADDED ACCOUNT - %s", username)
             flash("Created a user account (%s)" % username)
             return redirect(url_for('show_login'))
     return render_template('signup.html')
+
 
 # login page
 @app.route('/', methods=['GET', 'POST'])
@@ -63,6 +65,7 @@ def show_login():
         flash("Username or password is not correct")
     return render_template('login.html')
 
+
 # logout
 @app.route('/logout')
 @login_required
@@ -70,6 +73,7 @@ def logout():
     flash('Logged out from a user "%s"' % current_user.username)
     logout_user()
     return redirect(url_for('show_login'))
+
 
 # Top page
 @app.route('/top')
@@ -91,6 +95,7 @@ def show_top(vms=[]):
 
     now = datetime.now()
     return render_template('top.html', current_user=current_user, vms=vms, now=now, butterfly=butterfly)
+
 
 # Register a new machine page
 @app.route('/register', methods=['GET', 'POST'])
@@ -139,6 +144,7 @@ def add_vm(error1="", error2="", error3=""):
             'add_vm.html', ipaddr="", username="", password="",
             error1=error1, error2=error2, error3=error3)
 
+
 # Delete machines page
 @app.route('/delete', methods=['GET', 'POST'])
 @login_required
@@ -161,6 +167,7 @@ def delete_vm():
 
     elif request.method == 'GET':
         return render_template('delete_vm.html', ipaddr="", vms=vms)
+
 
 # SSH with butterfly application
 @app.route('/terminal', methods=['GET', 'POST'])
@@ -189,6 +196,7 @@ def open_terminal():
 
     elif request.method == 'GET':
         return redirect(url_for('show_top'))
+
 
 # Export JSON files
 @app.route('/export_json', methods=['GET', 'POST'])
@@ -220,6 +228,7 @@ def show_json_host(hostname):
         return jsonify(data=doc)
     abort(404)
 
+
 # Expose all machines' data via REST API
 # eg. curl -i http://localhost:5000/api/machines/all
 @app.route('/api/machines', methods=['GET'])
@@ -232,6 +241,7 @@ def show_json_all():
     if docs:
         return jsonify(data=[doc for doc in docs if doc['Hostname'] != '#Unknown'])
     abort(404)
+
 
 # Add machines via RESTful API
 # eg. curl -H "Content-Type: application/json" -X "POST" http://localhost:5000/api/machines/add/1.1.1.1:ubuntu
@@ -261,6 +271,7 @@ def add_vm_api_01(ipaddr, username, password):
             app.logger.info("- ADDED - %s", ipaddr)
             return make_response(jsonify(result={'success': True}), 201)
     return make_response(jsonify(result={'success': False, 'reason': error_list}), 422)
+
 
 # Add machines via RESTful API (by using -d option)
 ## eg. curl -H "Content-Type: application/json" -X "POST" http://localhost:5000/api/machines/add -d '[{"IP Address": "1.1.1.1", "Username": "ubuntu", "Password": "test"}, {"IP Address": "2.2.2.2", "Username": "ubuntu"}]'
@@ -314,6 +325,7 @@ def add_vm_api_02():
         return make_response(jsonify(result={'success': True}), 201)
     return make_response(jsonify(result={'success': False, 'reason': errors}), 422)
 
+
 # Delete machines via RESTful API
 # eg. curl -H "Content-Type: application/json" -X "DELETE" http://localhost:5000/api/machines/delete/1.1.1.1
 @app.route('/api/machines/delete/<ipaddresses>', methods=['DELETE'])
@@ -325,6 +337,7 @@ def delete_vm_api_01(ipaddresses):
         app.logger.info("- DELETED - %s", del_ip_list)
         return jsonify(result={'success': True, 'deleted machines': del_result['n']})
     return make_response(jsonify(result={'success': False, 'deleted machines': del_result['n']}), 422)
+
 
 # Delete machines via RESTful API (by using -d option)
 # eg. curl -H "Content-Type: application/json" -X "DELETE" http://localhost:5000/api/machines/delete -d '{"IP Address": [ "1.1.1.1", "2.2.2.2", "3.3.3.3" ]}'
@@ -348,13 +361,44 @@ def delete_vm_api_02():
         return jsonify(result={'success': True, 'deleted machines': del_result['n']})
     return make_response(jsonify(result={'success': False, 'deleted machines': del_result['n']}), 422)
 
+
+# for tests only
+@app.route('/api/users/add', methods=['POST'])
+def add_user_api():
+    if not request.get_json():
+        abort(400)
+
+    username = request.get_json()['Username']
+    password = request.get_json()['Password']
+
+    if mongo.db.users.find_one({"Username": username}):
+        return make_response(jsonify(result={'success': False, 'error': "User already exists"}), 422)
+    else:
+        hash_password = User.hash_password(password)
+        mongo.db.users.insert_one({"Username": username, "Password": hash_password})
+        app.logger.warning("- ADDED ACCOUNT - %s", username)
+        return jsonify(result={'success': True, 'added_users': 1})
+
+
+# for tests only
+@app.route('/api/users/delete/<username>', methods=['DELETE'])
+def delete_user_api(username):
+    del_result = mongo.db.users.remove({"Username": username})
+    app.logger.warning("- DELETED ACCOUNT - %s", username)
+    if del_result['ok'] == 1 and del_result['n'] > 0:
+        return jsonify(result={'success': True, 'deleted users': del_result['n']})
+    return make_response(jsonify(result={'success': False, 'deleted users': del_result['n']}), 422)
+
+
 @app.errorhandler(404)
 def not_found(error):
     return make_response(jsonify(result={'error': error.description}), 404)
 
+
 @app.errorhandler(400)
 def bad_request(error):
     return make_response(jsonify(result={'error': error.description}), 400)
+
 
 @app.errorhandler(405)
 def not_allowed(error):
