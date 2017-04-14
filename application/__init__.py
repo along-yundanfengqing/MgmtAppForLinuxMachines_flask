@@ -37,4 +37,4 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 mongo = DBManager(app)
 
-from application.modules import controllers
+from application.modules import views
