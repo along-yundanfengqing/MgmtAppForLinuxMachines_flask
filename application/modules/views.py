@@ -11,7 +11,7 @@ from application.modules.app_manager import AppManager
 from application.modules.bg_thread_manager import BackgroundThreadManager
 from application.modules.db_cache import DBCache
 from application.modules.file_io import FileIO
-from application.modules.form import LoginForm
+from application.modules.form import LoginForm, SignupForm
 from application.modules.validation import Validation
 from application.modules.users import User
 
@@ -36,7 +36,7 @@ def load_user(username):
 # signup page
 @app.route('/signup', methods=['GET', 'POST'])
 def show_signup():
-    form = LoginForm(request.form)
+    form = SignupForm(request.form)
     if request.method == 'POST' and form.validate():
         username = form.username.data
         hash_password = User.hash_password(form.password.data)
