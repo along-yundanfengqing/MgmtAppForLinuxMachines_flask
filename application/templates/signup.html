@@ -31,7 +31,7 @@
                 {{ form.username(class_="form-control") }}
                 {% if form.username.errors %}
                   {% for error in form.username.errors %}
-                    <p class="has-error">{{ error }}</p>
+                    <p id="username-error" class="has-error">{{ error }}</p>
                   {% endfor %}
                 {% endif %}
             </div>
@@ -41,7 +41,7 @@
                 {{ form.password(class_="form-control") }}
                 {% if form.password.errors %}
                   {% for error in form.password.errors %}
-                    <p class="has-error">{{ error }}</p>
+                    <p id="password-error" class="has-error">{{ error }}</p>
                   {% endfor %}
                 {% endif %}
             </div>
@@ -51,7 +51,7 @@
                 {{ form.confirm(class_="form-control") }}
                 {% if form.confirm.errors %}
                   {% for error in form.confirm.errors %}
-                    <p class="has-error">{{ error }}</p>
+                    <p id="confirm-error" class="has-error">{{ error }}</p>
                   {% endfor %}
                 {% endif %}
             </div>
