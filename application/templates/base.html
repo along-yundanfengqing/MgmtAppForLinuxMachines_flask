@@ -14,16 +14,18 @@
   <body>
     <div class="container">
       <div class="row">
-        <div class="col-md-6">
-          <a href = "{{url_for('show_top')}}">
-            <img id="home" src="{{url_for('static', filename='images/home.jpg')}}" style="width: 25%; height: 25%">
-          </a>
-        </div>
-        <div class="col-md-6 text-right">
-          <h1>Management Portal For Linux Machines</h1>
+        <div class="vertical-align">
+          <div class="col-xs-6 col-sm-6 col-md-6">
+            <a href = "{{url_for('show_top')}}">
+              <img id="home" class="vcenter" src="{{url_for('static', filename='images/home.png')}}" style="width: 25%; height: 25%">
+            </a>
+          </div>
+        <div class="col-xs-6 col-sm-6 col-md-6 text-right">
+          <h1>Management Portal<br/>For Linux Machines</h1>
           <h4>Version 2.0</h4>
           {% block logout_icon %}
           {% endblock%}
+        </div>
         </div>
       </div>
       <hr>
