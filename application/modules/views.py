@@ -50,8 +50,15 @@ def show_signup():
     return render_template('signup.html', form=form)
 
 
-# login page
+# root
 @app.route('/', methods=['GET', 'POST'])
+def root():
+    if current_user:
+        return redirect(url_for('show_top'))
+    return redirect(url_for('show_login'))
+
+
+# login page
 @app.route('/login', methods=['GET', 'POST'])
 def show_login():
     form = LoginForm(request.form)
@@ -59,7 +66,7 @@ def show_login():
         user = mongo.db.users.find_one({"Username": form.username.data})
         if user and User.validate_login(user['Password'], form.password.data):
             user_obj = User(user['Username'])
-            login_user(user_obj)
+            login_user(user_obj, remember=form.remember_me.data)
             flash('Logged in successfully as a user "%s"' % current_user.username)
             return redirect(url_for("show_top"))
         flash("Username or password is not correct")
