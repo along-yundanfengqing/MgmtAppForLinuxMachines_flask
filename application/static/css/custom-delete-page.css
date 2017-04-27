@@ -41,7 +41,7 @@ label img {
 }
 
 :checked + label {
-  border-color: #ddd;
+  border-color: #fff;
 }
 
 :checked + label:before {
@@ -51,12 +51,12 @@ label img {
 }
 
 :checked + label img {
-  transform: scale(0.9);
-  box-shadow: 0 0 5px #00b300;
+  transform: scale(0.85);
+  box-shadow: 0 0 5px #cc3300;
   z-index: -1;
 }
 
 :checked + label h4,
 :checked + label h5 {
-  color: #00b300;
+  color: #cc3300;
 }
