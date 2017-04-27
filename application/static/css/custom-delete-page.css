@@ -1,3 +1,6 @@
+.colored {
+  color: #337ab7
+}
 
 input[type="checkbox"][id^="myCheckbox"] {
   display: none;
@@ -51,11 +54,6 @@ label img {
   transform: scale(0.9);
   box-shadow: 0 0 5px #00b300;
   z-index: -1;
-}
-
-h4,
-h5 {
-  color: #337ab7
 }
 
 :checked + label h4,
