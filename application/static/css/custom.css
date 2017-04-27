@@ -1,0 +1,42 @@
+.col-md-12-flash {
+  position: relative;
+  min-height: 0px;
+  padding-right: 15px;
+  padding-left: 15px;
+  background-color: rgba(255, 255, 0, 0.3);
+  color: red;
+  font-weight: bold;
+}
+.col-md-12-flash2 {
+  position: relative;
+  min-height: 0px;
+  padding-right: 15px;
+  padding-left: 15px;
+  background-color: rgba(255, 255, 0, 0.3);
+  color: red;
+  font-weight: bold;
+}
+.has-error{
+  position: relative;
+  min-height: 0px;
+  padding-right: 15px;
+  padding-left: 15px;
+  color: red;
+  vertical-align: text-top;
+}
+.vertical-align {
+    display: flex;
+    align-items: center;
+}
+
+@media (min-width: 992px) {
+  .col-md-12-flash, .col-md-12-flash2 {
+    float: left;
+  }
+  .col-md-12-flash {
+    width: 100%;
+  }
+  .col-md-12-flash2 {
+    width: 100%;
+  }
+}

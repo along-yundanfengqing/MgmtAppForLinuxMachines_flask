@@ -32,7 +32,7 @@
       </div>
       <div class="row">
         <div class="col-md-12">
-          <p>Please select machines which you would like to delete from the list.</p>
+          <p>Please select machines which you would like to delete</p>
       <form action="{{url_for('delete_machine')}}" method='POST'>
           <div class="row text-center">
               <div class="form-group">
@@ -41,15 +41,15 @@
                       <input type="checkbox" id="myCheckbox{{loop.index}}" name = "checkbox" value="{{ machine.ip_address}}"/>
                       <label for="myCheckbox{{loop.index}}">
                           {% if machine.os_distribution == "Ubuntu" %}
-                            <img class="img-responsive" src="{{ url_for('static', filename='images/ubuntu.png') }}">
+                            <img class="img-responsive img-rounded" src="{{ url_for('static', filename='images/ubuntu.png') }}">
                           {% elif machine.os_distribution == "CentOS" %}
-                            <img class="img-responsive" src="{{ url_for('static', filename='images/centos.png') }}">
+                            <img class="img-responsive img-rounded" src="{{ url_for('static', filename='images/centos.png') }}">
                           {% elif machine.os_distribution == "Debian" %}
-                            <img class="img-responsive" src="{{ url_for('static', filename='images/debian.png') }}">
+                            <img class="img-responsive img-rounded" src="{{ url_for('static', filename='images/debian.png') }}">
                           {% elif machine.os_distribution == "Redhat" %}
-                            <img class="img-responsive" src="{{ url_for('static', filename='images/redhat.png') }}">
+                            <img class="img-responsive img-rounded" src="{{ url_for('static', filename='images/redhat.png') }}">
                           {% else %}
-                            <img class="img-responsive" src="{{ url_for('static', filename='images/other.png') }}">
+                            <img class="img-responsive img-rounded" src="{{ url_for('static', filename='images/other.png') }}">
                           {% endif %}
                           <h4>{{ machine.hostname }}</h4>
                           {% if machine.aws == True %}
