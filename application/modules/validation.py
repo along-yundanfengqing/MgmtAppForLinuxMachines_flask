@@ -8,6 +8,7 @@ class Validation(object):
     __aws_cache = []    # cache for AWS IP Address
     __no_aws_cache = [] # cache for non-AWS IP Address
 
+
     @staticmethod
     def is_valid_ipv4(ipaddr):
         try:
@@ -16,13 +17,16 @@ class Validation(object):
         except socket.error:
             return False
 
+
     @staticmethod
     def is_valid_username(username):
         return re.match(r"^[a-zA-Z0-9]+[a-zA-Z0-9_.-]+$", username)
 
+
     @staticmethod
     def is_valid_password(password):
         return password is None or re.match(r"^[a-zA-Z0-9!@#\$%\^&\*\(\)\-\+\=_\?\{\}\[\]\<\>\/:;\"\']+$", password)
+
 
     # check if the IP Address is from AWS cloud
     @staticmethod

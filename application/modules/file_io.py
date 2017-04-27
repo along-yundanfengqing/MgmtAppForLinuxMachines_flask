@@ -43,6 +43,7 @@ class FileIO(object):
             app.logger.error("Unable to open %s. Please check if the file exists" % cls.__LOGIN_FILENAME)
             return False
 
+
     @classmethod
     def get_username(cls, ipaddr):
         try:
@@ -54,6 +55,7 @@ class FileIO(object):
         except IOError:
             app.logger.error("Unable to open %s. Please check if the file exists" % cls.__LOGIN_FILENAME)
             return False
+
 
     @classmethod
     def exists_in_file(cls, ipaddr):
@@ -69,6 +71,7 @@ class FileIO(object):
             app.logger.error("Unable to open %s. Please check if the file exists" % cls.__LOGIN_FILENAME)
             return False
 
+
     @classmethod
     def add_vm_to_file(cls, ipaddr, username, password):
         try:
@@ -83,6 +86,7 @@ class FileIO(object):
         except IOError:
             app.logger.error("Unable to open %s. Please check if the file exists" % cls.__LOGIN_FILENAME)
             return False
+
 
     @classmethod
     def del_vm_from_file(cls, del_ip_list):
