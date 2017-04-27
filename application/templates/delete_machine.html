@@ -31,14 +31,14 @@
         <div class="col-md-12">
           <p>Please select machines which you would like to delete from the list.</p>
           <br>
-          <form action="{{url_for('delete_vm')}}" method='POST'>
+          <form action="{{url_for('delete_machine')}}" method='POST'>
             <div class="form-group">
               <label for="InputIPAddress">List of current machines</label>
-              {% for vm in vms %}
-                {% if vm['AWS'] == True %}
-                  <p><input type="checkbox" name = "checkbox" value="{{ vm['IP Address']}}">  {{vm['Hostname']}}: {{ vm['IP Address']}} (AWS)</p>
+              {% for machine in machines %}
+                {% if machine.aws == True %}
+                  <p><input type="checkbox" name = "checkbox" value="{{ machine.ip_address}}">  {{machine.hostname}}: {{ machine.ip_address }} (AWS)</p>
                 {% else %}
-                  <p><input type="checkbox" name = "checkbox" value="{{ vm['IP Address']}}">  {{vm['Hostname']}}: {{ vm['IP Address']}}</p>
+                  <p><input type="checkbox" name = "checkbox" value="{{ machine.ip_address}}">  {{machine.hostname}}: {{ machine.ip_address }}</p>
                 {% endif %}
               {% endfor %}
               <p>

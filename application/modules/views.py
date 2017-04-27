@@ -6,18 +6,16 @@ from flask import abort, flash, jsonify, make_response, redirect, render_templat
 from flask.ext.login import login_user, logout_user, login_required, current_user
 
 # my modules
-from application import app, login_manager, mongo
+from application import app, login_manager, mongo, machines_cache
 from application.modules.app_manager import AppManager
 from application.modules.bg_thread_manager import BackgroundThreadManager
-from application.modules.db_cache import DBCache
 from application.modules.file_io import FileIO
 from application.modules.form import LoginForm, SignupForm
 from application.modules.validation import Validation
 from application.modules.users import User
 
 
-app_manager = AppManager()
-butterfly = app_manager.check_butterfly()
+butterfly = AppManager.check_butterfly()
 login_file = app.config['LOGIN_FILENAME']
 login_manager.login_view = "show_login"
 
@@ -47,6 +45,7 @@ def show_signup():
             app.logger.warning("- ADDED ACCOUNT - %s", username)
             flash("Created a user account (%s)" % username)
             return redirect(url_for('show_login'))
+
     return render_template('signup.html', form=form)
 
 
@@ -55,6 +54,7 @@ def show_signup():
 def root():
     if current_user:
         return redirect(url_for('show_top'))
+
     return redirect(url_for('show_login'))
 
 
@@ -70,6 +70,7 @@ def show_login():
             flash('Logged in successfully as a user "%s"' % current_user.username)
             return redirect(url_for("show_top"))
         flash("Username or password is not correct")
+
     return render_template('login.html', form=form)
 
 
@@ -85,29 +86,24 @@ def logout():
 # Top page
 @app.route('/top')
 @login_required
-def show_top(vms=[]):
-    if DBCache.is_updated():     # Has any update in DB entries
-        docs = mongo.find({}).sort(
-            [["Hostname", pymongo.ASCENDING], ["IP Address", pymongo.ASCENDING]]
-            )
-        vms = [doc for doc in docs]
-        DBCache.update_cache(vms)   # update cache entries
-        app.logger.debug("Data loaded from database")
+def show_top():
+    machines = machines_cache.get()
 
-    else:
-        cache_contents = DBCache.get_cache()
-        if cache_contents:
-            vms = cache_contents    # else: vms = []
-            app.logger.debug("Data loaded from cache")
+    if not machines:    # In case machines_cache is empty, retrieve data from database
+        docs = mongo.find({}, {'_id': 0}).sort(
+            [["Hostname", pymongo.ASCENDING], ["IP Address", pymongo.ASCENDING]]
+        )
+        if docs:
+            machines = machines_cache.convert_to_machine_list(docs)
 
     now = datetime.now()
-    return render_template('top.html', current_user=current_user, vms=vms, now=now, butterfly=butterfly)
+    return render_template('top.html', current_user=current_user, machines=machines, now=now, butterfly=butterfly)
 
 
 # Register a new machine page
 @app.route('/register', methods=['GET', 'POST'])
 @login_required
-def add_vm(error1="", error2="", error3=""):
+def add_machine(ipaddr="", username="", password="", error1="", error2="", error3=""):
     if request.method == 'POST':
         ipaddr = request.form['InputIPAddress']
         username = request.form['InputUsername']
@@ -135,45 +131,45 @@ def add_vm(error1="", error2="", error3=""):
 
         # validation = all OK
         elif (not is_duplicate) and is_valid_ipaddr and is_valid_username and is_valid_password:
-            if app_manager.add_vm(ipaddr, username, password):
+            if AppManager.add_machine(ipaddr, username, password):
                 flash('Added the new machine with IP Address "%s" to %s and to the database. It will be marked as "Unknown" until subsequent ssh access succeeds' % (ipaddr, login_file))
                 app.logger.info("- ADDED - %s", ipaddr)
             else:
                 flash('Failed to added the new machine with IP Address "%s". ' % ipaddr)
             return redirect(url_for('show_top'))
 
-        # validation = NG
-        return render_template(
-            'add_vm.html', ipaddr=ipaddr, username=username, password="",
-            error1=error1, error2=error2, error3=error3)
-    elif request.method == 'GET':
-        return render_template(
-            'add_vm.html', ipaddr="", username="", password="",
-            error1=error1, error2=error2, error3=error3)
+    return render_template(
+        'add_machine.html', ipaddr=ipaddr, username=username, password="",
+        error1=error1, error2=error2, error3=error3)
 
 
 # Delete machines page
 @app.route('/delete', methods=['GET', 'POST'])
 @login_required
-def delete_vm():
-    docs = mongo.find({}).sort([["Hostname", pymongo.ASCENDING], ["IP Address", pymongo.ASCENDING]])
-    vms = [doc for doc in docs]
+def delete_machine():
+
+    machines = machines_cache.get()
+
+    if not machines:    # In case machine_list in memory is empty, retrieve data from database
+        docs = mongo.find({}, {'_id': 0}).sort(
+            [["Hostname", pymongo.ASCENDING], ["IP Address", pymongo.ASCENDING]]
+        )
+        if docs:
+            machines = machines_cache.convert_to_machine_list(docs)
 
     if request.method == 'POST':
         del_list_u = request.form.getlist('checkbox')
         del_list = map(str, del_list_u)
         if del_list:
-            app_manager.del_vm(del_list)
+            AppManager.del_machine(del_list)
             del_ip = ", ".join([ip for ip in del_list])
             flash('Deleted the machine with IP Address "%s" from both %s and the database' % (del_ip, login_file))
             app.logger.info("- DELETED - %s", del_ip)
             return redirect(url_for('show_top'))
         else:
             flash('Select machines to delete')
-            return render_template('delete_vm.html', ipaddr="", vms=vms)
 
-    elif request.method == 'GET':
-        return render_template('delete_vm.html', ipaddr="", vms=vms)
+    return render_template('delete_machine.html', ipaddr="", machines=machines)
 
 
 # SSH with butterfly application
@@ -183,10 +179,10 @@ def open_terminal():
     if request.method == 'POST':
         ipaddr = request.form['ipaddr']
         username = FileIO.get_username(ipaddr)
-        app_manager.kill_butterfly()
+        AppManager.kill_butterfly()
         # Check if the ip address is from AWS
         if Validation.is_aws(ipaddr):
-            pem_path, ssh_dir = app_manager.search_pem()
+            pem_path, ssh_dir = AppManager.search_pem()
             if pem_path:
                 subprocess.Popen([
                     "butterfly.server.py", "--unsecure", "--motd=/dev/null",
@@ -199,10 +195,8 @@ def open_terminal():
             subprocess.Popen([
                 "butterfly.server.py", "--unsecure", "--motd=/dev/null",
                 "--cmd=ssh %s@%s" % (username, ipaddr), "--one-shot"])
-        return redirect(url_for('show_top'))
 
-    elif request.method == 'GET':
-        return redirect(url_for('show_top'))
+    return redirect(url_for('show_top'))
 
 
 # Export JSON files
@@ -214,14 +208,14 @@ def export_json():
 
     if request.method == 'POST':
         filename = request.form['InputFilename']
-        result, json_dir = app_manager.export_json(filename, doc)
+        result, json_dir = AppManager.export_json(filename, doc)
         if result:
             flash('JSON file "%s" was successfully saved in %s/' % (filename, json_dir))
         else:
             flash('Failed to export the JSON file')
-        return redirect(url_for('show_top'))
-    elif request.method == 'GET':
-        return redirect(url_for('show_top'))
+
+    return redirect(url_for('show_top'))
+
 
 
 ######################## RESUful API ########################
@@ -274,7 +268,7 @@ def add_vm_api_01(ipaddr, username, password):
 
     # validation = all OK
     elif (not is_duplicate) and is_valid_ipaddr and is_valid_username and is_valid_password:
-        if app_manager.add_vm(ipaddr, username, password):
+        if AppManager.add_machine(ipaddr, username, password):
             app.logger.info("- ADDED - %s", ipaddr)
             return make_response(jsonify(result={'success': True}), 201)
     return make_response(jsonify(result={'success': False, 'reason': error_list}), 422)
@@ -322,7 +316,7 @@ def add_vm_api_02():
         # validation = all OK
         elif (not is_duplicate) and is_valid_ipaddr and is_valid_username and is_valid_password:
             errors.pop(ipaddr, None)
-            if app_manager.add_vm(ipaddr, username, password):
+            if AppManager.add_machine(ipaddr, username, password):
                 app.logger.info("- ADDED - %s", ipaddr)
                 continue
 
@@ -338,7 +332,7 @@ def add_vm_api_02():
 @app.route('/api/machines/delete/<ipaddresses>', methods=['DELETE'])
 def delete_vm_api_01(ipaddresses):
     del_list = filter(lambda x: FileIO.exists_in_file(x), ipaddresses.split(","))
-    del_result = app_manager.del_vm(del_list)
+    del_result = AppManager.del_machine(del_list)
     if del_result['ok'] == 1 and del_result['n'] > 0:
         del_ip_list = ", ".join([ip for ip in del_list])
         app.logger.info("- DELETED - %s", del_ip_list)
@@ -361,7 +355,7 @@ def delete_vm_api_02():
     # filter ip addresses which are not in text file
     del_list = filter(lambda x: FileIO.exists_in_file(x), del_list)
 
-    del_result = app_manager.del_vm(del_list)
+    del_result = AppManager.del_machine(del_list)
     if del_result['ok'] == 1 and del_result['n'] > 0:
         del_ip_list = ", ".join([ip for ip in del_list])
         app.logger.info("- DELETED - %s", del_ip_list)

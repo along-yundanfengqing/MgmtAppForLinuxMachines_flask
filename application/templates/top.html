@@ -31,32 +31,32 @@
         </div>
       </div>
       <div class="row text-center">      
-      {% if vms == [] %}
+      {% if machines == [] %}
         <br><br>
         <h4>Collecting data from machines and updating the database.... Please wait for a minute.</h4>
       {% else %}
-        {% for vm in vms %}
+        {% for machine in machines %}
           <div class="col-xs-4 col-sm-3 col-md-2">
-                {% if vm['OS'] == "Ubuntu" %}
-                  {% if vm['Fail_count'] < 2 %}
+                {% if machine.os_distribution == "Ubuntu" %}
+                  {% if machine.fail_count < 2 %}
                     <img class="img-responsive" src="{{ url_for('static', filename='images/ubuntu.png') }}", data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}">
                   {% else %}
                     <img class="img-responsive" src="{{ url_for('static', filename='images/ubuntu_unreachable.png') }}", data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}">
                   {% endif %}
-                {% elif vm['OS'] == "CentOS" %}
-                  {% if vm['Fail_count'] < 2 %}
+                {% elif machine.os_distribution == "CentOS" %}
+                  {% if machine.fail_count < 2 %}
                     <img class="img-responsive" src="{{ url_for('static', filename='images/centos.png') }}", data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}">
                   {% else %}
                     <img class="img-responsive" src="{{ url_for('static', filename='images/centos_unreachable.png') }}", data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}">
                   {% endif %}
-                {% elif vm['OS'] == "Debian" %}
-                  {% if vm['Fail_count'] < 2 %}
+                {% elif machine.os_distribution == "Debian" %}
+                  {% if machine.fail_count < 2 %}
                     <img class="img-responsive" src="{{ url_for('static', filename='images/debian.png') }}", data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}">
                   {% else %}
                     <img class="img-responsive" src="{{ url_for('static', filename='images/debian_unreachable.png') }}", data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}">
                   {% endif %}
-                {% elif vm['OS'] == "Redhat" %}
-                  {% if vm['Fail_count'] < 2 %}
+                {% elif machine.os_distribution == "Redhat" %}
+                  {% if machine.fail_count < 2 %}
                     <img class="img-responsive" src="{{ url_for('static', filename='images/redhat.png') }}", data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}">
                   {% else %}
                     <img class="img-responsive" src="{{ url_for('static', filename='images/redhat_unreachable.png') }}", data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}">
@@ -64,11 +64,11 @@
                 {% else %}
                     <img class="img-responsive" src="{{ url_for('static', filename='images/other.png') }}", data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}">
                 {% endif %}
-            <h4><a href="#" data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}">{{ vm['Hostname'] }} </a></h4>
-            {% if vm['AWS'] == True %}
-              <h5><a href="#" data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}">{{ vm['IP Address'] }} (AWS) </a></h5>
+            <h4><a href="#" data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}">{{ machine.hostname }} </a></h4>
+            {% if machine.aws == True %}
+              <h5><a href="#" data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}">{{ machine.ip_address }} (AWS) </a></h5>
             {% else %}
-              <h5><a href="#" data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}">{{ vm['IP Address'] }} </a></h5>
+              <h5><a href="#" data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}">{{ machine.ip_address }} </a></h5>
             {% endif %}
           </div>
         {% endfor %}
@@ -77,8 +77,8 @@
       <p>
       <div class="row">
         <div class="col-md-12">
-          <a class="btn btn-info" href="{{url_for('add_vm')}}" role="button">Register A New Machine</a>
-          <a class="btn btn-danger" href="{{url_for('delete_vm')}}" role="button">Delete Machines</a>
+          <a class="btn btn-info" href="{{url_for('add_machine')}}" role="button">Register A New Machine</a>
+          <a class="btn btn-danger" href="{{url_for('delete_machine')}}" role="button">Delete Machines</a>
         </div>
       </div>
 {% endif %}
@@ -86,70 +86,70 @@
 
     {% block modal %}
     <!-- Modal -->
-    <!-- For displaying each VM's information  -->
-    {% for vm in vms %}
+    <!-- For displaying each machine's information  -->
+    {% for machine in machines %}
      <div class="modal fade" id="myModal_machine_data{{loop.index}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h4 class="modal-title" id="myModalLabel">{{ vm['Hostname'] }}</h4>
+            <h4 class="modal-title" id="myModalLabel">{{ machine.hostname }}</h4>
           </div>
           <div class="modal-body">
               <div class="table-responsive">
-                {% set delta =  now - vm['Last Updated'] %}
+                {% set delta =  now - machine.last_updated %}
                 <div class ="text-right">Last Updated:</div>
-                <div class ="text-right">{{ vm['Last Updated'].strftime("%B %d, %Y / %I:%M:%S %p") }} ({{ delta.seconds }} seconds ago) </div>
+                <div class ="text-right">{{ machine.last_updated.strftime("%B %d, %Y / %I:%M:%S %p") }} ({{ delta.seconds }} seconds ago) </div>
                 <table class="table table-hover">
                   <tbody>
                     <th> Items </th>
                     <th> Parameters </th>
                     <tr>
                       <td>Status:</td>
-                      {% if vm['Status'] == 'OK' %}
+                      {% if machine.status == 'OK' %}
                         <td>
                           <img src="{{ url_for('static', filename='images/status_ok.png') }}">
-                          {{ vm['Status'] }}</td>
-                      {% elif vm['Status'] == 'Unreachable' %}
+                          {{ machine.status }}</td>
+                      {% elif machine.status == 'Unreachable' %}
                         <td>
                           <img src="{{ url_for('static', filename='images/status_unreachable.png') }}">
-                          {% if vm['Fail_count'] > 1 %}
-                            {{ vm['Status'] }} (SSH access failed {{ vm['Fail_count'] }} times)</td>
+                          {% if machine.fail_count > 1 %}
+                            {{ machine.status }} (SSH access failed {{ machine.fail_count }} times)</td>
                           {% else %}
-                            {{ vm['Status'] }} (SSH access failed {{ vm['Fail_count'] }} time)</td>
+                            {{ machine.status }} (SSH access failed {{ machine.fail_count }} time)</td>
                           {% endif %}
                       {% else %}
                         <td>
                           <img src="{{ url_for('static', filename='images/status_unknown.png') }}">
-                          {{ vm['Status'] }}</td>
+                          {{ machine.status }}</td>
                       {% endif %}
                     </tr>
                     <tr>
                       <td>OS Distribution:</td>
-                      <td>{{ vm['OS'] }}</td>
+                      <td>{{ machine.os_distribution }}</td>
                     </tr>
                     <tr>
                       <td>Release:</td>
-                      <td>{{ vm['Release'] }}</td>
+                      <td>{{ machine.release }}</td>
                     </tr>
                     <tr>
                       <td>IP Address:</td>
-                      <td>{{ vm['IP Address'] }}</td>
+                      <td>{{ machine.ip_address }}</td>
                     </tr>
                     <tr>
                       <td>MAC Address:</td>
-                      <td>{{ vm['MAC Address'] }}</td>
+                      <td>{{ machine.mac_address }}</td>
                     </tr>
                     <tr>
                       <td>Uptime:</td>
-                      <td>{{ vm['Uptime'] }}</td>
+                      <td>{{ machine.uptime }}</td>
                     </tr>
                     <tr>
                       <td>CPU Load Avg:</td>
                       <td>
-                        {% if vm['CPU Load Avg'] != "N.A" %}
-                          1 min: {{ vm['CPU Load Avg']['1min'] }}, 
-                          5 min: {{ vm['CPU Load Avg']['5min'] }}, 
-                          15 min: {{ vm['CPU Load Avg']['15min'] }} 
+                        {% if machine.cpu_load_avg != "N.A" %}
+                          1 min: {{ machine.cpu_load_avg['1min'] }},
+                          5 min: {{ machine.cpu_load_avg['5min'] }},
+                          15 min: {{ machine.cpu_load_avg['15min'] }}
                         {% else %}
                           N.A
                         {% endif %}
@@ -158,7 +158,7 @@
                     <tr>
                       <td>Memory Usage:</td>
                       <td>  
-                        {% if vm['Memory Usage'] != "N.A" and vm['Memory Usage']| length == 3 %}
+                        {% if machine.memory_usage != "N.A" and machine.memory_usage| length == 3 %}
                           <table class="table table-hover">
                             <tbody>
                               <th>  </th>
@@ -170,34 +170,34 @@
                               <th> cached </th>
                               <tr>
                                   <td> Mem: </td>
-                                  <td> {{ vm['Memory Usage']['Mem']['total'] }} </td>
-                                  <td> {{ vm['Memory Usage']['Mem']['used'] }} </td>
-                                  <td> {{ vm['Memory Usage']['Mem']['free'] }} </td>
-                                  <td> {{ vm['Memory Usage']['Mem']['shared'] }}</td>
-                                  <td> {{ vm['Memory Usage']['Mem']['buffers'] }} </td>
-                                  <td> {{ vm['Memory Usage']['Mem']['cached'] }} </td>
+                                  <td> {{ machine.memory_usage['Mem']['total'] }} </td>
+                                  <td> {{ machine.memory_usage['Mem']['used'] }} </td>
+                                  <td> {{ machine.memory_usage['Mem']['free'] }} </td>
+                                  <td> {{ machine.memory_usage['Mem']['shared'] }}</td>
+                                  <td> {{ machine.memory_usage['Mem']['buffers'] }} </td>
+                                  <td> {{ machine.memory_usage['Mem']['cached'] }} </td>
                               </tr>
                               <tr>
                                   <td> -/+ </td>
                                   <td> buffers/cache: </td>
-                                  <td> {{ vm['Memory Usage']['buffers/cache']['used'] }} </td>
-                                  <td> {{ vm['Memory Usage']['buffers/cache']['free'] }} </td>
+                                  <td> {{ machine.memory_usage['buffers/cache']['used'] }} </td>
+                                  <td> {{ machine.memory_usage['buffers/cache']['free'] }} </td>
                                   <td> </td>
                                   <td> </td>
                                   <td> </td>
                               </tr>
                               <tr>
                                   <td> Swap: </td>
-                                  <td> {{ vm['Memory Usage']['Swap']['total'] }} </td>
-                                  <td> {{ vm['Memory Usage']['Swap']['used'] }} </td>
-                                  <td> {{ vm['Memory Usage']['Swap']['free'] }} </td>
+                                  <td> {{ machine.memory_usage['Swap']['total'] }} </td>
+                                  <td> {{ machine.memory_usage['Swap']['used'] }} </td>
+                                  <td> {{ machine.memory_usage['Swap']['free'] }} </td>
                                   <td> </td>
                                   <td> </td>
                                   <td> </td>
                               </tr>
                             </tbody>
                           </table>
-                        {% elif vm['Memory Usage'] != "N.A" and vm['Memory Usage']| length == 2 %}
+                        {% elif machine.memory_usage != "N.A" and machine.memory_usage| length == 2 %}
                           <table class="table table-hover">
                             <tbody>
                               <th>  </th>
@@ -209,18 +209,18 @@
                               <th> available </th>
                               <tr>
                                   <td> Mem: </td>
-                                  <td> {{ vm['Memory Usage']['Mem']['total'] }} </td>
-                                  <td> {{ vm['Memory Usage']['Mem']['used'] }} </td>
-                                  <td> {{ vm['Memory Usage']['Mem']['free'] }} </td>
-                                  <td> {{ vm['Memory Usage']['Mem']['shared'] }}</td>
-                                  <td> {{ vm['Memory Usage']['Mem']['buff/cache'] }} </td>
-                                  <td> {{ vm['Memory Usage']['Mem']['available'] }} </td>
+                                  <td> {{ machine.memory_usage['Mem']['total'] }} </td>
+                                  <td> {{ machine.memory_usage['Mem']['used'] }} </td>
+                                  <td> {{ machine.memory_usage['Mem']['free'] }} </td>
+                                  <td> {{ machine.memory_usage['Mem']['shared'] }}</td>
+                                  <td> {{ machine.memory_usage['Mem']['buff/cache'] }} </td>
+                                  <td> {{ machine.memory_usage['Mem']['available'] }} </td>
                               </tr>
                               <tr>
                                   <td> Swap: </td>
-                                  <td> {{ vm['Memory Usage']['Swap']['total'] }} </td>
-                                  <td> {{ vm['Memory Usage']['Swap']['used'] }} </td>
-                                  <td> {{ vm['Memory Usage']['Swap']['free'] }} </td>
+                                  <td> {{ machine.memory_usage['Swap']['total'] }} </td>
+                                  <td> {{ machine.memory_usage['Swap']['used'] }} </td>
+                                  <td> {{ machine.memory_usage['Swap']['free'] }} </td>
                                   <td> </td>
                                   <td> </td>
                                   <td> </td>
@@ -235,7 +235,7 @@
                     <tr>
                       <td>Disk Usage:</td>
                       <td>  
-                        {% if vm['Disk Usage'] != "N.A" %}
+                        {% if machine.disk_usage != "N.A" %}
                           <table class="table table-hover">
                             <tbody>
                               <th> Filesystem </th>
@@ -244,7 +244,7 @@
                               <th> Avail </th>
                               <th> Use% </th>
                               <th> Mounted on </th>
-                                {% for row in vm['Disk Usage'] %}
+                                {% for row in machine.disk_usage %}
                               <tr>
                                   <td> {{ row['Filesystem'] }} </td>
                                   <td> {{ row['Size'] }} </td>
@@ -265,16 +265,16 @@
                 </table>    
               </div>
               <div class ="text-right">
-                {% if 'OK' in vm['Status'] and butterfly == 1 %}
+                {% if 'OK' in machine.status and butterfly == 1 %}
                   <form action="{{url_for('open_terminal')}}" method='POST'>
-                    <input type="hidden" name="ipaddr" value="{{ vm['IP Address'] }}">
+                    <input type="hidden" name="ipaddr" value="{{ machine.ip_address }}">
                     <button type="submit" class="btn btn-primary">Open Terminal via SSH</button>
                   </form>  
                 {% endif %}
               </div>
           </div>
           <div class="modal-footer">
-            {% if '#Unknown' not in vm['Hostname'] %}
+            {% if '#Unknown' not in machine.hostname %}
             <a class="btn btn-info" href="#" role="button" data-toggle="modal" data-target="#myModal_export_json{{loop.index}}" data-dismiss="modal">Export as JSON format</a>
             {% endif %}
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -286,7 +286,7 @@
 
 
     <!-- Second modal for exporting a JSON file  -->
-    {% for vm in vms %}
+    {% for machine in machines %}
      <div class="modal fade" id="myModal_export_json{{loop.index}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -297,8 +297,8 @@
             <form action="{{url_for('export_json')}}" method='POST'>
               <div class="form-group">
                 <label for="InputIPAddress">Enter a file name</label>
-                <input type="finename" class="form-control" name="InputFilename" placeholder="json file name" value="{{vm['Hostname']}}_{{ vm['Last Updated'].strftime('%m%d%Y_%H.%M.%S') }}.json">
-                <input type="hidden" name="ipaddr" value="{{ vm['IP Address'] }}">
+                <input type="finename" class="form-control" name="InputFilename" placeholder="json file name" value="{{machine.hostname}}_{{ machine.last_updated.strftime('%m%d%Y_%H.%M.%S') }}.json">
+                <input type="hidden" name="ipaddr" value="{{ machine.ip_address }}">
                 <p class="has-error">{{error1}}</p>
               </div>    
             <button type="submit" class="btn btn-primary">Export</button>

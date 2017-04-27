@@ -8,6 +8,7 @@ from logging.handlers import RotatingFileHandler
 
 # my modules
 from application.modules.db_manager import DBManager
+from application.modules.machines_cache import MachinesCache
 
 
 def set_logging():
@@ -36,5 +37,7 @@ set_logging()
 login_manager = LoginManager()
 login_manager.init_app(app)
 mongo = DBManager(app)
+machines_cache = MachinesCache()
 
 from application.modules import views
+

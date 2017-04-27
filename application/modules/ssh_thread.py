@@ -6,6 +6,7 @@ from pexpect import pxssh
 
 # my modules
 from application import app, mongo
+from application.modules.app_manager import AppManager
 from application.modules.file_io import FileIO
 
 
@@ -18,11 +19,13 @@ class SSHThread(threading.Thread):
     __CMD_MEMORY = "free -h"
     __CMD_DISK = "df -Ph"
 
+
     def __init__(self, ipaddr, username, password):
         threading.Thread.__init__(self, name="SSH_" + ipaddr)
         self.__ipaddr = ipaddr
         self.__username = username
         self.__password = password
+
 
     def run(self):
         s = pxssh.pxssh(timeout=30)
@@ -49,13 +52,12 @@ class SSHThread(threading.Thread):
             # If SSH access failed when the VM exists in both login.txt and DB,
             # mark the status as "Unreachable" and increment the failure count by 1
             if exists_in_file and exists_in_db:
-                mongo.update_one({'IP Address': self.__ipaddr}, {'$set': {'Status': 'Unreachable'}})
-                mongo.update_one({'IP Address': self.__ipaddr}, {'$inc': {'Fail_count': 1}})
+                AppManager.update_machine_obj_and_update_db_unreachable(self.__ipaddr)
 
-            # If the VM is in login.txt but not registerd in DB, mark it as Unknown with N.A parameters
+            # If the VM is in login.txt but not registered in DB, mark it as Unknown with N.A parameters
             # and register it in DB = In case users manually add to login.txt but SSH login to the VM fails
             elif exists_in_file and not exists_in_db:
-                mongo.write_unreachable(self.__ipaddr)
+                AppManager.create_machine_obj_and_write_db_unreachable(self.__ipaddr)
 
             return
 
@@ -94,7 +96,7 @@ class SSHThread(threading.Thread):
                 self.__ipaddr, hostname, mac, os_dist, release, uptime, cpu_load,
                 memory_usage, disk_usage
                 ]
-            mongo.write_ok(output_list)
+            AppManager.update_machine_obj_and_update_db_ok(output_list)
 
         except Exception as e:
             app.logger.critical("UNKNOWN ERROR OCCURED DURING THE SSH SESSION")
@@ -104,11 +106,13 @@ class SSHThread(threading.Thread):
         finally:
             s.logout()
 
+
     def __get_output(self, cmd, s):
         s.sendline(cmd)
         s.prompt()
         output = s.before
         return output
+
 
     def __get_os(self, output):
         if "Ubuntu" in output:
@@ -141,6 +145,7 @@ class SSHThread(threading.Thread):
                 release = "Unknown"
                 return os_dist, release
 
+
     def __get_mac(self, output, ipaddr):
         lines = output.splitlines()[1:]
         mac = ""
@@ -153,10 +158,12 @@ class SSHThread(threading.Thread):
             elif PATTERN in line:
                 return mac
 
+
     def __get_hostname(self, output):
         lines = output.splitlines()[1:]
         hostname = lines[0]
         return hostname
+
 
     def __get_uptime(self, output):
         lines = output.splitlines()[1:]
@@ -167,6 +174,7 @@ class SSHThread(threading.Thread):
             d, h = divmod(h, 24)
             break
         return "%dd %dh %dm %ds" % (d, h, m, s)
+
 
     def __get_cpu(self, output):
         cpu_load = {}
@@ -182,6 +190,7 @@ class SSHThread(threading.Thread):
         cpu_load['5min'] = cpu_2
         cpu_load['15min'] = cpu_3
         return cpu_load
+
 
     def __get_memory(self, output):
         memory_usage = {}
@@ -233,6 +242,7 @@ class SSHThread(threading.Thread):
                 else:
                     continue
         return memory_usage
+
 
     def __get_disk(self, output):
         disk_usage = []

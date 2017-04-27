@@ -17,6 +17,7 @@ class BackgroundThreadManager(object):
         th.daemon = True
         th.start()
 
+
     # repeat the background process
     @classmethod
     def __repeat_bg_thread(cls):
@@ -31,6 +32,7 @@ class BackgroundThreadManager(object):
             app.logger.critical("Stopping the program due to the unexpected error...")
             app.logger.critical(e.message)
             thread.interrupt_main()
+
 
     @classmethod
     def __start_ssh_threads(cls):
