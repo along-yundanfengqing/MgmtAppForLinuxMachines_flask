@@ -25,8 +25,7 @@
         <div class="col-xs-6 col-sm-6 col-md-6">
           <form action="{{url_for('show_login')}}" method='POST'>
             <div class="form-group" >
-              <label for="Username">Username</label>
-                {{ form.username(class_="form-control") }}
+                {{ form.username(class_="form-control", placeholder="Username") }}
                 {% if form.username.errors %}
                   {% for error in form.username.errors %}
                     <p id="username-error" class="has-error">{{ error }}</p>
@@ -34,8 +33,7 @@
                 {% endif %}
             </div>
             <div class="form-group">
-              <label for="Password">Password</label>
-              {{ form.password(class_="form-control") }}
+              {{ form.password(class_="form-control", placeholder="Password") }}
               {% if form.password.errors %}
                 {% for error in form.password.errors %}
                   <p id="password-error" class="has-error">{{ error }}</p>
