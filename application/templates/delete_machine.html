@@ -1,4 +1,7 @@
 {% extends "base.html" %}
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/custom-delete-page.css') }}">
+{% endblock %}
 {% block title %} Delete Machines {% endblock %}
 {% block logout_icon%}
       <div class="row">
@@ -30,23 +33,52 @@
       <div class="row">
         <div class="col-md-12">
           <p>Please select machines which you would like to delete from the list.</p>
-          <br>
-          <form action="{{url_for('delete_machine')}}" method='POST'>
-            <div class="form-group">
-              <label for="InputIPAddress">List of current machines</label>
-              {% for machine in machines %}
-                {% if machine.aws == True %}
-                  <p><input type="checkbox" name = "checkbox" value="{{ machine.ip_address}}">  {{machine.hostname}}: {{ machine.ip_address }} (AWS)</p>
-                {% else %}
-                  <p><input type="checkbox" name = "checkbox" value="{{ machine.ip_address}}">  {{machine.hostname}}: {{ machine.ip_address }}</p>
-                {% endif %}
-              {% endfor %}
-              <p>
-              <button type="submit" class="btn btn-primary">Delete</button>
+      <form action="{{url_for('delete_machine')}}" method='POST'>
+          <div class="row text-center">
+              <div class="form-group">
+                  {% for machine in machines %}
+                  <div class="col-xs-4 col-sm-3 col-md-2">
+                      <input type="checkbox" id="myCheckbox{{loop.index}}" name = "checkbox" value="{{ machine.ip_address}}"/>
+                      <label for="myCheckbox{{loop.index}}">
+                          {% if machine.os_distribution == "Ubuntu" %}
+                            <img class="img-responsive" src="{{ url_for('static', filename='images/ubuntu.png') }}">
+                          {% elif machine.os_distribution == "CentOS" %}
+                            <img class="img-responsive" src="{{ url_for('static', filename='images/centos.png') }}">
+                          {% elif machine.os_distribution == "Debian" %}
+                            <img class="img-responsive" src="{{ url_for('static', filename='images/debian.png') }}">
+                          {% elif machine.os_distribution == "Redhat" %}
+                            <img class="img-responsive" src="{{ url_for('static', filename='images/redhat.png') }}">
+                          {% else %}
+                            <img class="img-responsive" src="{{ url_for('static', filename='images/other.png') }}">
+                          {% endif %}
+                          <h4>{{ machine.hostname }}</h4>
+                          {% if machine.aws == True %}
+                            <h5>{{ machine.ip_address }} (AWS)</h5>
+                          {% else %}
+                            <h5>{{ machine.ip_address }}</h5>
+                          {% endif %}
+                      </label>
+                  </div>
+                {% endfor %}
+              </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+                <button type="submit" class="btn btn-primary">Delete</button>
             </div>
-          </form>
-        </div>
-      </div>
+          </div>
+      </form>
+
+
+
+
+
+
+
+
+
 {% endblock %}
+
   </body>
 </html>
