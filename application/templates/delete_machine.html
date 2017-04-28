@@ -30,9 +30,8 @@
           <h2> Delete Machines</h2>
         </div>
       </div>
-      <div class="row">
-        <div class="col-md-12">
-          <p>Please select machines which you would like to delete</p>
+
+      <p class="text-info">Please select machines to delete</p>
       <form action="{{url_for('delete_machine')}}" method='POST'>
           <div class="row text-center">
               <div class="form-group">
@@ -69,16 +68,6 @@
             </div>
           </div>
       </form>
-
-
-
-
-
-
-
-
-
 {% endblock %}
-
   </body>
 </html>
