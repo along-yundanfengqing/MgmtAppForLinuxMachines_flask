@@ -18,6 +18,7 @@ from application.modules.users import User
 butterfly = AppManager.check_butterfly()
 login_file = app.config['LOGIN_FILENAME']
 login_manager.login_view = "show_login"
+login_manager.login_message_category = 'error'
 
 # Start background thread
 BackgroundThreadManager.start()
@@ -39,11 +40,11 @@ def show_signup():
         username = form.username.data
         hash_password = User.hash_password(form.password.data)
         if mongo.db.users.find_one({"Username": username}):
-            flash('Username "%s" already exists in the database' % username)
+            flash('Username "%s" already exists in the database' % username, 'error')
         else:
             mongo.db.users.insert_one({"Username": username, "Password": hash_password})
             app.logger.warning("- ADDED ACCOUNT - %s", username)
-            flash("Created a user account (%s)" % username)
+            flash("Created a user account (%s)" % username, 'success')
             return redirect(url_for('show_login'))
 
     return render_template('signup.html', form=form)
@@ -67,9 +68,9 @@ def show_login():
         if user and User.validate_login(user['Password'], form.password.data):
             user_obj = User(user['Username'])
             login_user(user_obj, remember=form.remember_me.data)
-            flash('Logged in successfully as a user "%s"' % current_user.username)
+            flash('Logged in successfully as a user "%s"' % current_user.username, 'success')
             return redirect(url_for("show_top"))
-        flash("Username or password is not correct")
+        flash("Username or password is not correct", 'error')
 
     return render_template('login.html', form=form)
 
@@ -78,7 +79,7 @@ def show_login():
 @app.route('/logout')
 @login_required
 def logout():
-    flash('Logged out from a user "%s"' % current_user.username)
+    flash('Logged out from a user "%s"' % current_user.username, 'success')
     logout_user()
     return redirect(url_for('show_login'))
 
@@ -126,16 +127,16 @@ def add_machine(ipaddr="", username="", password="", error1="", error2="", error
         if not is_valid_password:
             error3 = "Please enter a valid passowrd"
         if is_duplicate:     # IP Address already exists in the login file
-            flash('The IP Address "%s" already exists in %s' % (ipaddr, login_file))
+            flash('The IP Address "%s" already exists in %s' % (ipaddr, login_file), 'error')
             ipaddr = username = password = error1 = error2 = error3 = ""
 
         # validation = all OK
         elif (not is_duplicate) and is_valid_ipaddr and is_valid_username and is_valid_password:
             if AppManager.add_machine(ipaddr, username, password):
-                flash('Added the new machine with IP Address "%s" to %s and to the database. It will be marked as "Unknown" until subsequent ssh access succeeds' % (ipaddr, login_file))
+                flash('Added the new machine with IP Address "%s" to %s and to the database. It will be marked as "Unknown" until subsequent ssh access succeeds' % (ipaddr, login_file), 'success')
                 app.logger.info("- ADDED - %s", ipaddr)
             else:
-                flash('Failed to added the new machine with IP Address "%s". ' % ipaddr)
+                flash('Failed to added the new machine with IP Address "%s". ' % ipaddr, 'error')
             return redirect(url_for('show_top'))
 
     return render_template(
@@ -163,11 +164,11 @@ def delete_machine():
         if del_list:
             AppManager.del_machine(del_list)
             del_ip = ", ".join([ip for ip in del_list])
-            flash('Deleted the machine with IP Address "%s" from both %s and the database' % (del_ip, login_file))
+            flash('Deleted the machine with IP Address "%s" from both %s and the database' % (del_ip, login_file), 'success')
             app.logger.info("- DELETED - %s", del_ip)
             return redirect(url_for('show_top'))
         else:
-            flash('Select machines to delete')
+            flash('Select machines to delete', 'error')
 
     return render_template('delete_machine.html', ipaddr="", machines=machines)
 
@@ -188,7 +189,7 @@ def open_terminal():
                     "butterfly.server.py", "--unsecure", "--motd=/dev/null",
                     "--cmd=ssh -i %s %s@%s" % (pem_path, username, ipaddr), "--one-shot"])
             else:
-                flash("SSH access to the AWS instance failed as the program couldn't locate .pem file in %s" % ssh_dir)
+                flash("SSH access to the AWS instance failed as the program couldn't locate .pem file in %s" % ssh_dir, 'error')
                 app.logger.warning("Unable to locate .pem file in ~/.ssh")
 
         else:   # if not AWS
@@ -210,9 +211,9 @@ def export_json():
         filename = request.form['InputFilename']
         result, json_dir = AppManager.export_json(filename, doc)
         if result:
-            flash('JSON file "%s" was successfully saved in %s/' % (filename, json_dir))
+            flash('JSON file "%s" was successfully saved in %s/' % (filename, json_dir), 'success')
         else:
-            flash('Failed to export the JSON file')
+            flash('Failed to export the JSON file', 'error')
 
     return redirect(url_for('show_top'))
 

@@ -14,17 +14,7 @@
 
 {% block content %}
 {% if current_user.is_authenticated %}
-      <div class="row">
-        <div class="col-md-12-flash">
-          {% with messages = get_flashed_messages() %}
-            {% if messages %}
-              {% for message in messages %}
-                {{ message }}
-              {% endfor %}
-            {% endif %}
-          {% endwith %}
-        </div>
-      </div>
+
       <div class="row">
         <div id="page-heading" class="col-md-12">
           <h2>Linux Machines</h2>

@@ -2,17 +2,7 @@
 {% block title %} Login {% endblock %}
 
 {% block content %}
-      <div class="row">
-        <div class="col-md-12-flash">
-          {% with messages = get_flashed_messages() %}
-            {% if messages %}
-              {% for message in messages %}
-                {{ message }}
-              {% endfor %}
-            {% endif %}
-          {% endwith %}
-        </div>
-      </div>
+
       <div class="row">
         <div class="col-xs-3 col-sm-3 col-md-3"></div>
         <div id="page-heading" class="col-xs-6 col-sm-6 col-md-6">
