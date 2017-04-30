@@ -3,13 +3,13 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    {% block meta %}{% endblock %}
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/custom.css') }}">
     {% block css %}{% endblock %}
     <title>{% block title %}{% endblock %}</title>
     <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.2.1.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    {% block javascript %}{% endblock %}
   </head>
 
 
@@ -24,7 +24,7 @@
           </div>
         <div class="col-xs-6 col-sm-6 col-md-6 text-right">
           <h1>Management Portal<br/>For Linux Machines</h1>
-          <h4>Version 2.2</h4>
+          <h4>Version 2.3</h4>
           {% block logout_icon %}
           {% endblock%}
         </div>

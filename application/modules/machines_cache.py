@@ -16,7 +16,9 @@ class MachinesCache(object):
 
         # return specified machine
         for machine in self.machine_obj_list:
-            if machine.ip_address == ip_address:
+            if Validation.is_valid_ipv4(ip_address) and machine.ip_address == ip_address:
+                return machine
+            elif machine.hostname == ip_address:
                 return machine
 
         return None
@@ -75,7 +77,7 @@ class MachinesCache(object):
         self.machine_obj_list.append(machine)
 
 
-    def convert_to_machine_list(self, docs):
+    def convert_docs_to_machine_list(self, docs):
         tmp_machine_list = []
         for doc in docs:
             machine = Machine(
@@ -96,6 +98,33 @@ class MachinesCache(object):
             tmp_machine_list.append(machine)
 
         return tmp_machine_list
+
+    def convert_machine_to_doc(self, ip_address=None):
+        if ip_address:
+            doc = {}
+            machine = self.get(ip_address)
+            doc['IP Address'] = machine.ip_address
+            doc['Last Updated'] = machine.last_updated
+            doc['Status'] = machine.status
+            doc['Fail_count'] = machine.fail_count
+            doc['Hostname'] = machine.hostname
+            doc['MAC Address'] = machine.mac_address
+            doc['OS'] = machine.os_distribution
+            doc['Release'] = machine.release
+            doc['Uptime'] = machine.uptime
+            doc['CPU Load Avg'] = machine.cpu_load_avg
+            doc['Memory Usage'] = machine.memory_usage
+            doc['Disk Usage'] = machine.disk_usage
+            doc['AWS'] = Validation.is_aws(machine.ip_address)
+
+            return doc
+
+        else:
+            docs = []
+            for machine in self.machine_obj_list:
+                docs.append(self.convert_machine_to_doc(machine.ip_address))
+
+            return docs
 
 
     def clear(self):    # Unused
