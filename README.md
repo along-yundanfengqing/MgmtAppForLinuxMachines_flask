@@ -43,6 +43,7 @@ All features are demonstrated with screenshots in the document.
 **Technology Stack**  
 - Python with Flask web framework
 - HTML/CSS + Twitter bootstrap
+- JavaScript/jQuery/Ajax
 - MongoDB, pymongo
 - Docker containers (Docker Engine + Docker Compose)
 - Bash shell script
