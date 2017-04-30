@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import pymongo
 import sys
-from datetime import datetime
 
 # my modules
 from application.modules.file_io import FileIO

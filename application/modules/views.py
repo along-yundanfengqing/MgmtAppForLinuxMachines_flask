@@ -95,9 +95,9 @@ def show_top():
             [["Hostname", pymongo.ASCENDING], ["IP Address", pymongo.ASCENDING]]
         )
         if docs:
-            machines = machines_cache.convert_to_machine_list(docs)
+            machines = machines_cache.convert_docs_to_machine_list(docs)
 
-    now = datetime.now()
+    now = datetime.utcnow()
     return render_template('top.html', current_user=current_user, machines=machines, now=now, butterfly=butterfly)
 
 
@@ -148,7 +148,6 @@ def add_machine(ipaddr="", username="", password="", error1="", error2="", error
 @app.route('/delete', methods=['GET', 'POST'])
 @login_required
 def delete_machine():
-
     machines = machines_cache.get()
 
     if not machines:    # In case machine_list in memory is empty, retrieve data from database
@@ -156,7 +155,7 @@ def delete_machine():
             [["Hostname", pymongo.ASCENDING], ["IP Address", pymongo.ASCENDING]]
         )
         if docs:
-            machines = machines_cache.convert_to_machine_list(docs)
+            machines = machines_cache.convert_docs_to_machine_list(docs)
 
     if request.method == 'POST':
         del_list_u = request.form.getlist('checkbox')
@@ -205,7 +204,10 @@ def open_terminal():
 @login_required
 def export_json():
     ipaddr = request.form['ipaddr']
-    doc = mongo.find_one({'IP Address': ipaddr}, {'_id': 0})
+    if machines_cache.get(ipaddr) in machines_cache.machine_obj_list:
+        doc = machines_cache.convert_machine_to_doc(ipaddr)
+    else:
+        doc = mongo.find_one({'IP Address': ipaddr}, {'_id': 0})
 
     if request.method == 'POST':
         filename = request.form['InputFilename']
@@ -223,9 +225,16 @@ def export_json():
 
 # Expose each machine's data via REST API
 # eg. curl -i http://localhost:5000/api/machines/vm01
+# eg. curl -i http://localhost:5000/api/machines/172.30.0.1
 @app.route('/api/machines/<hostname>', methods=['GET'])
 def show_json_host(hostname):
-    doc = mongo.find_one({'Hostname': hostname}, {'_id': 0})
+    if machines_cache.get(hostname) in machines_cache.machine_obj_list:
+        doc = machines_cache.convert_machine_to_doc(hostname)
+    else:
+        if Validation.is_valid_ipv4(hostname):
+            doc = mongo.find_one({'IP Address': hostname}, {'_id': 0})
+        else:
+            doc = mongo.find_one({'Hostname': hostname}, {'_id': 0})
     if doc:
         return jsonify(data=doc)
     abort(404)
@@ -236,9 +245,12 @@ def show_json_host(hostname):
 @app.route('/api/machines', methods=['GET'])
 @app.route('/api/machines/all', methods=['GET'])
 def show_json_all():
-    docs = mongo.find({}, {'_id': 0}).sort(
-            [["Hostname", pymongo.ASCENDING], ["IP Address", pymongo.ASCENDING]]
-            )
+    if machines_cache.get():
+        docs = machines_cache.convert_machine_to_doc()
+#    else:
+#        docs = mongo.find({}, {'_id': 0}).sort(
+#            [["Hostname", pymongo.ASCENDING], ["IP Address", pymongo.ASCENDING]]
+#            )
     # return all machines except Hostname = #Unknown
     if docs:
         return jsonify(data=[doc for doc in docs if doc['Hostname'] != '#Unknown'])
@@ -405,3 +417,4 @@ def bad_request(error):
 @app.errorhandler(405)
 def not_allowed(error):
     return make_response(jsonify(result={'error': error.description}), 405)
+
