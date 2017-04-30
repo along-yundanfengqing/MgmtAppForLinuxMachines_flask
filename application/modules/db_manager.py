@@ -99,30 +99,11 @@ class DBManager(object):
         doc['Memory Usage'] = memory_usage
         doc['Disk Usage'] = disk_usage
         doc['AWS'] = Validation.is_aws(ipaddr)
-        doc['Last Updated'] = datetime.now()
+        doc['Last Updated'] = last_updated
         # Unmark the old Hostname(#Unknown) entry if exists after SSH succeeds
         if self.find({'IP Address': ipaddr, 'Hostname': "#Unknown"}):
             self.delete_one({'IP Address': ipaddr, 'Hostname': "#Unknown"})
         self.update({'IP Address': ipaddr}, {'$set': doc}, upsert=True)
-
-
-    # When SSH fails to new machines which does not exist in DB
-    def write_status_unreachable(self, ipaddr):
-        doc = {}
-        doc['Status'] = "Unreachable"
-        doc['Fail_count'] = 1
-        doc['Hostname'] = "#Unknown"
-        doc['IP Address'] = ipaddr
-        doc['MAC Address'] = "N.A"
-        doc['OS'] = "N.A"
-        doc['Release'] = "N.A"
-        doc['Uptime'] = "N.A"
-        doc['CPU Load Avg'] = "N.A"
-        doc['Memory Usage'] = "N.A"
-        doc['Disk Usage'] = "N.A"
-        doc['AWS'] = Validation.is_aws(ipaddr)
-        doc['Last Updated'] = datetime.now()
-        self.update({'IP Address': ipaddr, 'Hostname': "#Unknown"}, {'$set': doc}, upsert=True)
 
 
     # When SSH fails to existing machines whose status was previously ok

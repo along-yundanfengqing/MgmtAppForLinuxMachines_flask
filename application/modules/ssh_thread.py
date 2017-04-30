@@ -57,7 +57,7 @@ class SSHThread(threading.Thread):
             # If the VM is in login.txt but not registered in DB, mark it as Unknown with N.A parameters
             # and register it in DB = In case users manually add to login.txt but SSH login to the VM fails
             elif exists_in_file and not exists_in_db:
-                AppManager.create_machine_obj_and_write_db_unreachable(self.__ipaddr)
+                AppManager.create_machine_obj_and_write_db_new(self.__ipaddr)
 
             return
 

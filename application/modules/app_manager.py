@@ -92,7 +92,7 @@ class AppManager(object):
     # create a machine object and write a new entry(status Unknoqn) to MongoDB
     @staticmethod
     def create_machine_obj_and_write_db_new(ipaddr):
-        created_time = datetime.now()
+        created_time = datetime.utcnow()
         machine = Machine(ipaddr, created_time)        # create a machine object
         mongo.write_new(ipaddr, created_time)          # Write to MongoDB
         machines_cache.add(machine)
@@ -101,23 +101,16 @@ class AppManager(object):
     # update a machine object and update db entry(status OK)
     @staticmethod
     def update_machine_obj_and_update_db_ok(machine_data):
-        last_updated = datetime.now()
+        last_updated = datetime.utcnow()
         machines_cache.update_ok(machine_data, last_updated)           # update machine object
         mongo.update_status_ok(machine_data, last_updated)     # Update MongoDB
 
 
     @staticmethod
     def update_machine_obj_and_update_db_unreachable(ipaddr):
-        last_updated = datetime.now()
+        last_updated = datetime.utcnow()
         machines_cache.update_unreachable(ipaddr, last_updated)         # update machine object(increment failure count)
         mongo.update_status_unreachable(ipaddr)
-
-
-    @staticmethod
-    def create_machine_obj_and_write_db_unreachable(ipaddr):
-        last_updated = datetime.now()
-        machines_cache.write_unreachable(ipaddr, last_updated)  # update machine object(increment failure count)
-        mongo.write_status_unreachable(ipaddr)
 
 
     @staticmethod
