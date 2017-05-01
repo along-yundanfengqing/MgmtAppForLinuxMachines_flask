@@ -17,7 +17,7 @@
                 {{ form.username(class_="form-control", placeholder="Username") }}
                 {% if form.username.errors %}
                   {% for error in form.username.errors %}
-                    <p id="username-error" class="has-error">{{ error }}</p>
+                    <p id="username-error" class="text-danger">{{ error }}</p>
                   {% endfor %}
                 {% endif %}
             </div>
@@ -26,7 +26,7 @@
                 {{ form.password(class_="form-control", placeholder="Password") }}
                 {% if form.password.errors %}
                   {% for error in form.password.errors %}
-                    <p id="password-error" class="has-error">{{ error }}</p>
+                    <p id="password-error" class="text-danger">{{ error }}</p>
                   {% endfor %}
                 {% endif %}
             </div>
@@ -35,7 +35,7 @@
                 {{ form.confirm(class_="form-control", placeholder="Confirm Password") }}
                 {% if form.confirm.errors %}
                   {% for error in form.confirm.errors %}
-                    <p id="confirm-error" class="has-error">{{ error }}</p>
+                    <p id="confirm-error" class="text-danger">{{ error }}</p>
                   {% endfor %}
                 {% endif %}
             </div>
