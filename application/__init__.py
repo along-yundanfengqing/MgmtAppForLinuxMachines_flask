@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 import logging
-from flask import Flask
 import pytz
+from flask import Flask
+from flask.ext.login import LoginManager
+from flask.ext.socketio import SocketIO, emit, join_room, disconnect
+from logging.handlers import RotatingFileHandler
 app = Flask(__name__)
 app.config.from_object('config')
-from flask.ext.login import LoginManager
-from logging.handlers import RotatingFileHandler
+socketio = SocketIO(app)
 
 # my modules
-from application.modules.db_manager import DBManager
-from application.modules.machines_cache import MachinesCache
+
+
 
 
 def datetimefilter(value, format="%B %d, %Y / %H:%M:%S"):
@@ -29,6 +31,8 @@ def datetimefilter2(value, format="%Y%m%d_%H.%M.%S"):
 def set_logging():
     logging_level = app.config['LOGGING_LEVEL']
     logging_level_werkzeug = app.config['LOGGING_LEVEL_WERKZEUG']
+    logging_level_socketio = app.config['LOGGING_LEVEL_SOCKETIO']
+    logging_level_engineio = app.config['LOGGING_LEVEL_ENGINEIO']
     logging_level_handler = app.config['LOGGING_LEVEL_HANDLER']
     logging_max_bytes = app.config['LOGGING_MAX_BYTES']
     log_format = "%(asctime)s [%(levelname)s] %(message)s"
@@ -42,17 +46,25 @@ def set_logging():
     app.logger.addHandler(error_log_handler)
 
     # werkzeug logs
-    log_werkzeug = logging.getLogger('werkzeug')
-    log_werkzeug.setLevel(logging_level_werkzeug)
-    log_werkzeug.addHandler(error_log_handler)
+    logging.getLogger('werkzeug').setLevel(logging_level_werkzeug)
+    logging.getLogger('werkzeug').addHandler(error_log_handler)
+
+    # SocketIO logging
+    logging.getLogger('socketio').setLevel(logging_level_socketio)
+    logging.getLogger('engineio').setLevel(logging_level_engineio)
+    logging.getLogger('socketio').addHandler(error_log_handler)
+    logging.getLogger('engineio').addHandler(error_log_handler)
+
 
 # STARTING THE PROGRAM
 print("Starting the program...\n")
 set_logging()
-login_manager = LoginManager()
-login_manager.init_app(app)
-mongo = DBManager(app)
+login_manager = LoginManager(app)
+from application.modules.machines_cache import MachinesCache
 machines_cache = MachinesCache()
+from application.modules.db_manager import DBManager
+mongo = DBManager(app)
+
 app.jinja_env.filters['datetimefilter'] = datetimefilter
 app.jinja_env.filters['datetimefilter2'] = datetimefilter2
 

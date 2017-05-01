@@ -7,7 +7,7 @@ import signal
 from datetime import datetime
 
 # my modules
-from application import app, mongo, machines_cache
+from application import app, mongo, machines_cache, socketio
 from application.modules.file_io import FileIO
 from application.modules.machines import Machine
 
@@ -89,13 +89,14 @@ class AppManager(object):
             app.logger.warning("...Not Installed")
             return False
 
-    # create a machine object and write a new entry(status Unknoqn) to MongoDB
+    # create a machine object and write a new entry(status Unknown) to MongoDB
     @staticmethod
     def create_machine_obj_and_write_db_new(ipaddr):
         created_time = datetime.utcnow()
         machine = Machine(ipaddr, created_time)        # create a machine object
         mongo.write_new(ipaddr, created_time)          # Write to MongoDB
         machines_cache.add(machine)
+        socketio.emit('message', {'data': 'created'})
 
 
     # update a machine object and update db entry(status OK)

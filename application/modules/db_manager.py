@@ -3,6 +3,7 @@ import pymongo
 import sys
 
 # my modules
+from application import machines_cache
 from application.modules.file_io import FileIO
 from application.modules.validation import Validation
 
@@ -111,13 +112,14 @@ class DBManager(object):
         self.update_one({'IP Address': ipaddr}, {'$inc': {'Fail_count': 1}})
 
 
+    # Check mismatch between login.txt and database
     def check_mismatch(self):
         docs = self.find({}, {'_id': 0, 'IP Address': 1, 'Hostname': 1})
         for doc in docs:
             ipaddr = doc['IP Address']
-            if FileIO.exists_in_file(ipaddr):
-                continue
-            else:
+            if not FileIO.exists_in_file(ipaddr):
                 self.delete_one({'IP Address': ipaddr})
+                machines_cache.delete(ipaddr)
+
 
 

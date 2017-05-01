@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from application import socketio
 from application.modules.validation import Validation
 from application.modules.machines import Machine
 
@@ -29,10 +30,14 @@ class MachinesCache(object):
 
 
     def delete(self, delete_ip_list):
+        if type(delete_ip_list) != list:
+            delete_ip_list = [delete_ip_list]
+
         for ip in delete_ip_list:
             for machine in self.machine_obj_list:
                 if machine.ip_address == ip:
                     self.machine_obj_list.remove(machine)
+                    socketio.emit('message', {'data': 'deleted', "ip_address": machine.ip_address})
 
 
     def update_ok(self, machine_data, last_updated):
@@ -61,6 +66,7 @@ class MachinesCache(object):
         machine = Machine(ip_address, last_updated, 'OK', 0, hostname, mac_address, os_distribution,
                           release, uptime, cpu_load_avg, memory_usage, disk_usage)
         self.machine_obj_list.append(machine)
+        socketio.emit('message', {'data': 'created'})
 
 
     def update_unreachable(self, ip_address, last_updated):
@@ -75,6 +81,7 @@ class MachinesCache(object):
         # machine does not exist in machine_list
         machine = Machine(ip_address, last_updated, 'Unreachable', 1)
         self.machine_obj_list.append(machine)
+        socketio.emit('message', {'data': 'created'})
 
 
     def convert_docs_to_machine_list(self, docs):
