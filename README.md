@@ -63,12 +63,13 @@ Following python modules are required.
 - flask-socketio
 - pymongo
 - pexpect
+- eventlet
 - butterfly (Optional)
 
 To install:
 
 ```
-$ sudo pip install flask flask-login flask-wtf flask-socketio pymongo pexpect butterfly
+$ sudo pip install flask flask-login flask-wtf flask-socketio pymongo pexpect eventlet butterfly
 ```
 
 > [Butterfly](https://github.com/paradoxxxzero/butterfly) is an xterm compatible external terminal application that runs in your browser.  
