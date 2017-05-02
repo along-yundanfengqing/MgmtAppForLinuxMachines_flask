@@ -1,12 +1,14 @@
-var socket = io.connect('http://localhost:5000');
-
 $(function () {
+    var socket = io.connect('http://localhost:5000');
+
     socket.on('connect', function() {
         socket.emit('message', {data: 'connected'});
     });
-});
 
-$(function () {
+    socket.on('disconnect', function() {
+        socket.emit('message', {data: 'disconnected'});
+    });
+
     socket.on('message', function(msg){
         if (msg.data === "started") {
             $('#status-message').html('<img src="/static/images/ajax-loader.gif"><span class="text-success"> Collecting machine data...</span>');
@@ -17,7 +19,7 @@ $(function () {
                 $('#status-message').text("");
             }, 2000);
         }
-        else if (msg.data === "created" || msg.data == "updated") {
+        else if (msg.data === "created" || msg.data === "updated") {
             location.reload();
         }
         else if (msg.data === "deleted") {
@@ -37,4 +39,3 @@ $(function () {
         }
     });
 });
-

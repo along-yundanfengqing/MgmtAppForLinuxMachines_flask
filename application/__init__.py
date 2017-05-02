@@ -1,17 +1,14 @@
 # -*- coding: utf-8 -*-
+import eventlet
 import logging
 import pytz
 from flask import Flask
-from flask.ext.login import LoginManager
-from flask.ext.socketio import SocketIO, emit, join_room, disconnect
+from flask_socketio import SocketIO
+from flask_login import LoginManager
 from logging.handlers import RotatingFileHandler
 app = Flask(__name__)
 app.config.from_object('config')
 socketio = SocketIO(app)
-
-# my modules
-
-
 
 
 def datetimefilter(value, format="%B %d, %Y / %H:%M:%S"):
@@ -59,6 +56,7 @@ def set_logging():
 # STARTING THE PROGRAM
 print("Starting the program...\n")
 set_logging()
+eventlet.monkey_patch()
 login_manager = LoginManager(app)
 from application.modules.machines_cache import MachinesCache
 machines_cache = MachinesCache()

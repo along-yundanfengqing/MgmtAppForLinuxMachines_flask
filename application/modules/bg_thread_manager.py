@@ -36,6 +36,7 @@ class BackgroundThreadManager(object):
     @classmethod
     def __start_ssh_threads(cls):
         socketio.emit('message', {'data': 'started'})
+        app.logger.debug("Sent SocketIO message: started")
         app.logger.info("Started collecting data via SSH")
         # Check status mismatches between login.txt and DB.
         # Delete entry in DB if the ip is not in login.txt (= Deleted manually by user)
@@ -56,6 +57,7 @@ class BackgroundThreadManager(object):
                 th.join()
 
             socketio.emit('message', {'data': 'completed'})
+            app.logger.debug("Sent SocketIO message: completed")
             app.logger.info("Completed collecting data and updated the database")
         else:   # no entry found in login.txt
             return

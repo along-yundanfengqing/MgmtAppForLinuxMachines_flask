@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from application import socketio
+from application import socketio, app
 from application.modules.validation import Validation
 from application.modules.machines import Machine
 
@@ -28,6 +28,7 @@ class MachinesCache(object):
     def add(self, machine):
         self.machine_obj_list.append(machine)
         socketio.emit('message', {'data': 'created'})
+        app.logger.debug("Sent SocketIO message: created")
 
 
     def delete(self, delete_ip_list):
@@ -39,6 +40,7 @@ class MachinesCache(object):
                 if machine.ip_address == ip:
                     self.machine_obj_list.remove(machine)
                     socketio.emit('message', {'data': 'deleted', "ip_address": machine.ip_address})
+                    app.logger.debug("Sent SocketIO message: deleted " + machine.ip_address)
 
 
     def update_ok(self, machine_data, last_updated):
@@ -64,6 +66,7 @@ class MachinesCache(object):
                     self.machine_obj_list[index] = machine      # update machine_list
                     if ("Unknown" in old_status or "Unreachable" in old_status):
                         socketio.emit('message', {'data': 'updated'})
+                        app.logger.debug("Sent SocketIO message: updated")
                     return
 
         # machine does not exist in machine_list
@@ -71,6 +74,7 @@ class MachinesCache(object):
                           release, uptime, cpu_load_avg, memory_usage, disk_usage)
         self.machine_obj_list.append(machine)
         socketio.emit('message', {'data': 'created'})
+        app.logger.debug("Sent SocketIO message: created")
 
 
     def update_unreachable(self, ip_address, last_updated):
@@ -81,6 +85,7 @@ class MachinesCache(object):
                     machine.fail_count += 1
                     if (machine.hostname != "#Unknown" and machine.fail_count > 1):
                         socketio.emit('message', {'data': 'unreachable', 'ip_address': machine.ip_address})
+                        app.logger.debug("Sent SocketIO message: unreachable " + machine.ip_address)
                     self.machine_obj_list[index] = machine  # update machine_list
                     return
 
@@ -88,6 +93,7 @@ class MachinesCache(object):
         machine = Machine(ip_address, last_updated, 'Unreachable', 1)
         self.machine_obj_list.append(machine)
         socketio.emit('message', {'data': 'created'})
+        app.logger.debug("Sent SocketIO message: created")
 
 
     def convert_docs_to_machine_list(self, docs):

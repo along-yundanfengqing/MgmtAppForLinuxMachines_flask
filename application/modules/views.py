@@ -3,16 +3,16 @@ import pymongo
 import subprocess
 from datetime import datetime
 from flask import abort, flash, jsonify, make_response, redirect, render_template, request, url_for
-from flask.ext.login import login_user, logout_user, login_required, current_user
+from flask_login import login_user, logout_user, login_required, current_user
 
 # my modules
-from application import app, login_manager, mongo, machines_cache, socketio
+from application import app, login_manager, mongo, machines_cache
 from application.modules.app_manager import AppManager
 from application.modules.bg_thread_manager import BackgroundThreadManager
 from application.modules.file_io import FileIO
 from application.modules.form import LoginForm, SignupForm
-from application.modules.validation import Validation
 from application.modules.users import User
+from application.modules.validation import Validation
 
 
 butterfly = AppManager.check_butterfly()
@@ -22,11 +22,6 @@ login_manager.login_message_category = 'error'
 
 # Start background thread
 BackgroundThreadManager.start()
-
-
-@socketio.on('message')
-def handle_message(message):
-    app.logger.debug("Received SocketIO message: " + message['data'])
 
 
 @login_manager.user_loader
