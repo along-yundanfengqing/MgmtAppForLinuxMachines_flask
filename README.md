@@ -45,6 +45,7 @@ All features are demonstrated with screenshots in the document.
 - HTML/CSS + Twitter bootstrap
 - JavaScript/jQuery/Ajax
 - MongoDB, pymongo
+- SocketIO
 - Docker containers (Docker Engine + Docker Compose)
 - Bash shell script
 - Selenium WebDriver/TestNG/Rest-Assured (Test automatinon in Java)
@@ -59,6 +60,7 @@ Following python modules are required.
 - flask
 - flask-login
 - flask-wtf
+- flask-socketio
 - pymongo
 - pexpect
 - butterfly (Optional)
@@ -66,7 +68,7 @@ Following python modules are required.
 To install:
 
 ```
-$ sudo pip install flask flask-login flask-wtf pymongo pexpect butterfly
+$ sudo pip install flask flask-login flask-wtf flask-socketio pymongo pexpect butterfly
 ```
 
 > [Butterfly](https://github.com/paradoxxxzero/butterfly) is an xterm compatible external terminal application that runs in your browser.  
