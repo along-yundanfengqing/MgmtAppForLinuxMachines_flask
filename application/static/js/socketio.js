@@ -17,7 +17,7 @@ $(function () {
                 $('#status-message').text("");
             }, 2000);
         }
-        else if (msg.data === "created") {
+        else if (msg.data === "created" || msg.data == "updated") {
             location.reload();
         }
         else if (msg.data === "deleted") {
@@ -28,6 +28,12 @@ $(function () {
             $('div[id=' + '"machine-' + msg.ip_address + '"]').remove();
             $(modal01ID).remove();
             $(modal02ID).remove();
+        }
+        else if (msg.data === "unreachable") {
+            var imgName = $('img[id="machine-img' + msg.ip_address + '"]').attr('src');
+            if (! imgName.includes("unreachable.png")) {
+                $('img[id="machine-img' + msg.ip_address + '"]').attr('src', imgName.replace(".png", "_unreachable.png"));
+            }
         }
     });
 });

@@ -7,7 +7,7 @@ import signal
 from datetime import datetime
 
 # my modules
-from application import app, mongo, machines_cache, socketio
+from application import app, mongo, machines_cache
 from application.modules.file_io import FileIO
 from application.modules.machines import Machine
 
@@ -96,7 +96,6 @@ class AppManager(object):
         machine = Machine(ipaddr, created_time)        # create a machine object
         mongo.write_new(ipaddr, created_time)          # Write to MongoDB
         machines_cache.add(machine)
-        socketio.emit('message', {'data': 'created'})
 
 
     # update a machine object and update db entry(status OK)
