@@ -73,9 +73,11 @@ $(function refreshModal() {
 
             else if(machine['Status'] === 'Unreachable'){
               thisModal.find('#basic' + index + ' tbody tr:nth-child(2) td:nth-child(2)').html('<img src="/static/images/status_unreachable.png"> Unreachable (SSH access failed ' + machine['Fail_count'] + ' times)');
+              thisModal.find('form button').remove();
             }
             else{
               thisModal.find('#basic' + index + ' tbody tr:nth-child(2) td:nth-child(2)').html('<img src="/static/images/status_unknown.png"> Unknown (Waiting for the first SSH access)');
+              thisModal.find('form button').remove();
             }
 
         }
