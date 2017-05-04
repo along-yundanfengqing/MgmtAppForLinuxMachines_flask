@@ -1,4 +1,4 @@
-$(function refreshModal() {
+$(function () {
   $('img[id^=machine-img], a[id^=machine-hostname], a[id^=machine-ip]').on('click', function(){
     var ipAddress = $(this).parent().find('a[id^=machine-ip]').text();
     var index = $(this).attr("data-target").replace("#myModal_machine_data", "");
