@@ -25,7 +25,11 @@
           <div class="row text-center">
               <div class="form-group">
                   {% for machine in machines %}
+                  {% if machines | length > 15 %}
+                  <div class="col-xs-3 col-sm-2 col-md-1">
+                  {% else %}
                   <div class="col-xs-4 col-sm-3 col-md-2">
+                  {% endif %}
                       <input type="checkbox" id="myCheckbox{{loop.index}}" name = "checkbox" value="{{ machine.ip_address}}"/>
                       <label for="myCheckbox{{loop.index}}">
                           {% if machine.os_distribution == "Ubuntu" %}

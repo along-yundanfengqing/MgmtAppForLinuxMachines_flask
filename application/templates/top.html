@@ -31,7 +31,11 @@
         <h4>Collecting data from machines and updating the database.... Please wait for a minute.</h4>
       {% else %}
         {% for machine in machines %}
+          {% if machines | length > 15 %}
+          <div class="col-xs-3 col-sm-2 col-md-1" id="machine-{{ machine.ip_address }}">
+          {% else %}
           <div class="col-xs-4 col-sm-3 col-md-2" id="machine-{{ machine.ip_address }}">
+          {% endif %}
                 {% if machine.os_distribution == "Ubuntu" %}
                   {% if machine.fail_count < 2 %}
                     <img id="machine-img-{{ machine.ip_address }}" class="img-responsive" src="{{ url_for('static', filename='images/ubuntu.png') }}" data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}">
