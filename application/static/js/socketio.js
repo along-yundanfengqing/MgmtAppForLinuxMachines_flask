@@ -23,7 +23,7 @@ $(function () {
             location.reload();
         }
         else if (msg.data === "deleted") {
-            var modal01ID = $('img[id="machine-img' + msg.ip_address + '"]').attr('data-target');
+            var modal01ID = $('img[id="machine-img-' + msg.ip_address + '"]').attr('data-target');
             var modal02ID = $(modal01ID).find('.modal-footer a').attr('data-target');
             var numOfMachines = parseInt($('.badge').text());
             $('.badge').text(numOfMachines - 1);
@@ -32,9 +32,9 @@ $(function () {
             $(modal02ID).remove();
         }
         else if (msg.data === "unreachable") {
-            var imgName = $('img[id="machine-img' + msg.ip_address + '"]').attr('src');
+            var imgName = $('img[id="machine-img-' + msg.ip_address + '"]').attr('src');
             if (! imgName.includes("unreachable.png")) {
-                $('img[id="machine-img' + msg.ip_address + '"]').attr('src', imgName.replace(".png", "_unreachable.png"));
+                $('img[id="machine-img-' + msg.ip_address + '"]').attr('src', imgName.replace(".png", "_unreachable.png"));
             }
         }
     });
