@@ -13,7 +13,7 @@
       <div class="row">
         <div class="col-xs-3 col-sm-3 col-md-3"></div>
         <div class="col-xs-6 col-sm-6 col-md-6">
-          <form action="{{url_for('show_login')}}" method='POST'>
+          <form action="{{url_for('view.show_login')}}" method='POST'>
             <div class="form-group" >
                 {{ form.username(class_="form-control", placeholder="Username") }}
                 {% if form.username.errors %}
@@ -35,7 +35,7 @@
             </div>
 
             <button type="submit" class="btn btn-primary">Login</button>
-            <a class="btn btn-link" href="{{url_for('show_signup')}}" role="button">or create a new account?</a>
+            <a class="btn btn-link" href="{{url_for('view.show_signup')}}" role="button">or create a new account?</a>
           </form>
         </div>
         <div class="col-xs-3 col-sm-3 col-md-3"></div>

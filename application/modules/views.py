@@ -2,26 +2,28 @@
 import pymongo
 import subprocess
 from datetime import datetime
-from flask import abort, flash, jsonify, make_response, redirect, render_template, request, url_for
-from flask_login import login_user, logout_user, login_required, current_user
+from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 
 # my modules
-from application import app, login_manager, mongo, machines_cache
+from application import app
 from application.modules.app_manager import AppManager
-from application.modules.bg_thread_manager import BackgroundThreadManager
+from application.modules.db_manager import DBManager
 from application.modules.file_io import FileIO
 from application.modules.form import LoginForm, SignupForm
 from application.modules.users import User
 from application.modules.validation import Validation
+from application.modules.machines_cache import MachinesCache
 
 
+view = Blueprint('view', __name__)
+machines_cache = MachinesCache.get_current_instance()
+mongo = DBManager.get_current_instance()
 butterfly = AppManager.is_butterfly_installed()
 login_file = app.config['LOGIN_FILENAME']
-login_manager.login_view = "show_login"
+login_manager = LoginManager(app)
+login_manager.login_view = "view.show_login"
 login_manager.login_message_category = 'error'
-
-# Start background thread
-BackgroundThreadManager.start()
 
 
 @login_manager.user_loader
@@ -33,7 +35,7 @@ def load_user(username):
 
 
 # signup page
-@app.route('/signup', methods=['GET', 'POST'])
+@view.route('/signup', methods=['GET', 'POST'])
 def show_signup():
     form = SignupForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -45,22 +47,22 @@ def show_signup():
             mongo.db.users.insert_one({"Username": username, "Password": hash_password})
             app.logger.warning("- ADDED ACCOUNT - %s", username)
             flash("Created a user account (%s)" % username, 'success')
-            return redirect(url_for('show_login'))
+            return redirect(url_for('view.show_login'))
 
     return render_template('signup.html', form=form)
 
 
 # root
-@app.route('/', methods=['GET', 'POST'])
+@view.route('/', methods=['GET', 'POST'])
 def root():
     if current_user:
-        return redirect(url_for('show_top'))
+        return redirect(url_for('view.show_top'))
 
-    return redirect(url_for('show_login'))
+    return redirect(url_for('view.show_login'))
 
 
 # login page
-@app.route('/login', methods=['GET', 'POST'])
+@view.route('/login', methods=['GET', 'POST'])
 def show_login():
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -69,23 +71,23 @@ def show_login():
             user_obj = User(user['Username'])
             login_user(user_obj, remember=form.remember_me.data)
             flash('Logged in successfully as a user "%s"' % current_user.username, 'success')
-            return redirect(url_for("show_top"))
+            return redirect(url_for("view.show_top"))
         flash("Username or password is not correct", 'error')
 
     return render_template('login.html', form=form)
 
 
 # logout
-@app.route('/logout')
+@view.route('/logout')
 @login_required
 def logout():
     flash('Logged out from a user "%s"' % current_user.username, 'success')
     logout_user()
-    return redirect(url_for('show_login'))
+    return redirect(url_for('view.show_login'))
 
 
 # Top page
-@app.route('/top')
+@view.route('/top')
 @login_required
 def show_top():
     machines = machines_cache.get()
@@ -102,7 +104,7 @@ def show_top():
 
 
 # Register a new machine page
-@app.route('/register', methods=['GET', 'POST'])
+@view.route('/register', methods=['GET', 'POST'])
 @login_required
 def add_machine(ipaddr="", username="", password="", error1="", error2="", error3=""):
     if request.method == 'POST':
@@ -137,7 +139,7 @@ def add_machine(ipaddr="", username="", password="", error1="", error2="", error
                 app.logger.info("- ADDED - %s", ipaddr)
             else:
                 flash('Failed to added the new machine with IP Address "%s". ' % ipaddr, 'error')
-            return redirect(url_for('show_top'))
+            return redirect(url_for('view.show_top'))
 
     return render_template(
         'add_machine.html', ipaddr=ipaddr, username=username, password="",
@@ -145,7 +147,7 @@ def add_machine(ipaddr="", username="", password="", error1="", error2="", error
 
 
 # Delete machines page
-@app.route('/delete', methods=['GET', 'POST'])
+@view.route('/delete', methods=['GET', 'POST'])
 @login_required
 def delete_machine():
     machines = machines_cache.get()
@@ -165,7 +167,7 @@ def delete_machine():
             del_ip = ", ".join([ip for ip in del_list])
             flash('Deleted the machine with IP Address "%s" from both %s and the database' % (del_ip, login_file), 'success')
             app.logger.info("- DELETED - %s", del_ip)
-            return redirect(url_for('show_top'))
+            return redirect(url_for('view.show_top'))
         else:
             flash('Select machines to delete', 'error')
 
@@ -173,7 +175,7 @@ def delete_machine():
 
 
 # SSH with butterfly application
-@app.route('/terminal', methods=['GET', 'POST'])
+@view.route('/terminal', methods=['GET', 'POST'])
 @login_required
 def open_terminal():
     if request.method == 'POST':
@@ -196,11 +198,11 @@ def open_terminal():
                 "butterfly.server.py", "--unsecure", "--motd=/dev/null",
                 "--cmd=ssh %s@%s" % (username, ipaddr), "--one-shot"])
 
-    return redirect(url_for('show_top'))
+    return redirect(url_for('view.show_top'))
 
 
 # Export JSON files
-@app.route('/export_json', methods=['GET', 'POST'])
+@view.route('/export_json', methods=['GET', 'POST'])
 @login_required
 def export_json():
     ipaddr = request.form['ipaddr']
@@ -217,203 +219,5 @@ def export_json():
         else:
             flash('Failed to export the JSON file', 'error')
 
-    return redirect(url_for('show_top'))
+    return redirect(url_for('view.show_top'))
 
-
-
-######################## RESUful API ########################
-
-# Expose each machine's data via REST API
-# eg. curl -i http://localhost:5000/api/machines/vm01
-# eg. curl -i http://localhost:5000/api/machines/172.30.0.1
-@app.route('/api/machines/<hostname>', methods=['GET'])
-def show_json_host(hostname):
-    if machines_cache.get(hostname) in machines_cache.machine_obj_list:
-        doc = machines_cache.convert_machine_to_doc(hostname)
-    else:
-        if Validation.is_valid_ipv4(hostname):
-            doc = mongo.find_one({'IP Address': hostname}, {'_id': 0})
-        else:
-            doc = mongo.find_one({'Hostname': hostname}, {'_id': 0})
-    if doc:
-        return jsonify(data=doc)
-    abort(404)
-
-
-# Expose all machines' data via REST API
-# eg. curl -i http://localhost:5000/api/machines/all
-@app.route('/api/machines', methods=['GET'])
-@app.route('/api/machines/all', methods=['GET'])
-def show_json_all():
-    if machines_cache.get():
-        docs = machines_cache.convert_machine_to_doc()
-#    else:
-#        docs = mongo.find({}, {'_id': 0}).sort(
-#            [["Hostname", pymongo.ASCENDING], ["IP Address", pymongo.ASCENDING]]
-#            )
-    # return all machines except Hostname = #Unknown
-    if docs:
-        return jsonify(data=[doc for doc in docs if doc['Hostname'] != '#Unknown'])
-    abort(404)
-
-
-# Add machines via RESTful API
-# eg. curl -H "Content-Type: application/json" -X "POST" http://localhost:5000/api/machines/add/1.1.1.1:ubuntu
-@app.route('/api/machines/add/<ipaddr>:<username>', defaults={'password': None}, methods=['POST'])
-@app.route('/api/machines/add/<ipaddr>:<username>:<password>', methods=['POST'])
-def add_vm_api_01(ipaddr, username, password):
-    error_list = []
-
-    # validate ip address format and duplication check
-    is_duplicate = FileIO.exists_in_file(ipaddr)
-    is_valid_ipaddr = Validation.is_valid_ipv4(ipaddr)
-    is_valid_username = Validation.is_valid_username(username)
-    is_valid_password = Validation.is_valid_password(password)
-
-    if not is_valid_ipaddr:
-        error_list.append("invalid ip address")
-    if not is_valid_username:
-        error_list.append("invalid username")
-    if not is_valid_password:
-        error_list.append("invalid password")
-    if is_duplicate:     # IP Address already exists in the login file
-        error_list.append("ip duplicate")
-
-    # validation = all OK
-    elif (not is_duplicate) and is_valid_ipaddr and is_valid_username and is_valid_password:
-        if AppManager.add_machine(ipaddr, username, password):
-            app.logger.info("- ADDED - %s", ipaddr)
-            return make_response(jsonify(result={'success': True}), 201)
-    return make_response(jsonify(result={'success': False, 'reason': error_list}), 422)
-
-
-# Add machines via RESTful API (by using -d option)
-## eg. curl -H "Content-Type: application/json" -X "POST" http://localhost:5000/api/machines/add -d '[{"IP Address": "1.1.1.1", "Username": "ubuntu", "Password": "test"}, {"IP Address": "2.2.2.2", "Username": "ubuntu"}]'
-@app.route('/api/machines/add', methods=['POST'])
-def add_vm_api_02():
-    if not request.get_json():
-        abort(400)
-
-    add_machines = request.get_json()
-    if type(add_machines) != list:
-        add_machines = [add_machines]
-
-    errors = {}
-    all_success = True
-
-    for item in add_machines:
-        ipaddr = item['IP Address']
-        username = item['Username']
-        try:
-            password = item['Password']
-        except:
-            password = None
-
-        errors[ipaddr] = []
-
-        # validate ip address format and duplication check
-        is_duplicate = FileIO.exists_in_file(ipaddr)
-        is_valid_ipaddr = Validation.is_valid_ipv4(ipaddr)
-        is_valid_username = Validation.is_valid_username(username)
-        is_valid_password = Validation.is_valid_password(password)
-
-        if not is_valid_ipaddr:
-            errors[ipaddr].append("invalid ip address")
-        if not is_valid_username:
-            errors[ipaddr].append("invalid username")
-        if not is_valid_password:
-            errors[ipaddr].append("invalid password")
-        if is_duplicate:     # IP Address already exists in the login file
-            errors[ipaddr].append("ip duplicate")
-
-        # validation = all OK
-        elif (not is_duplicate) and is_valid_ipaddr and is_valid_username and is_valid_password:
-            errors.pop(ipaddr, None)
-            if AppManager.add_machine(ipaddr, username, password):
-                app.logger.info("- ADDED - %s", ipaddr)
-                continue
-
-        all_success = False
-
-    if all_success:
-        return make_response(jsonify(result={'success': True}), 201)
-    return make_response(jsonify(result={'success': False, 'reason': errors}), 422)
-
-
-# Delete machines via RESTful API
-# eg. curl -H "Content-Type: application/json" -X "DELETE" http://localhost:5000/api/machines/delete/1.1.1.1
-@app.route('/api/machines/delete/<ipaddresses>', methods=['DELETE'])
-def delete_vm_api_01(ipaddresses):
-    del_list = filter(lambda x: FileIO.exists_in_file(x), ipaddresses.split(","))
-    del_result = AppManager.del_machine(del_list)
-    if del_result['ok'] == 1 and del_result['n'] > 0:
-        del_ip_list = ", ".join([ip for ip in del_list])
-        app.logger.info("- DELETED - %s", del_ip_list)
-        return jsonify(result={'success': True, 'deleted machines': del_result['n']})
-    return make_response(jsonify(result={'success': False, 'deleted machines': del_result['n']}), 422)
-
-
-# Delete machines via RESTful API (by using -d option)
-# eg. curl -H "Content-Type: application/json" -X "DELETE" http://localhost:5000/api/machines/delete -d '{"IP Address": [ "1.1.1.1", "2.2.2.2", "3.3.3.3" ]}'
-@app.route('/api/machines/delete', methods=['DELETE'])
-def delete_vm_api_02():
-    if not request.get_json() or not 'IP Address' in request.get_json():
-        abort(400)
-    del_list = request.get_json()['IP Address']
-
-    # convert to list if the data is not
-    if type(del_list) != list:
-        del_list = del_list.split()
-
-    # filter ip addresses which are not in text file
-    del_list = filter(lambda x: FileIO.exists_in_file(x), del_list)
-
-    del_result = AppManager.del_machine(del_list)
-    if del_result['ok'] == 1 and del_result['n'] > 0:
-        del_ip_list = ", ".join([ip for ip in del_list])
-        app.logger.info("- DELETED - %s", del_ip_list)
-        return jsonify(result={'success': True, 'deleted machines': del_result['n']})
-    return make_response(jsonify(result={'success': False, 'deleted machines': del_result['n']}), 422)
-
-
-# for tests only
-@app.route('/api/users/add', methods=['POST'])
-def add_user_api():
-    if not request.get_json():
-        abort(400)
-
-    username = request.get_json()['Username']
-    password = request.get_json()['Password']
-
-    if mongo.db.users.find_one({"Username": username}):
-        return make_response(jsonify(result={'success': False, 'error': "User already exists"}), 422)
-    else:
-        hash_password = User.hash_password(password)
-        mongo.db.users.insert_one({"Username": username, "Password": hash_password})
-        app.logger.warning("- ADDED ACCOUNT - %s", username)
-        return jsonify(result={'success': True, 'added_users': 1})
-
-
-# for tests only
-@app.route('/api/users/delete/<username>', methods=['DELETE'])
-def delete_user_api(username):
-    del_result = mongo.db.users.remove({"Username": username})
-    app.logger.warning("- DELETED ACCOUNT - %s", username)
-    if del_result['ok'] == 1 and del_result['n'] > 0:
-        return jsonify(result={'success': True, 'deleted users': del_result['n']})
-    return make_response(jsonify(result={'success': False, 'deleted users': del_result['n']}), 422)
-
-
-@app.errorhandler(404)
-def not_found(error):
-    return make_response(jsonify(result={'error': error.description}), 404)
-
-
-@app.errorhandler(400)
-def bad_request(error):
-    return make_response(jsonify(result={'error': error.description}), 400)
-
-
-@app.errorhandler(405)
-def not_allowed(error):
-    return make_response(jsonify(result={'error': error.description}), 405)

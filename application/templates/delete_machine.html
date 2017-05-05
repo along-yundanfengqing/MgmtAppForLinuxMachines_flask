@@ -6,7 +6,7 @@
 {% block logout_icon%}
       <div class="row">
         <div class="col-md-12 text-right">
-            <a href="{{url_for('logout')}}">
+            <a href="{{url_for('view.logout')}}">
                 <img id="logout" src="{{url_for('static', filename='images/logout.png')}}" style="width: 5%; height: 5%"> Logout from <strong>{{current_user.username}}</strong>
             </a>
         </div>
@@ -21,7 +21,7 @@
       </div>
 
       <p class="text-info">Please select machines to delete</p>
-      <form action="{{url_for('delete_machine')}}" method='POST'>
+      <form action="{{url_for('view.delete_machine')}}" method='POST'>
           <div class="row text-center">
               <div class="form-group">
                   {% for machine in machines %}

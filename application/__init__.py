@@ -3,12 +3,18 @@ import eventlet
 import logging
 import pytz
 from flask import Flask
-from flask_socketio import SocketIO
-from flask_login import LoginManager
-from logging.handlers import RotatingFileHandler
 app = Flask(__name__)
 app.config.from_object('config')
+from flask_socketio import SocketIO
 socketio = SocketIO(app)
+from logging.handlers import RotatingFileHandler
+
+# my modules
+from application.modules.api import api
+from application.modules.bg_thread_manager import BackgroundThreadManager
+from application.modules.db_manager import DBManager
+from application.modules.machines_cache import MachinesCache
+from application.modules.views import view
 
 
 def datetimefilter(value, format="%B %d, %Y / %H:%M:%S"):
@@ -18,12 +24,14 @@ def datetimefilter(value, format="%B %d, %Y / %H:%M:%S"):
     local_dt = value.astimezone(tz)
     return local_dt.strftime(format)
 
+
 def datetimefilter2(value, format="%Y%m%d_%H.%M.%S"):
     tz = pytz.timezone('US/Pacific') # timezone you want to convert to from UTC
     utc = pytz.timezone('UTC')
     value = utc.localize(value, is_dst=None).astimezone(pytz.utc)
     local_dt = value.astimezone(tz)
     return local_dt.strftime(format)
+
 
 def set_logging():
     logging_level = app.config['LOGGING_LEVEL']
@@ -53,17 +61,19 @@ def set_logging():
     logging.getLogger('engineio').addHandler(error_log_handler)
 
 
-# STARTING THE PROGRAM
-print("Starting the program...\n")
-set_logging()
-eventlet.monkey_patch()
-login_manager = LoginManager(app)
-from application.modules.machines_cache import MachinesCache
-machines_cache = MachinesCache()
-from application.modules.db_manager import DBManager
-mongo = DBManager(app)
+def start():
+    print("Starting the program...\n")
+    set_logging()
+    app.register_blueprint(view)
+    app.register_blueprint(api)
+    eventlet.monkey_patch()
+    app.jinja_env.filters['datetimefilter'] = datetimefilter
+    app.jinja_env.filters['datetimefilter2'] = datetimefilter2
 
-app.jinja_env.filters['datetimefilter'] = datetimefilter
-app.jinja_env.filters['datetimefilter2'] = datetimefilter2
+    DBManager()
 
-from application.modules import views
+    # Start background thread
+    BackgroundThreadManager.start()
+
+
+start()
