@@ -147,7 +147,7 @@ class MachinesCache(object):
 
         else:
             docs = []
-            for machine in self.machine_obj_list:
+            for machine in self.get():
                 docs.append(self.convert_machine_to_doc(machine.ip_address))
 
             return docs
