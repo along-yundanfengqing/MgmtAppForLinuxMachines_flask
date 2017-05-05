@@ -41,14 +41,27 @@ All features are demonstrated with screenshots in the document.
 
 
 **Technology Stack**  
-- Python with Flask web framework
-- HTML/CSS + Twitter bootstrap
-- JavaScript/jQuery/Ajax
-- MongoDB, pymongo
-- SocketIO
-- Docker containers (Docker Engine + Docker Compose)
-- Bash shell script
-- Selenium WebDriver/TestNG/Rest-Assured (Test automatinon in Java)
+- Front-end  
+    + HTML/CSS
+    + JavaScript (jQuery/Ajax)
+    + Twitter bootstrap
+
+- Back-end  
+    + Python
+    + Flask Web Framework
+    + MongoDB
+    + JSON
+    + RESTful API
+    + SocketIO
+    + Docker containers (Docker Engine + Docker Compose)
+    + Shell Script
+
+- Test Automation  
+    + Java
+    + Selenium WebDriver
+    + TestNG
+    + Rest-Assured
+    + Docker-client API
 
 
 ## 2. Supported environment
