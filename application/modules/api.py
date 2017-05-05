@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from flask import abort, Blueprint, current_app, jsonify, make_response, request
+from flask import abort, Blueprint, jsonify, make_response, request
+import pymongo
 
 # my modules
 from application import app
@@ -88,7 +89,7 @@ def add_vm_api_02():
         abort(400)
 
     add_machines = request.get_json()
-    if type(add_machines) != list:
+    if not isinstance(add_machines, list):
         add_machines = [add_machines]
 
     errors = {}
@@ -155,7 +156,7 @@ def delete_vm_api_02():
     del_list = request.get_json()['IP Address']
 
     # convert to list if the data is not
-    if type(del_list) != list:
+    if not isinstance(del_list, list):
         del_list = del_list.split()
 
     # filter ip addresses which are not in text file

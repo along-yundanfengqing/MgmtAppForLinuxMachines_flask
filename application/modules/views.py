@@ -220,4 +220,3 @@ def export_json():
             flash('Failed to export the JSON file', 'error')
 
     return redirect(url_for('view.show_top'))
-

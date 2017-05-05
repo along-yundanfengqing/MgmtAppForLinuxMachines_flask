@@ -25,7 +25,7 @@ class DBManager(object):
 
     @classmethod
     def get_current_instance(cls):
-        if DBManager.current_instance == None:
+        if DBManager.current_instance is None:
             DBManager.current_instance = DBManager()
         return DBManager.current_instance
 
@@ -129,6 +129,3 @@ class DBManager(object):
             if not FileIO.exists_in_file(ipaddr):
                 self.delete_one({'IP Address': ipaddr})
                 machines_cache.delete(ipaddr)
-
-
-

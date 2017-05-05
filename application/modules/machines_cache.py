@@ -12,7 +12,7 @@ class MachinesCache(object):
 
     @classmethod
     def get_current_instance(cls):
-        if MachinesCache.current_instance == None:
+        if MachinesCache.current_instance is None:
             MachinesCache.current_instance = MachinesCache()
         return MachinesCache.current_instance
 
@@ -39,7 +39,7 @@ class MachinesCache(object):
 
 
     def delete(self, delete_ip_list):
-        if type(delete_ip_list) != list:
+        if not isinstance(delete_ip_list, list):
             delete_ip_list = [delete_ip_list]
 
         for ip in delete_ip_list:

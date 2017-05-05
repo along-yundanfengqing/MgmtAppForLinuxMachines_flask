@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import os
 import re
 import socket
 from application import app
@@ -51,7 +50,7 @@ class Validation(object):
 
     @staticmethod
     def check_internet_connection():
-        if Validation.__is_connected == None:
+        if Validation.__is_connected is None:
             try:
                 socket.setdefaulttimeout(3)
                 socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect(("8.8.8.8", 53))
