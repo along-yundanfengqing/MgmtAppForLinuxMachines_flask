@@ -5,9 +5,16 @@ from application.modules.validation import Validation
 from application.modules.machines import Machine
 
 class MachinesCache(object):
+    current_instance = None
+
     def __init__(self):
         self.machine_obj_list = []      # Cache
 
+    @classmethod
+    def get_current_instance(cls):
+        if MachinesCache.current_instance == None:
+            MachinesCache.current_instance = MachinesCache()
+        return MachinesCache.current_instance
 
     def get(self, ip_address=None):
         # return all machines

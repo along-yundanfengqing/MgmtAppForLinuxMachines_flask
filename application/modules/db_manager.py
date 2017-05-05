@@ -3,15 +3,18 @@ import pymongo
 import sys
 
 # my modules
-from application import machines_cache
+from application import app
 from application.modules.file_io import FileIO
 from application.modules.validation import Validation
+from application.modules.machines_cache import MachinesCache
 
+machines_cache = MachinesCache.get_current_instance()
 
 class DBManager(object):
 
-    def __init__(self, app):
-        self.__app = app
+    current_instance = None
+
+    def __init__(self):
         self.__database_name = app.config['MONGO_DATABASE_NAME']
         self.__database_ip = app.config['MONGO_HOST']
         self.__collection_name = app.config['MONGO_COLLECTION_NAME']
@@ -20,21 +23,27 @@ class DBManager(object):
         self.db.collection = self.db[self.__collection_name]
         self.db.collection.create_index([("IP Address", pymongo.ASCENDING), ("Hostname", pymongo.ASCENDING)])
 
+    @classmethod
+    def get_current_instance(cls):
+        if DBManager.current_instance == None:
+            DBManager.current_instance = DBManager()
+        return DBManager.current_instance
+
 
     def __connect_db(self):
         try:
-            self.__app.logger.info("Checking the connectivity to the database(%s)...." % self.__database_ip)
+            app.logger.info("Checking the connectivity to the database(%s)...." % self.__database_ip)
             uri = "mongodb://%s:%d" % (self.__database_ip, self.__port)
             client = pymongo.MongoClient(uri, serverSelectionTimeoutMS=3000)
             mongo_db = pymongo.database.Database(client, self.__database_name)
             if client.server_info():
-                self.__app.logger.info("...OK")
+                app.logger.info("...OK")
                 return mongo_db
         except pymongo.errors.ServerSelectionTimeoutError as e:
-            self.__app.logger.error("Unable to connect to %s:%s" % (self.__database_ip, self.__port))
+            app.logger.error("Unable to connect to %s:%s" % (self.__database_ip, self.__port))
             sys.exit(3)
         except Exception as e:
-            self.__app.logger.critical(e.message)
+            app.logger.critical(e.message)
             sys.exit(3)
 
 

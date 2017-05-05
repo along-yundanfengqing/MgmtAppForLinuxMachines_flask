@@ -7,10 +7,14 @@ import signal
 from datetime import datetime
 
 # my modules
-from application import app, mongo, machines_cache
+from application import app
+from application.modules.db_manager import DBManager
 from application.modules.file_io import FileIO
 from application.modules.machines import Machine
+from application.modules.machines_cache import MachinesCache
 
+machines_cache = MachinesCache.get_current_instance()
+mongo = DBManager.get_current_instance()
 
 class AppManager(object):
     # Register a machine to (login.txt, database, cache)
@@ -79,15 +83,9 @@ class AppManager(object):
     # Check if butterfly module is installed
     @staticmethod
     def is_butterfly_installed():
-        app.logger.info("Checking if butterfly module is installed...")
         installed_packages = pip.get_installed_distributions()
         flat_installed_packages = [package.project_name for package in installed_packages]
-        if 'butterfly' in flat_installed_packages:      # Installed
-            app.logger.info("...OK")
-            return True
-        else:       # Not installed
-            app.logger.warning("...Not Installed")
-            return False
+        return 'butterfly' in flat_installed_packages
 
     # create a machine object and write a new entry(status Unknown) to MongoDB
     @staticmethod
