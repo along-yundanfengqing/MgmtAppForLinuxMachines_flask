@@ -15,7 +15,7 @@ from application.modules.users import User
 from application.modules.validation import Validation
 
 
-butterfly = AppManager.check_butterfly()
+butterfly = AppManager.is_butterfly_installed()
 login_file = app.config['LOGIN_FILENAME']
 login_manager.login_view = "show_login"
 login_manager.login_message_category = 'error'

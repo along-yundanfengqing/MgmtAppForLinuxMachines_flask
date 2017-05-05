@@ -78,7 +78,7 @@ class AppManager(object):
 
     # Check if butterfly module is installed
     @staticmethod
-    def check_butterfly():
+    def is_butterfly_installed():
         app.logger.info("Checking if butterfly module is installed...")
         installed_packages = pip.get_installed_distributions()
         flat_installed_packages = [package.project_name for package in installed_packages]
