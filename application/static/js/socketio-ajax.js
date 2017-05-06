@@ -23,17 +23,26 @@ $(function () {
         }
         // New machine created with status #Unknwon
         else if (msg.data === "created_new") {
-            var url = '/api/machines/' + msg.ip_address;
-            $.getJSON(url, function(data){
-                var machine = data['data'];
-                if (machine['Status'].includes("Unknown")){
-                    createUnknownMachineElement(msg.ip_address, machine);
+            //var url = '/api/machines/' + msg.ip_address;
+            $.ajax({
+                type: "GET",
+                url: '/api/machines/' + msg.ip_address,
+                dataType: "json",
+                success: function(data){
+                    var machine = data['data'];
+                    if (machine['Status'].includes("Unknown")){
+                        createUnknownMachineElement(msg.ip_address, machine);
+                    }
+                },
+                error: function(e) {
+                    // Error handling
+                    alert("Ajax failed");
+                    location.reload();
                 }
-            }).fail(function(e) {
-                // Error handling
-                alert("Ajax failed");
-                location.reload();
             });
+
+
+
         }
         // Machines updated
         else if (msg.data === "created" || msg.data === "updated") {
