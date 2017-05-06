@@ -29,6 +29,10 @@ $(function () {
                 if (machine['Status'].includes("Unknown")){
                     createUnknownMachineElement(msg.ip_address, machine);
                 }
+            }).fail(function(e) {
+                // Error handling
+                alert("Ajax failed");
+                location.reload();
             });
         }
         // Machines updated
