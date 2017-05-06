@@ -34,8 +34,8 @@ class MachinesCache(object):
 
     def add(self, machine):
         self.machine_obj_list.append(machine)
-        socketio.emit('message', {'data': 'created'})
-        app.logger.debug("Sent SocketIO message: created")
+        socketio.emit('message', {'data': 'created_new', 'ip_address': machine.ip_address})
+        app.logger.debug("Sent SocketIO message: created_new")
 
 
     def delete(self, delete_ip_list):
