@@ -1,5 +1,5 @@
 $(function () {
-  $('img[id^=machine-img], a[id^=machine-hostname], a[id^=machine-ip]').on('click', function(){
+  $('#machine-list').on('click', 'img[id^=machine-img], a[id^=machine-hostname], a[id^=machine-ip]', function(){
     var ipAddress = $(this).parent().find('a[id^=machine-ip]').text();
     var index = $(this).attr("data-target").replace("#myModal_machine_data", "");
     var url = '/api/machines/' + ipAddress;
@@ -71,7 +71,7 @@ $(function () {
           thisModal.find('#basic' + index + ' tbody tr:nth-child(2) td:nth-child(2)').html('<img src="/static/images/status_unreachable.png"> Unreachable (SSH access failed ' + machine['Fail_count'] + ' times)');
           thisModal.find('form button').remove();
         }
-        else{
+        else{ // Unknown
           thisModal.find('#basic' + index + ' tbody tr:nth-child(2) td:nth-child(2)').html('<img src="/static/images/status_unknown.png"> Unknown (Waiting for the first SSH access)');
           thisModal.find('form button').remove();
         }

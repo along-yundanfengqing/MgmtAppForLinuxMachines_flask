@@ -25,7 +25,7 @@
         <div id="status-message" class="col-xs-4 col-sm-4 col-md-4 text-right"></div>
       </div>
 
-      <div class="row text-center">      
+      <div id="machine-list" class="row text-center">
       {% if machines == [] %}
         <br><br>
         <h4>Collecting data from machines and updating the database.... Please wait for a minute.</h4>
@@ -63,11 +63,11 @@
                 {% else %}
                     <img id="machine-img-{{ machine.ip_address }}" class="img-responsive" src="{{ url_for('static', filename='images/other.png') }}" data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}">
                 {% endif %}
-            <h4><a href="#" data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}" id="machine-hostname-{{ machine.hostname }}-{{loop.index}}">{{ machine.hostname }} </a></h4>
+            <h4><a href="#" data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}" id="machine-hostname-{{ machine.hostname }}-{{loop.index}}">{{ machine.hostname }}</a></h4>
             {% if machine.aws == True %}
-              <h5><a href="#" data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}" id="machine-ip-{{ machine.ip_address }}-{{loop.index}}">{{ machine.ip_address }} (AWS) </a></h5>
+              <h5><a href="#" data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}" id="machine-ip-{{ machine.ip_address }}-{{loop.index}}">{{ machine.ip_address }} (AWS)</a></h5>
             {% else %}
-              <h5><a href="#" data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}" id="machine-ip-{{ machine.ip_address }}-{{loop.index}}">{{ machine.ip_address }} </a></h5>
+              <h5><a href="#" data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}" id="machine-ip-{{ machine.ip_address }}-{{loop.index}}">{{ machine.ip_address }}</a></h5>
             {% endif %}
           </div>
         {% endfor %}
@@ -87,6 +87,7 @@
     {% block modal %}
     <!-- Modal -->
     <!-- For displaying each machine's information  -->
+  <div id="modal1" class="row">
     {% for machine in machines %}
      <div class="modal fade" id="myModal_machine_data{{loop.index}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
       <div class="modal-dialog">
@@ -321,8 +322,9 @@
       </div>
     </div>
     {% endfor %}
+  </div>
 
-
+  <div id="modal2" class="row">
     <!-- Second modal for exporting a JSON file  -->
     {% for machine in machines %}
      <div class="modal fade" id="myModal_export_json{{loop.index}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true">
@@ -348,5 +350,6 @@
       </div>
     </div>
     {% endfor %}
+  </div>
 
 {% endblock %}
