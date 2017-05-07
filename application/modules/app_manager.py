@@ -24,7 +24,8 @@ class AppManager(object):
             FileIO.add_vm_to_file(ipaddr, username, password)     # write to login.txt
             AppManager.create_machine_obj_and_write_db_new(ipaddr)   # Create a machine object and write to MongoDB
             return True
-        except Exception:
+        except Exception as e:
+            print e.message
             return False
 
 
