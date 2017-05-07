@@ -19,7 +19,7 @@ class MachinesCache(object):
     def get(self, ip_address=None):
         # return all machines
         if not ip_address:
-            self.machine_obj_list.sort(key=lambda x: (x.hostname, x.ip_address), reverse=False)
+            self.machine_obj_list.sort(key=lambda x: (x.hostname, x.ip_address_decimal), reverse=False)
             return self.machine_obj_list
 
         # return specified machine

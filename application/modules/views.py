@@ -94,7 +94,7 @@ def show_top():
 
     if not machines:    # In case machines_cache is empty, retrieve data from database
         docs = mongo.find({}, {'_id': 0}).sort(
-            [["Hostname", pymongo.ASCENDING], ["IP Address", pymongo.ASCENDING]]
+            [["Hostname", pymongo.ASCENDING], ["decimal_ip", pymongo.ASCENDING]]
         )
         if docs:
             machines = machines_cache.convert_docs_to_machine_list(docs)
@@ -154,7 +154,7 @@ def delete_machine():
 
     if not machines:    # In case machine_list in memory is empty, retrieve data from database
         docs = mongo.find({}, {'_id': 0}).sort(
-            [["Hostname", pymongo.ASCENDING], ["IP Address", pymongo.ASCENDING]]
+            [["Hostname", pymongo.ASCENDING], ["decimal_ip", pymongo.ASCENDING]]
         )
         if docs:
             machines = machines_cache.convert_docs_to_machine_list(docs)

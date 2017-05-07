@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import ipaddress
 import pymongo
 import sys
 
@@ -22,6 +23,7 @@ class DBManager(object):
         self.db = self.__connect_db()
         self.db.collection = self.db[self.__collection_name]
         self.db.collection.create_index([("IP Address", pymongo.ASCENDING), ("Hostname", pymongo.ASCENDING)])
+        self.db.collection.create_index([("Hostname", pymongo.ASCENDING), ("decimal_ip", pymongo.ASCENDING)])
 
     @classmethod
     def get_current_instance(cls):
@@ -78,6 +80,7 @@ class DBManager(object):
         doc['Fail_count'] = 0
         doc['Hostname'] = "#Unknown"
         doc['IP Address'] = ipaddr
+        doc['ip_address_decimal'] = int(ipaddress.IPv4Address(ipaddr))
         doc['MAC Address'] = "N.A"
         doc['OS'] = "N.A"
         doc['Release'] = "N.A"
@@ -100,6 +103,7 @@ class DBManager(object):
         doc['Fail_count'] = 0
         doc['Hostname'] = hostname
         doc['IP Address'] = ipaddr
+        doc['ip_address_decimal'] = int(ipaddress.IPv4Address(ipaddr))
         doc['MAC Address'] = mac
         doc['OS'] = os_dist
         doc['Release'] = release

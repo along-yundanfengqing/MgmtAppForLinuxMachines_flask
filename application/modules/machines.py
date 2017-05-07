@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import ipaddress
 
 from application.modules.validation import Validation
 
@@ -11,6 +12,7 @@ class Machine(object):
         self.fail_count = fail_count
         self.hostname = hostname
         self.ip_address = ip_address
+        self.ip_address_decimal = int(ipaddress.IPv4Address(self.ip_address))
         self.mac_address = mac_address
         self.os_distribution = os_distribution
         self.release = release
