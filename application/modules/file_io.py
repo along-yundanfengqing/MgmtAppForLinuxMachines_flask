@@ -23,10 +23,10 @@ class FileIO(object):
                     if re.search(r"^#", login_data[0]) or (len(login_data) != 2 and len(login_data) != 3):
                         continue
 
-                    ipaddr = login_data[0].strip()
-                    username = login_data[1].strip()
+                    ipaddr = unicode(login_data[0].strip(), "utf-8")
+                    username = unicode(login_data[1].strip(), "utf-8")
                     try:
-                        password = login_data[2].strip()
+                        password = unicode(login_data[2].strip(), "utf-8")
                     except Exception:
                         login_data.append(None)
 
