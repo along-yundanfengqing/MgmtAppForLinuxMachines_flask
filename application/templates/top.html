@@ -207,12 +207,12 @@
                                   <th class="active"> cached </th>
                                   <tr>
                                       <td> Mem: </td>
-                                      <td> {{ machine.memory_usage['Mem']['total'] }} </td>
-                                      <td> {{ machine.memory_usage['Mem']['used'] }} </td>
-                                      <td> {{ machine.memory_usage['Mem']['free'] }} </td>
-                                      <td> {{ machine.memory_usage['Mem']['shared'] }}</td>
-                                      <td> {{ machine.memory_usage['Mem']['buffers'] }} </td>
-                                      <td> {{ machine.memory_usage['Mem']['cached'] }} </td>
+                                      <td> {{ machine.memory_usage['mem']['total'] }} </td>
+                                      <td> {{ machine.memory_usage['mem']['used'] }} </td>
+                                      <td> {{ machine.memory_usage['mem']['free'] }} </td>
+                                      <td> {{ machine.memory_usage['mem']['shared'] }}</td>
+                                      <td> {{ machine.memory_usage['mem']['buffers'] }} </td>
+                                      <td> {{ machine.memory_usage['mem']['cached'] }} </td>
                                   </tr>
                                   <tr>
                                       <td> -/+ </td>
@@ -225,9 +225,9 @@
                                   </tr>
                                   <tr>
                                       <td> Swap: </td>
-                                      <td> {{ machine.memory_usage['Swap']['total'] }} </td>
-                                      <td> {{ machine.memory_usage['Swap']['used'] }} </td>
-                                      <td> {{ machine.memory_usage['Swap']['free'] }} </td>
+                                      <td> {{ machine.memory_usage['swap']['total'] }} </td>
+                                      <td> {{ machine.memory_usage['swap']['used'] }} </td>
+                                      <td> {{ machine.memory_usage['swap']['free'] }} </td>
                                       <td> </td>
                                       <td> </td>
                                       <td> </td>
@@ -244,18 +244,18 @@
                                   <th class="active"> available </th>
                                   <tr>
                                       <td> Mem: </td>
-                                      <td> {{ machine.memory_usage['Mem']['total'] }} </td>
-                                      <td> {{ machine.memory_usage['Mem']['used'] }} </td>
-                                      <td> {{ machine.memory_usage['Mem']['free'] }} </td>
-                                      <td> {{ machine.memory_usage['Mem']['shared'] }}</td>
-                                      <td> {{ machine.memory_usage['Mem']['buff/cache'] }} </td>
-                                      <td> {{ machine.memory_usage['Mem']['available'] }} </td>
+                                      <td> {{ machine.memory_usage['mem']['total'] }} </td>
+                                      <td> {{ machine.memory_usage['mem']['used'] }} </td>
+                                      <td> {{ machine.memory_usage['mem']['free'] }} </td>
+                                      <td> {{ machine.memory_usage['mem']['shared'] }}</td>
+                                      <td> {{ machine.memory_usage['mem']['buff/cache'] }} </td>
+                                      <td> {{ machine.memory_usage['mem']['available'] }} </td>
                                   </tr>
                                   <tr>
                                       <td> Swap: </td>
-                                      <td> {{ machine.memory_usage['Swap']['total'] }} </td>
-                                      <td> {{ machine.memory_usage['Swap']['used'] }} </td>
-                                      <td> {{ machine.memory_usage['Swap']['free'] }} </td>
+                                      <td> {{ machine.memory_usage['swap']['total'] }} </td>
+                                      <td> {{ machine.memory_usage['swap']['used'] }} </td>
+                                      <td> {{ machine.memory_usage['swap']['free'] }} </td>
                                       <td> </td>
                                       <td> </td>
                                       <td> </td>
@@ -285,12 +285,12 @@
                                   <th class="active"> Mounted on </th>
                                     {% for row in machine.disk_usage %}
                                   <tr>
-                                      <td> {{ row['Filesystem'] }} </td>
-                                      <td> {{ row['Size'] }} </td>
-                                      <td> {{ row['Used'] }} </td>
-                                      <td> {{ row['Avail'] }} </td>
-                                      <td> {{ row['Use%'] }} </td>
-                                      <td> {{ row['Mounted on'] }} </td>
+                                      <td> {{ row['filesystem'] }} </td>
+                                      <td> {{ row['size'] }} </td>
+                                      <td> {{ row['used'] }} </td>
+                                      <td> {{ row['avail'] }} </td>
+                                      <td> {{ row['use%'] }} </td>
+                                      <td> {{ row['mounted_on'] }} </td>
                                   </tr>
                                     {% endfor %}
                                 </tbody>

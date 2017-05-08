@@ -22,8 +22,8 @@ class DBManager(object):
         self.__port = app.config['MONGO_PORT']
         self.db = self.__connect_db()
         self.db.collection = self.db[self.__collection_name]
-        self.db.collection.create_index([("IP Address", pymongo.ASCENDING), ("Hostname", pymongo.ASCENDING)])
-        self.db.collection.create_index([("Hostname", pymongo.ASCENDING), ("decimal_ip", pymongo.ASCENDING)])
+        self.db.collection.create_index([('ip_address', pymongo.ASCENDING), ('hostname', pymongo.ASCENDING)])
+        self.db.collection.create_index([('hostname', pymongo.ASCENDING), ('ip_address_decimal', pymongo.ASCENDING)])
 
     @classmethod
     def get_current_instance(cls):
@@ -66,7 +66,7 @@ class DBManager(object):
 
 
     def remove(self, del_ip_list):
-        return self.db.collection.remove({'IP Address': {'$in': del_ip_list}})
+        return self.db.collection.remove({'ip_address': {'$in': del_ip_list}})
 
 
     def delete_one(self, *args):
@@ -76,22 +76,22 @@ class DBManager(object):
     # When registered from GUI or RESTful API
     def write_new(self, ipaddr, last_updated):
         doc = {}
-        doc['Status'] = "Unknown (Waiting for the first SSH access)"
-        doc['Fail_count'] = 0
-        doc['Hostname'] = "#Unknown"
-        doc['IP Address'] = ipaddr
+        doc['status'] = "Unknown (Waiting for the first SSH access)"
+        doc['fail_count'] = 0
+        doc['hostname'] = "#Unknown"
+        doc['ip_address'] = ipaddr
         doc['ip_address_decimal'] = int(ipaddress.IPv4Address(ipaddr))
-        doc['MAC Address'] = "N.A"
-        doc['OS'] = "N.A"
-        doc['Release'] = "N.A"
-        doc['Uptime'] = "N.A"
-        doc['CPU Load Avg'] = "N.A"
-        doc['Memory Usage'] = "N.A"
-        doc['Disk Usage'] = "N.A"
-        doc['AWS'] = Validation.is_aws(ipaddr)
-        doc['Last Updated'] = last_updated
+        doc['mac_address'] = "N.A"
+        doc['os_distribution'] = "N.A"
+        doc['release'] = "N.A"
+        doc['uptime'] = "N.A"
+        doc['cpu_load_avg'] = "N.A"
+        doc['memory_usage'] = "N.A"
+        doc['disk_usage'] = "N.A"
+        doc['aws'] = Validation.is_aws(ipaddr)
+        doc['last_updated'] = last_updated
         self.update_one(
-            {'IP Address': ipaddr, 'Hostname': "#Unknown"},
+            {'ip_address': ipaddr, 'hostname': "#Unknown"},
             {'$set': doc}, upsert=True)
 
 
@@ -99,37 +99,37 @@ class DBManager(object):
     def update_status_ok(self, machine_data, last_updated):
         ipaddr, hostname, mac, os_dist, release, uptime, cpu_load, memory_usage, disk_usage = machine_data
         doc = {}
-        doc['Status'] = "OK"
-        doc['Fail_count'] = 0
-        doc['Hostname'] = hostname
-        doc['IP Address'] = ipaddr
+        doc['status'] = "OK"
+        doc['fail_count'] = 0
+        doc['hostname'] = hostname
+        doc['ip_address'] = ipaddr
         doc['ip_address_decimal'] = int(ipaddress.IPv4Address(ipaddr))
-        doc['MAC Address'] = mac
-        doc['OS'] = os_dist
-        doc['Release'] = release
-        doc['Uptime'] = uptime
-        doc['CPU Load Avg'] = cpu_load
-        doc['Memory Usage'] = memory_usage
-        doc['Disk Usage'] = disk_usage
-        doc['AWS'] = Validation.is_aws(ipaddr)
-        doc['Last Updated'] = last_updated
+        doc['mac_address'] = mac
+        doc['os_distribution'] = os_dist
+        doc['release'] = release
+        doc['uptime'] = uptime
+        doc['cpu_load_avg'] = cpu_load
+        doc['memory_usage'] = memory_usage
+        doc['disk_usage'] = disk_usage
+        doc['aws'] = Validation.is_aws(ipaddr)
+        doc['last_updated'] = last_updated
         # Unmark the old Hostname(#Unknown) entry if exists after SSH succeeds
-        if self.find({'IP Address': ipaddr, 'Hostname': "#Unknown"}):
-            self.delete_one({'IP Address': ipaddr, 'Hostname': "#Unknown"})
-        self.update({'IP Address': ipaddr}, {'$set': doc}, upsert=True)
+        if self.find({'ip_address': ipaddr, 'hostname': "#Unknown"}):
+            self.delete_one({'ip_address': ipaddr, 'hostname': "#Unknown"})
+        self.update({'ip_address': ipaddr}, {'$set': doc}, upsert=True)
 
 
     # When SSH fails to existing machines whose status was previously ok
     def update_status_unreachable(self, ipaddr):
-        self.update_one({'IP Address': ipaddr}, {'$set': {'Status': 'Unreachable'}})
-        self.update_one({'IP Address': ipaddr}, {'$inc': {'Fail_count': 1}})
+        self.update_one({'ip_address': ipaddr}, {'$set': {'status': 'Unreachable'}})
+        self.update_one({'ip_address': ipaddr}, {'$inc': {'fail_count': 1}})
 
 
     # Check mismatch between login.txt and database
     def check_mismatch(self):
-        docs = self.find({}, {'_id': 0, 'IP Address': 1, 'Hostname': 1})
+        docs = self.find({}, {'_id': 0, 'ip_address': 1, 'hostname': 1})
         for doc in docs:
-            ipaddr = doc['IP Address']
+            ipaddr = doc['ip_address']
             if not FileIO.exists_in_file(ipaddr):
-                self.delete_one({'IP Address': ipaddr})
+                self.delete_one({'ip_address': ipaddr})
                 machines_cache.delete(ipaddr)

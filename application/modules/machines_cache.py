@@ -107,18 +107,19 @@ class MachinesCache(object):
         tmp_machine_list = []
         for doc in docs:
             machine = Machine(
-                doc['IP Address'],
-                doc['Last Updated'],
-                doc['Status'],
-                doc['Fail_count'],
-                doc['Hostname'],
-                doc['MAC Address'],
-                doc['OS'],
-                doc['Release'],
-                doc['Uptime'],
-                doc['CPU Load Avg'],
-                doc['Memory Usage'],
-                doc['Disk Usage'],
+                doc['ip_address'],
+                doc['last_updated'],
+                doc['status'],
+                doc['fail_count'],
+                doc['hostname'],
+                doc['mac_address'],
+                doc['os_distribution'],
+                doc['release'],
+                doc['uptime'],
+                doc['cpu_load_avg'],
+                doc['memory_usage'],
+                doc['disk_usage'],
+
             )
 
             tmp_machine_list.append(machine)
@@ -129,19 +130,19 @@ class MachinesCache(object):
         if ip_address:
             doc = {}
             machine = self.get(ip_address)
-            doc['IP Address'] = machine.ip_address
-            doc['Last Updated'] = machine.last_updated
-            doc['Status'] = machine.status
-            doc['Fail_count'] = machine.fail_count
-            doc['Hostname'] = machine.hostname
-            doc['MAC Address'] = machine.mac_address
-            doc['OS'] = machine.os_distribution
-            doc['Release'] = machine.release
-            doc['Uptime'] = machine.uptime
-            doc['CPU Load Avg'] = machine.cpu_load_avg
-            doc['Memory Usage'] = machine.memory_usage
-            doc['Disk Usage'] = machine.disk_usage
-            doc['AWS'] = Validation.is_aws(machine.ip_address)
+            doc['ip_address'] = machine.ip_address
+            doc['last_updated'] = machine.last_updated
+            doc['status'] = machine.status
+            doc['fail_count'] = machine.fail_count
+            doc['hostname'] = machine.hostname
+            doc['mac_address'] = machine.mac_address
+            doc['os_distribution'] = machine.os_distribution
+            doc['release'] = machine.release
+            doc['uiptime'] = machine.uptime
+            doc['cpu_load_avg'] = machine.cpu_load_avg
+            doc['memory_usage'] = machine.memory_usage
+            doc['disk_usage'] = machine.disk_usage
+            doc['aws'] = Validation.is_aws(machine.ip_address)
 
             return doc
 

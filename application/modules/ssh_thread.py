@@ -49,7 +49,7 @@ class SSHThread(threading.Thread):
 
             # Check if the IP Address still exists in login.txt and DB when ssh access failed.
             exists_in_file = FileIO.exists_in_file(self.__ipaddr)
-            exists_in_db = mongo.find_one({"IP Address": self.__ipaddr})
+            exists_in_db = mongo.find_one({"ip_address": self.__ipaddr})
 
             # If SSH access failed when the VM exists in both login.txt and DB,
             # mark the status as "Unreachable" and increment the failure count by 1
@@ -202,7 +202,7 @@ class SSHThread(threading.Thread):
             for line in lines[2:]:
                 line = line.split()
                 if "Mem:" in line:
-                    memory_usage['Mem'] = {
+                    memory_usage['mem'] = {
                         "total": line[1],
                         "used": line[2],
                         "free": line[3],
@@ -216,7 +216,7 @@ class SSHThread(threading.Thread):
                         "free": line[3]
                     }
                 elif "Swap:" in line:
-                    memory_usage['Swap'] = {
+                    memory_usage['swap'] = {
                         "total": line[1],
                         "used": line[2],
                         "free": line[3]
@@ -227,7 +227,7 @@ class SSHThread(threading.Thread):
             for line in lines[2:]:
                 line = line.split()
                 if "Mem:" in line:
-                    memory_usage['Mem'] = {
+                    memory_usage['mem'] = {
                         "total": line[1],
                         "used": line[2],
                         "free": line[3],
@@ -236,7 +236,7 @@ class SSHThread(threading.Thread):
                         "available": line[6]
                     }
                 elif "Swap:" in line:
-                    memory_usage['Swap'] = {
+                    memory_usage['swap'] = {
                         "total": line[1],
                         "used": line[2],
                         "free": line[3]
@@ -253,11 +253,11 @@ class SSHThread(threading.Thread):
             line = line.split()
             disk_usage.append(
                 {
-                    "Filesystem": line[0],
-                    "Size": line[1],
-                    "Used": line[2],
-                    "Avail": line[3],
-                    "Use%": line[4],
-                    "Mounted on": line[5]
+                    "filesystem": line[0],
+                    "size": line[1],
+                    "used": line[2],
+                    "avail": line[3],
+                    "use%": line[4],
+                    "mounted_on": line[5]
                 })
         return disk_usage

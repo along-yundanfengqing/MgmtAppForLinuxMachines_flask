@@ -5,12 +5,12 @@ from wtforms import validators
 
 
 class LoginForm(Form):
-    username = StringField('Username', validators=[validators.DataRequired()])
-    password = PasswordField('Password', validators=[validators.DataRequired()])
-    remember_me = BooleanField('Remember me?')
+    username = StringField('username', validators=[validators.DataRequired()])
+    password = PasswordField('password', validators=[validators.DataRequired()])
+    remember_me = BooleanField('remember_me')
 
 
 class SignupForm(Form):
-    username = StringField('Username', validators=[validators.DataRequired()])
-    password = PasswordField('Password', validators=[validators.DataRequired(), validators.EqualTo('confirm', message='Password does not match.')])
-    confirm = PasswordField('Confirm Password', validators=[validators.DataRequired()])
+    username = StringField('username', validators=[validators.DataRequired()])
+    password = PasswordField('password', validators=[validators.DataRequired(), validators.EqualTo('confirm', message='Password does not match.')])
+    confirm = PasswordField('confirm_password', validators=[validators.DataRequired()])

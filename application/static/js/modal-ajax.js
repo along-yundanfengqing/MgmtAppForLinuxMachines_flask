@@ -10,68 +10,68 @@ $(function () {
             var machine = data['data'];
             var thisModal = $('#myModal_machine_data' + index);
             var now = new Date().getTime();
-            var lastUpdated = Date.parse(machine['Last Updated']);
+            var lastUpdated = Date.parse(machine['last_updated']);
             var lastUpdatedFormatted = getFormattedDatetime(new Date(lastUpdated));
             var deltaInSec = Math.ceil((now - lastUpdated)/1000);
 
             // Last updated
             thisModal.find('#modal-body' + index + ' > div:nth-child(2)').text(lastUpdatedFormatted + ' (' + deltaInSec + ' seconds ago)');
 
-            if (machine['Status'] === 'OK'){
+            if (machine['status'] === 'OK'){
                 // Basic tab
                 thisModal.find('#basic' + index + ' tbody tr:nth-child(2) td:nth-child(2)').html('<img src="/static/images/status_ok.png"> OK');
-                thisModal.find('#basic' + index + ' tbody tr:nth-child(3) td:nth-child(2)').text(machine['OS']);
-                thisModal.find('#basic' + index + ' tbody tr:nth-child(4) td:nth-child(2)').text(machine['Release']);
-                thisModal.find('#basic' + index + ' tbody tr:nth-child(6) td:nth-child(2)').text(machine['MAC Address']);
-                thisModal.find('#basic' + index + ' tbody tr:nth-child(7) td:nth-child(2)').text(machine['Uptime']);
+                thisModal.find('#basic' + index + ' tbody tr:nth-child(3) td:nth-child(2)').text(machine['os_distribution']);
+                thisModal.find('#basic' + index + ' tbody tr:nth-child(4) td:nth-child(2)').text(machine['release']);
+                thisModal.find('#basic' + index + ' tbody tr:nth-child(6) td:nth-child(2)').text(machine['mac_address']);
+                thisModal.find('#basic' + index + ' tbody tr:nth-child(7) td:nth-child(2)').text(machine['uptime']);
 
                 // CPU tab
-                thisModal.find('#cpu' + index + ' tbody tr:nth-child(2) td:nth-child(1)').text(machine['CPU Load Avg']['1min']);
-                thisModal.find('#cpu' + index + ' tbody tr:nth-child(3) td:nth-child(1)').text(machine['CPU Load Avg']['5min']);
-                thisModal.find('#cpu' + index + ' tbody tr:nth-child(4) td:nth-child(1)').text(machine['CPU Load Avg']['15min']);
+                thisModal.find('#cpu' + index + ' tbody tr:nth-child(2) td:nth-child(1)').text(machine['cpu_load_avg']['1min']);
+                thisModal.find('#cpu' + index + ' tbody tr:nth-child(3) td:nth-child(1)').text(machine['cpu_load_avg']['5min']);
+                thisModal.find('#cpu' + index + ' tbody tr:nth-child(4) td:nth-child(1)').text(machine['cpu_load_avg']['15min']);
 
                 // Memory tab
-                if (Object.keys(machine['Memory Usage']).length === 3){
-                    thisModal.find('#memory' + index + ' tbody tr:nth-child(2) td:nth-child(2)').text(machine['Memory Usage']['Mem']['total']);
-                    thisModal.find('#memory' + index + ' tbody tr:nth-child(2) td:nth-child(3)').text(machine['Memory Usage']['Mem']['used']);
-                    thisModal.find('#memory' + index + ' tbody tr:nth-child(2) td:nth-child(4)').text(machine['Memory Usage']['Mem']['free']);
-                    thisModal.find('#memory' + index + ' tbody tr:nth-child(2) td:nth-child(5)').text(machine['Memory Usage']['Mem']['shared']);
-                    thisModal.find('#memory' + index + ' tbody tr:nth-child(2) td:nth-child(6)').text(machine['Memory Usage']['Mem']['buffers']);
-                    thisModal.find('#memory' + index + ' tbody tr:nth-child(2) td:nth-child(7)').text(machine['Memory Usage']['Mem']['cached']);
+                if (Object.keys(machine['memory_usage']).length === 3){
+                    thisModal.find('#memory' + index + ' tbody tr:nth-child(2) td:nth-child(2)').text(machine['memory_usage']['mem']['total']);
+                    thisModal.find('#memory' + index + ' tbody tr:nth-child(2) td:nth-child(3)').text(machine['memory_usage']['mem']['used']);
+                    thisModal.find('#memory' + index + ' tbody tr:nth-child(2) td:nth-child(4)').text(machine['memory_usage']['mem']['free']);
+                    thisModal.find('#memory' + index + ' tbody tr:nth-child(2) td:nth-child(5)').text(machine['memory_usage']['mem']['shared']);
+                    thisModal.find('#memory' + index + ' tbody tr:nth-child(2) td:nth-child(6)').text(machine['memory_usage']['mem']['buffers']);
+                    thisModal.find('#memory' + index + ' tbody tr:nth-child(2) td:nth-child(7)').text(machine['memory_usage']['mem']['cached']);
 
-                    thisModal.find('#memory' + index + ' tbody tr:nth-child(3) td:nth-child(3)').text(machine['Memory Usage']['buffers/cache']['used']);
-                    thisModal.find('#memory' + index + ' tbody tr:nth-child(3) td:nth-child(4)').text(machine['Memory Usage']['buffers/cache']['free']);
+                    thisModal.find('#memory' + index + ' tbody tr:nth-child(3) td:nth-child(3)').text(machine['memory_usage']['buffers/cache']['used']);
+                    thisModal.find('#memory' + index + ' tbody tr:nth-child(3) td:nth-child(4)').text(machine['memory_usage']['buffers/cache']['free']);
 
-                    thisModal.find('#memory' + index + ' tbody tr:nth-child(4) td:nth-child(2)').text(machine['Memory Usage']['swap']['total']);
-                    thisModal.find('#memory' + index + ' tbody tr:nth-child(4) td:nth-child(3)').text(machine['Memory Usage']['swap']['used']);
-                    thisModal.find('#memory' + index + ' tbody tr:nth-child(4) td:nth-child(4)').text(machine['Memory Usage']['swap']['free']);
+                    thisModal.find('#memory' + index + ' tbody tr:nth-child(4) td:nth-child(2)').text(machine['memory_usage']['swap']['total']);
+                    thisModal.find('#memory' + index + ' tbody tr:nth-child(4) td:nth-child(3)').text(machine['memory_usage']['swap']['used']);
+                    thisModal.find('#memory' + index + ' tbody tr:nth-child(4) td:nth-child(4)').text(machine['memory_usage']['swap']['free']);
                 }
-                else if (Object.keys(machine['Memory Usage']).length === 2){
-                    thisModal.find('#memory' + index + ' tbody tr:nth-child(2) td:nth-child(2)').text(machine['Memory Usage']['Mem']['total']);
-                    thisModal.find('#memory' + index + ' tbody tr:nth-child(2) td:nth-child(3)').text(machine['Memory Usage']['Mem']['used']);
-                    thisModal.find('#memory' + index + ' tbody tr:nth-child(2) td:nth-child(4)').text(machine['Memory Usage']['Mem']['free']);
-                    thisModal.find('#memory' + index + ' tbody tr:nth-child(2) td:nth-child(5)').text(machine['Memory Usage']['Mem']['shared']);
-                    thisModal.find('#memory' + index + ' tbody tr:nth-child(2) td:nth-child(6)').text(machine['Memory Usage']['Mem']['buff/cache']);
-                    thisModal.find('#memory' + index + ' tbody tr:nth-child(2) td:nth-child(7)').text(machine['Memory Usage']['Mem']['available']);
+                else if (Object.keys(machine['memory_usage']).length === 2){
+                    thisModal.find('#memory' + index + ' tbody tr:nth-child(2) td:nth-child(2)').text(machine['memory_usage']['mem']['total']);
+                    thisModal.find('#memory' + index + ' tbody tr:nth-child(2) td:nth-child(3)').text(machine['memory_usage']['mem']['used']);
+                    thisModal.find('#memory' + index + ' tbody tr:nth-child(2) td:nth-child(4)').text(machine['memory_usage']['mem']['free']);
+                    thisModal.find('#memory' + index + ' tbody tr:nth-child(2) td:nth-child(5)').text(machine['memory_usage']['mem']['shared']);
+                    thisModal.find('#memory' + index + ' tbody tr:nth-child(2) td:nth-child(6)').text(machine['memory_usage']['mem']['buff/cache']);
+                    thisModal.find('#memory' + index + ' tbody tr:nth-child(2) td:nth-child(7)').text(machine['memory_usage']['mem']['available']);
 
-                    thisModal.find('#memory' + index + ' tbody tr:nth-child(4) td:nth-child(2)').text(machine['Memory Usage']['swap']['total']);
-                    thisModal.find('#memory' + index + ' tbody tr:nth-child(4) td:nth-child(3)').text(machine['Memory Usage']['swap']['used']);
-                    thisModal.find('#memory' + index + ' tbody tr:nth-child(4) td:nth-child(4)').text(machine['Memory Usage']['swap']['free']);
+                    thisModal.find('#memory' + index + ' tbody tr:nth-child(4) td:nth-child(2)').text(machine['memory_usage']['swap']['total']);
+                    thisModal.find('#memory' + index + ' tbody tr:nth-child(4) td:nth-child(3)').text(machine['memory_usage']['swap']['used']);
+                    thisModal.find('#memory' + index + ' tbody tr:nth-child(4) td:nth-child(4)').text(machine['memory_usage']['swap']['free']);
                 }
 
                 // Disk tab
-                for (var i=0; i<machine['Disk Usage'].length; i++){
-                    thisModal.find('#disk' + index + ' tbody tr:nth-child(' + i+1 + ') td:nth-child(1)').text(machine['Disk Usage'][i]['Filesystem']);
-                    thisModal.find('#disk' + index + ' tbody tr:nth-child(' + i+1 + ') td:nth-child(2)').text(machine['Disk Usage'][i]['Size']);
-                    thisModal.find('#disk' + index + ' tbody tr:nth-child(' + i+1 + ') td:nth-child(3)').text(machine['Disk Usage'][i]['Used']);
-                    thisModal.find('#disk' + index + ' tbody tr:nth-child(' + i+1 + ') td:nth-child(4)').text(machine['Disk Usage'][i]['Avail']);
-                    thisModal.find('#disk' + index + ' tbody tr:nth-child(' + i+1 + ') td:nth-child(5)').text(machine['Disk Usage'][i]['Use%']);
-                    thisModal.find('#disk' + index + ' tbody tr:nth-child(' + i+1 + ') td:nth-child(6)').text(machine['Disk Usage'][i]['Mounted on']);
+                for (var i=0; i<machine['disk_usage'].length; i++){
+                    thisModal.find('#disk' + index + ' tbody tr:nth-child(' + i+1 + ') td:nth-child(1)').text(machine['disk_usage'][i]['filesystem']);
+                    thisModal.find('#disk' + index + ' tbody tr:nth-child(' + i+1 + ') td:nth-child(2)').text(machine['disk_usage'][i]['size']);
+                    thisModal.find('#disk' + index + ' tbody tr:nth-child(' + i+1 + ') td:nth-child(3)').text(machine['disk_usage'][i]['used']);
+                    thisModal.find('#disk' + index + ' tbody tr:nth-child(' + i+1 + ') td:nth-child(4)').text(machine['disk_usage'][i]['avail']);
+                    thisModal.find('#disk' + index + ' tbody tr:nth-child(' + i+1 + ') td:nth-child(5)').text(machine['disk_usage'][i]['use%']);
+                    thisModal.find('#disk' + index + ' tbody tr:nth-child(' + i+1 + ') td:nth-child(6)').text(machine['disk_usage'][i]['mounted_on']);
                 }
             }
 
-            else if(machine['Status'] === 'Unreachable'){
-              thisModal.find('#basic' + index + ' tbody tr:nth-child(2) td:nth-child(2)').html('<img src="/static/images/status_unreachable.png"> Unreachable (SSH access failed ' + machine['Fail_count'] + ' times)');
+            else if(machine['status'] === 'Unreachable'){
+              thisModal.find('#basic' + index + ' tbody tr:nth-child(2) td:nth-child(2)').html('<img src="/static/images/status_unreachable.png"> Unreachable (SSH access failed ' + machine['fail_count'] + ' times)');
               thisModal.find('form button').remove();
             }
             else{ // Unknown

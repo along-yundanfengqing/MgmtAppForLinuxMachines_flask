@@ -25,9 +25,9 @@ def show_json_host(hostname):
         doc = machines_cache.convert_machine_to_doc(hostname)
     else:
         if Validation.is_valid_ipv4(hostname):
-            doc = mongo.find_one({'IP Address': hostname}, {'_id': 0})
+            doc = mongo.find_one({'ip_address': hostname}, {'_id': 0})
         else:
-            doc = mongo.find_one({'Hostname': hostname}, {'_id': 0})
+            doc = mongo.find_one({'hostname': hostname}, {'_id': 0})
     if doc:
         return jsonify(data=doc)
 
@@ -43,11 +43,11 @@ def show_json_all():
         docs = machines_cache.convert_machine_to_doc()
     else:
         docs = mongo.find({}, {'_id': 0}).sort(
-            [["Hostname", pymongo.ASCENDING], ["IP Address", pymongo.ASCENDING]]
+            [['hostname', pymongo.ASCENDING], ['ip_address', pymongo.ASCENDING]]
             )
     # return all machines except Hostname = #Unknown
     if docs:
-        return jsonify(data=[doc for doc in docs if doc['Hostname'] != '#Unknown'])
+        return jsonify(data=[doc for doc in docs if doc['hostname'] != '#Unknown'])
     abort(404)
 
 
@@ -179,11 +179,11 @@ def add_user_api():
     username = request.get_json()['Username']
     password = request.get_json()['Password']
 
-    if mongo.db.users.find_one({"Username": username}):
+    if mongo.db.users.find_one({"username": username}):
         return make_response(jsonify(result={'success': False, 'error': "User already exists"}), 422)
     else:
         hash_password = User.hash_password(password)
-        mongo.db.users.insert_one({"Username": username, "Password": hash_password})
+        mongo.db.users.insert_one({"username": username, "password": hash_password})
         app.logger.warning("- ADDED ACCOUNT - %s", username)
         return jsonify(result={'success': True, 'added_users': 1})
 
@@ -191,7 +191,7 @@ def add_user_api():
 # for tests only
 @api.route('/api/users/delete/<username>', methods=['DELETE'])
 def delete_user_api(username):
-    del_result = mongo.db.users.remove({"Username": username})
+    del_result = mongo.db.users.remove({"username": username})
     app.logger.warning("- DELETED ACCOUNT - %s", username)
     if del_result['ok'] == 1 and del_result['n'] > 0:
         return jsonify(result={'success': True, 'deleted users': del_result['n']})

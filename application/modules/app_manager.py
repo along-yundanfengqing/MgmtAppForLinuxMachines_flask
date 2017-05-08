@@ -48,7 +48,7 @@ class AppManager(object):
 
         try:
             with open(JSON_FILEPATH, 'w') as f:
-                doc['Last Updated'] = str(doc['Last Updated'])
+                doc['last_updated'] = str(doc['last_updated'])
                 json.dump(doc, f, indent=4)
                 return True, JSON_DIR
         except Exception as e:

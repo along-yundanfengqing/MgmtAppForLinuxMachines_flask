@@ -30,13 +30,12 @@ $(function () {
                 dataType: "json",
                 success: function(data){
                     var machine = data['data'];
-                    if (machine['Status'].includes("Unknown")){
+                    if (machine['status'].includes("Unknown")){
                         insertUnknownMachineElement(msg.ip_address, machine);
                     }
                 },
                 error: function(e) {
                     // Error handling
-                    alert("Ajax failed");
                     location.reload();
                 }
             });
@@ -114,11 +113,11 @@ function toInt(ip){
 function insertUnknownMachineElement(ip_address, machine) {
     var numOfMachines = parseInt($('.badge').text());
     var index = numOfMachines + 101;
-    var indexToInsert = getIndexToInsert(machine['Hostname'], ip_address) + 1;
+    var indexToInsert = getIndexToInsert(machine['hostname'], ip_address) + 1;
     $('.badge').text(numOfMachines + 1);
 
     var ip_address_aws = ip_address;
-    if (machine['AWS']) {
+    if (machine['aws']) {
         ip_address_aws = ip_address + " (AWS)";
     }
 
