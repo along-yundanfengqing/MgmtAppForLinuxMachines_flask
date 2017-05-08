@@ -31,7 +31,7 @@ $(function () {
                 success: function(data){
                     var machine = data['data'];
                     if (machine['Status'].includes("Unknown")){
-                        createUnknownMachineElement(msg.ip_address, machine);
+                        insertUnknownMachineElement(msg.ip_address, machine);
                     }
                 },
                 error: function(e) {
@@ -56,7 +56,7 @@ $(function () {
             var modal02ID = "#myModal_export_json" + index;
             var numOfMachines = parseInt($('.badge').text());
             $('.badge').text(numOfMachines - 1);
-            $('div[id=' + '"machine-' + msg.ip_address + '"]').remove();
+            $('div[id="machine-' + msg.ip_address + '"]').remove();
             $(modal01ID).remove();
             $(modal02ID).remove();
         }
@@ -70,10 +70,51 @@ $(function () {
     });
 });
 
+function getIndexToInsert(hostname, ip_address){
+    var hostnameList = [];
+    var ipaddressList = [];
+    var index;
+    $('[id^=machine-hostname]').each(function(){
+        hostnameList.push($(this).text());
+    });
+    $('[id^=machine-ip]').each(function(){
+        ipaddressList.push($(this).text());
+    });
 
-function createUnknownMachineElement(ip_address, machine) {
+    for (var i = 0; i < hostnameList.length; i++){
+        if (hostname < hostnameList[i]){
+            index = i;
+            break;
+        }
+
+        else if (hostname === hostnameList[i]){
+            if (toInt(ip_address) < toInt(ipaddressList[i])){
+                index = i;
+                break;
+            }
+        }
+
+        else {
+            index = i + 1;
+        }
+   }
+
+   return index;
+}
+
+function toInt(ip){
+  var ipl=0;
+  ip.split('.').forEach(function( octet ) {
+      ipl<<=8;
+      ipl+=parseInt(octet);
+  });
+  return(ipl >>>0);
+};
+
+function insertUnknownMachineElement(ip_address, machine) {
     var numOfMachines = parseInt($('.badge').text());
     var index = numOfMachines + 101;
+    var indexToInsert = getIndexToInsert(machine['Hostname'], ip_address) + 1;
     $('.badge').text(numOfMachines + 1);
 
     var ip_address_aws = ip_address;
@@ -82,7 +123,7 @@ function createUnknownMachineElement(ip_address, machine) {
     }
 
     // Top page machine icon
-    $('#machine-list').prepend(
+    $('#machine-list div:nth-child(' + indexToInsert + ')').before(
         '<div class="col-xs-4 col-sm-3 col-md-2" id="machine-' + ip_address + '">' +
         '<img id="machine-img-' + ip_address + '" class="img-responsive" src="/static/images/other.png" data-toggle="modal" data-target="#myModal_machine_data' + index + '">' +
         '<h4><a href="#" data-toggle="modal" data-target="#myModal_machine_data' + index + '" id="machine-hostname-#Unknown-' + index + '">#Unknown</a></h4>' +
