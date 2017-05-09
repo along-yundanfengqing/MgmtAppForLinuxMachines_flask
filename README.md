@@ -65,8 +65,8 @@ All features are demonstrated with screenshots in the document.
 
 
 ## 2. Supported environment
-This program supports only Python 2.x on Linux or OS X platforms.  
-Python 3.x and Windows platforms are not supported.  
+This application supports both Python 2.x and 3.x on Linux or OS X platforms.  
+Windows platforms are not supported.  
 
 ## 3. Install packages
 Following python modules are required.
@@ -77,12 +77,13 @@ Following python modules are required.
 - pymongo
 - pexpect
 - eventlet
+- pytz
 - butterfly (Optional)
 
 To install:
 
 ```
-$ sudo pip install flask flask-login flask-wtf flask-socketio pymongo pexpect eventlet butterfly
+$ sudo pip install flask flask-login flask-wtf flask-socketio pymongo pexpect eventlet pytz butterfly
 ```
 
 > [Butterfly](https://github.com/paradoxxxzero/butterfly) is an xterm compatible external terminal application that runs in your browser.  
