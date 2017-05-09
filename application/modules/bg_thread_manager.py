@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-import thread
+try:
+    import _thread as thread    #for python 3.x
+except ImportError:
+    import thread   # for python 2.x
 import threading
 
 # my modules
@@ -31,7 +34,7 @@ class BackgroundThreadManager(object):
             th.start()
         except Exception as e:
             app.logger.critical("Stopping the program due to the unexpected error...")
-            app.logger.critical(e.message)
+            app.logger.critical(e)
             thread.interrupt_main()
 
 

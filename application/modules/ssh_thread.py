@@ -101,9 +101,9 @@ class SSHThread(threading.Thread):
             AppManager.update_machine_obj_and_update_db_ok(output_list)
 
         except Exception as e:
-            app.logger.critical("UNKNOWN ERROR OCCURED DURING THE SSH SESSION")
+            app.logger.critical("UNKNOWN ERROR OCCURRED DURING THE SSH SESSION")
             app.logger.critical(type(e))
-            app.logger.critical(e.message)
+            app.logger.critical(e)
 
         finally:
             s.logout()
@@ -112,7 +112,7 @@ class SSHThread(threading.Thread):
     def __get_output(self, cmd, s):
         s.sendline(cmd)
         s.prompt()
-        output = s.before
+        output = s.before.decode('ascii')
         return output
 
 
@@ -127,7 +127,6 @@ class SSHThread(threading.Thread):
             os_dist = "Redhat"
         else:
             os_dist = "Other(Not supported)"
-
         for line in output.splitlines():
             if os_dist == "Ubuntu" or os_dist == "Debian" or os_dist == "Redhat":
                 if re.search('VERSION=', line):
@@ -258,6 +257,6 @@ class SSHThread(threading.Thread):
                     "used": line[2],
                     "avail": line[3],
                     "use%": line[4],
-                    "mounted_on": line[5]
+                    "mounted on": line[5]
                 })
         return disk_usage

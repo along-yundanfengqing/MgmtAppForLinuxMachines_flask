@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 import os
 import re
 
@@ -23,11 +24,11 @@ class FileIO(object):
                     if re.search(r"^#", login_data[0]) or (len(login_data) != 2 and len(login_data) != 3):
                         continue
 
-                    ipaddr = unicode(login_data[0].strip(), "utf-8")
-                    username = unicode(login_data[1].strip(), "utf-8")
+                    ipaddr = login_data[0].strip()
+                    username = login_data[1].strip()
                     try:
-                        password = unicode(login_data[2].strip(), "utf-8")
-                    except Exception:
+                        password = login_data[2].strip()
+                    except Exception:   # no password
                         login_data.append(None)
 
                     login_list.append([ipaddr, username, password])

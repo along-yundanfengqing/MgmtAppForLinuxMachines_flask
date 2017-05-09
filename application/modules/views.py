@@ -161,7 +161,7 @@ def delete_machine():
 
     if request.method == 'POST':
         del_list_u = request.form.getlist('checkbox')
-        del_list = map(str, del_list_u)
+        del_list = list(map(str, del_list_u))
         if del_list:
             AppManager.del_machine(del_list)
             del_ip = ", ".join([ip for ip in del_list])

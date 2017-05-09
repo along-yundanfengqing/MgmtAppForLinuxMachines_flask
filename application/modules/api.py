@@ -138,7 +138,7 @@ def add_vm_api_02():
 # eg. curl -H "Content-Type: application/json" -X "DELETE" http://localhost:5000/api/machines/delete/1.1.1.1
 @api.route('/api/machines/delete/<ipaddresses>', methods=['DELETE'])
 def delete_vm_api_01(ipaddresses):
-    del_list = filter(lambda x: FileIO.exists_in_file(x), ipaddresses.split(","))
+    del_list = [x for x in ipaddresses.split(",") if FileIO.exists_in_file(x)]
     del_result = AppManager.del_machine(del_list)
     if del_result['ok'] == 1 and del_result['n'] > 0:
         del_ip_list = ", ".join([ip for ip in del_list])
@@ -160,7 +160,7 @@ def delete_vm_api_02():
         del_list = del_list.split()
 
     # filter ip addresses which are not in text file
-    del_list = filter(lambda x: FileIO.exists_in_file(x), del_list)
+    del_list = [x for x in del_list if FileIO.exists_in_file(x)]
 
     del_result = AppManager.del_machine(del_list)
     if del_result['ok'] == 1 and del_result['n'] > 0:

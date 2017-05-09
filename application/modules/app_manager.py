@@ -25,7 +25,7 @@ class AppManager(object):
             AppManager.create_machine_obj_and_write_db_new(ipaddr)   # Create a machine object and write to MongoDB
             return True
         except Exception as e:
-            print e.message
+            print(e)
             return False
 
 
@@ -52,7 +52,7 @@ class AppManager(object):
                 json.dump(doc, f, indent=4)
                 return True, JSON_DIR
         except Exception as e:
-            app.logger.error(e.message)
+            app.logger.error(e)
             return False, None
 
 
