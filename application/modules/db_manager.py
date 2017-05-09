@@ -25,6 +25,7 @@ class DBManager(object):
         self.db.collection.create_index([('ip_address', pymongo.ASCENDING), ('hostname', pymongo.ASCENDING)])
         self.db.collection.create_index([('hostname', pymongo.ASCENDING), ('ip_address_decimal', pymongo.ASCENDING)])
 
+
     @classmethod
     def get_current_instance(cls):
         if DBManager.current_instance is None:
@@ -43,10 +44,10 @@ class DBManager(object):
                 return mongo_db
         except pymongo.errors.ServerSelectionTimeoutError as e:
             app.logger.error("Unable to connect to %s:%s" % (self.__database_ip, self.__port))
-            sys.exit(3)
+            sys.exit(1)
         except Exception as e:
             app.logger.critical(e)
-            sys.exit(3)
+            sys.exit(1)
 
 
     def find(self, *args):

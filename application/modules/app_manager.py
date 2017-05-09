@@ -48,7 +48,7 @@ class AppManager(object):
 
         try:
             with open(JSON_FILEPATH, 'w') as f:
-                doc['last_updated'] = str(doc['last_updated'])
+                doc['last_updated'] = doc['last_updated'].isoformat()
                 json.dump(doc, f, indent=4)
                 return True, JSON_DIR
         except Exception as e:
@@ -70,14 +70,13 @@ class AppManager(object):
     def search_pem():
         HOME_DIR = os.getenv("HOME")
         SSH_DIR = os.path.join(HOME_DIR, '.ssh')
+        PEM_PATH = None
         ls = os.listdir(SSH_DIR)
         for item in ls:
             PATTERN = re.compile(r".*\.pem")
             if re.search(PATTERN, item.strip()):
                 PEM_PATH = "%s/%s" % (SSH_DIR, item)
-                return PEM_PATH, SSH_DIR
-        # if .pem not exists
-        PEM_PATH = None
+
         return PEM_PATH, SSH_DIR
 
 

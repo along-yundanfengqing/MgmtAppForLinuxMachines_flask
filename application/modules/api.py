@@ -20,7 +20,7 @@ mongo = DBManager.get_current_instance()
 # eg. curl -i http://localhost:5000/api/machines/vm01
 # eg. curl -i http://localhost:5000/api/machines/172.30.0.1
 @api.route('/api/machines/<hostname>', methods=['GET'])
-def show_json_host(hostname):
+def get_machine_api(hostname):
     if machines_cache.get(hostname) in machines_cache.machine_obj_list:
         doc = machines_cache.convert_machine_to_doc(hostname)
     else:
@@ -38,7 +38,7 @@ def show_json_host(hostname):
 # eg. curl -i http://localhost:5000/api/machines/all
 @api.route('/api/machines', methods=['GET'])
 @api.route('/api/machines/all', methods=['GET'])
-def show_json_all():
+def get_all_api():
     if machines_cache.get():
         docs = machines_cache.convert_machine_to_doc()
     else:
@@ -55,7 +55,7 @@ def show_json_all():
 # eg. curl -H "Content-Type: application/json" -X "POST" http://localhost:5000/api/machines/add/1.1.1.1:ubuntu
 @api.route('/api/machines/add/<ipaddr>:<username>', defaults={'password': None}, methods=['POST'])
 @api.route('/api/machines/add/<ipaddr>:<username>:<password>', methods=['POST'])
-def add_vm_api_01(ipaddr, username, password):
+def register_machine_api_01(ipaddr, username, password):
     error_list = []
 
     # validate ip address format and duplication check
@@ -84,7 +84,7 @@ def add_vm_api_01(ipaddr, username, password):
 # Add machines via RESTful API (by using -d option)
 ## eg. curl -H "Content-Type: application/json" -X "POST" http://localhost:5000/api/machines/add -d '[{"IP Address": "1.1.1.1", "Username": "ubuntu", "Password": "test"}, {"IP Address": "2.2.2.2", "Username": "ubuntu"}]'
 @api.route('/api/machines/add', methods=['POST'])
-def add_vm_api_02():
+def register_machine_api_02():
     if not request.get_json():
         abort(400)
 
@@ -137,7 +137,7 @@ def add_vm_api_02():
 # Delete machines via RESTful API
 # eg. curl -H "Content-Type: application/json" -X "DELETE" http://localhost:5000/api/machines/delete/1.1.1.1
 @api.route('/api/machines/delete/<ipaddresses>', methods=['DELETE'])
-def delete_vm_api_01(ipaddresses):
+def delete_machine_api_01(ipaddresses):
     del_list = [x for x in ipaddresses.split(",") if FileIO.exists_in_file(x)]
     del_result = AppManager.del_machine(del_list)
     if del_result['ok'] == 1 and del_result['n'] > 0:
@@ -150,7 +150,7 @@ def delete_vm_api_01(ipaddresses):
 # Delete machines via RESTful API (by using -d option)
 # eg. curl -H "Content-Type: application/json" -X "DELETE" http://localhost:5000/api/machines/delete -d '{"IP Address": [ "1.1.1.1", "2.2.2.2", "3.3.3.3" ]}'
 @api.route('/api/machines/delete', methods=['DELETE'])
-def delete_vm_api_02():
+def delete_machine_api_02():
     if not request.get_json() or not 'IP Address' in request.get_json():
         abort(400)
     del_list = request.get_json()['IP Address']

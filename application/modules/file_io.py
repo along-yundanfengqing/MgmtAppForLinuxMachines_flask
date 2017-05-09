@@ -18,7 +18,6 @@ class FileIO(object):
         try:
             with open(cls.__LOGIN_FILEPATH, 'r') as f:
                 for line in f.readlines():
-                    login_data = []
                     login_data = line.split(',')
                     # Skip comment outed or invalid entries in login.txt
                     if re.search(r"^#", login_data[0]) or (len(login_data) != 2 and len(login_data) != 3):

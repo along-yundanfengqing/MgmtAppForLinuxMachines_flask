@@ -42,12 +42,11 @@ class MachinesCache(object):
         if not isinstance(delete_ip_list, list):
             delete_ip_list = [delete_ip_list]
 
-        for ip in delete_ip_list:
-            for machine in self.machine_obj_list:
-                if machine.ip_address == ip:
-                    self.machine_obj_list.remove(machine)
-                    socketio.emit('message', {'data': 'deleted', "ip_address": machine.ip_address})
-                    app.logger.debug("Sent SocketIO message: deleted " + machine.ip_address)
+        for machine in self.machine_obj_list[:]:
+            if machine.ip_address in delete_ip_list:
+                self.machine_obj_list.remove(machine)
+                socketio.emit('message', {'data': 'deleted', "ip_address": machine.ip_address})
+                app.logger.debug("Sent SocketIO message: deleted " + machine.ip_address)
 
 
     def update_ok(self, machine_data, last_updated):
@@ -147,11 +146,7 @@ class MachinesCache(object):
             return doc
 
         else:
-            docs = []
-            for machine in self.get():
-                docs.append(self.convert_machine_to_doc(machine.ip_address))
-
-            return docs
+            return [self.convert_machine_to_doc(machine.ip_address)  for machine in self.get()]
 
 
     def clear(self):    # Unused
