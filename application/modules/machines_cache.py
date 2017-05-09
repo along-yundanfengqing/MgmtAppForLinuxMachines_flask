@@ -54,7 +54,7 @@ class MachinesCache(object):
         ip_address, hostname, mac_address, os_distribution, release, uptime, \
         cpu_load_avg, memory_usage, disk_usage = machine_data
 
-        if self.machine_obj_list > 0:
+        if len(self.machine_obj_list) > 0:
             for index, machine in enumerate(self.machine_obj_list):
                 if machine.ip_address == ip_address:
                     old_status = machine.status
@@ -85,7 +85,7 @@ class MachinesCache(object):
 
 
     def update_unreachable(self, ip_address, last_updated):
-        if self.machine_obj_list > 0:
+        if len(self.machine_obj_list) > 0:
             for index, machine in enumerate(self.machine_obj_list):
                 if machine.ip_address == ip_address:
                     machine.status = "Unreachable"
