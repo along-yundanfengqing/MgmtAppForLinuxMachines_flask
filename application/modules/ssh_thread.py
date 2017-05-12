@@ -35,42 +35,30 @@ class SSHThread(threading.Thread):
         # Check IP reachability before attempting SSH
         if self.__check_ip_reachability() != 0:
             app.logger.warning("IP Address %s is not reachable" % self.__ipaddr)
+            self.__update_cache_and_db()
             return
 
         else:
-            s = pxssh.pxssh(timeout=30)
+            s = pxssh.pxssh(timeout=10)
 
             # Attempt SSH access
             try:
                 if self.__password:    # for password authentication
-                    s.login(self.__ipaddr, self.__username, self.__password, login_timeout=30)
+                    s.login(self.__ipaddr, self.__username, self.__password, login_timeout=10)
                 else:           # for SSH-key based authentication
-                    s.login(self.__ipaddr, self.__username, login_timeout=30)
+                    s.login(self.__ipaddr, self.__username, login_timeout=10)
 
             # SSH login failure
             except KeyboardInterrupt:
                 return
             except (pexpect.exceptions.EOF, pxssh.ExceptionPxssh) as e:
                 if e.args[0] == 'password refused':
-                    app.logger.warning("SSH access to %s failed. Please check username or passord for login" % self.__ipaddr)
+                    app.logger.warning("SSH access to %s failed. Please check username or password for login" % self.__ipaddr)
 
                 else:
                     app.logger.error(e)
 
-                # Check if the IP Address still exists in login.txt and DB when ssh access failed.
-                exists_in_file = FileIO.exists_in_file(self.__ipaddr)
-                exists_in_db = mongo.find_one({"ip_address": self.__ipaddr})
-
-                # If SSH access failed when the VM exists in both login.txt and DB,
-                # mark the status as "Unreachable" and increment the failure count by 1
-                if exists_in_file and exists_in_db:
-                    AppManager.update_machine_obj_and_update_db_unreachable(self.__ipaddr)
-
-                # If the VM is in login.txt but not registered in DB, mark it as Unknown with N.A parameters
-                # and register it in DB = In case users manually add to login.txt but SSH login to the VM fails
-                elif exists_in_file and not exists_in_db:
-                    AppManager.create_machine_obj_and_write_db_new(self.__ipaddr)
-
+                self.__update_cache_and_db()
                 return
 
             # After SSH login succeeds: Collect data, parse, and store to DB
@@ -126,6 +114,22 @@ class SSHThread(threading.Thread):
 
     def __check_ip_reachability(self):
         return os.system("ping -c 1 -W 1 %s > /dev/null 2>&1" % self.__ipaddr)
+
+
+    def __update_cache_and_db(self):
+        # Check if the IP Address still exists in login.txt and DB when ssh access failed.
+        exists_in_file = FileIO.exists_in_file(self.__ipaddr)
+        exists_in_db = mongo.find_one({"ip_address": self.__ipaddr})
+
+        # If SSH access failed when the VM exists in both login.txt and DB,
+        # mark the status as "Unreachable" and increment the failure count by 1
+        if exists_in_file and exists_in_db:
+            AppManager.update_machine_obj_and_update_db_unreachable(self.__ipaddr)
+
+        # If the VM is in login.txt but not registered in DB, mark it as Unknown with N.A parameters
+        # and register it in DB = In case users manually add to login.txt but SSH login to the VM fails
+        elif exists_in_file and not exists_in_db:
+            AppManager.create_machine_obj_and_write_db_new(self.__ipaddr)
 
 
     def __get_output(self, cmd, s):
