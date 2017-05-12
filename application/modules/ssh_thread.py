@@ -276,7 +276,7 @@ class SSHThread(threading.Thread):
                     "used": line[2],
                     "avail": line[3],
                     "use%": line[4],
-                    "mounted on": line[5]
+                    "mounted_on": line[5]
                 })
 
         return disk_usage

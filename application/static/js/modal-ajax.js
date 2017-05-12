@@ -61,12 +61,12 @@ $(function () {
 
                 // Disk tab
                 for (var i=0; i<machine['disk_usage'].length; i++){
-                    thisModal.find('#disk' + index + ' tbody tr:nth-child(' + i+1 + ') td:nth-child(1)').text(machine['disk_usage'][i]['filesystem']);
-                    thisModal.find('#disk' + index + ' tbody tr:nth-child(' + i+1 + ') td:nth-child(2)').text(machine['disk_usage'][i]['size']);
-                    thisModal.find('#disk' + index + ' tbody tr:nth-child(' + i+1 + ') td:nth-child(3)').text(machine['disk_usage'][i]['used']);
-                    thisModal.find('#disk' + index + ' tbody tr:nth-child(' + i+1 + ') td:nth-child(4)').text(machine['disk_usage'][i]['avail']);
-                    thisModal.find('#disk' + index + ' tbody tr:nth-child(' + i+1 + ') td:nth-child(5)').text(machine['disk_usage'][i]['use%']);
-                    thisModal.find('#disk' + index + ' tbody tr:nth-child(' + i+1 + ') td:nth-child(6)').text(machine['disk_usage'][i]['mounted_on']);
+                    thisModal.find('#disk' + index + ' tbody tr:nth-child(' + i+2 + ') td:nth-child(1)').text(machine['disk_usage'][i]['filesystem']);
+                    thisModal.find('#disk' + index + ' tbody tr:nth-child(' + i+2 + ') td:nth-child(2)').text(machine['disk_usage'][i]['size']);
+                    thisModal.find('#disk' + index + ' tbody tr:nth-child(' + i+2 + ') td:nth-child(3)').text(machine['disk_usage'][i]['used']);
+                    thisModal.find('#disk' + index + ' tbody tr:nth-child(' + i+2 + ') td:nth-child(4)').text(machine['disk_usage'][i]['avail']);
+                    thisModal.find('#disk' + index + ' tbody tr:nth-child(' + i+2 + ') td:nth-child(5)').text(machine['disk_usage'][i]['use%']);
+                    thisModal.find('#disk' + index + ' tbody tr:nth-child(' + i+2 + ') td:nth-child(6)').text(machine['disk_usage'][i]['mounted_on']);
                 }
             }
 
