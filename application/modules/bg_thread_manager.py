@@ -13,6 +13,7 @@ from application.modules.db_manager import DBManager
 
 mongo = DBManager.get_current_instance()
 
+
 class BackgroundThreadManager(object):
     # Start the backgroud thread for SSH access and DB write/read
     @classmethod
@@ -64,5 +65,6 @@ class BackgroundThreadManager(object):
             socketio.emit('message', {'data': 'completed'})
             app.logger.debug("Sent SocketIO message: completed")
             app.logger.info("Completed collecting data and updated the database")
+
         else:   # no entry found in login.txt
             return

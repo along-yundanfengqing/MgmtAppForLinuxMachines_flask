@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import eventlet
+eventlet.monkey_patch()
 import pytz
 from flask import Flask
 app = Flask(__name__)
@@ -36,7 +37,6 @@ def start():
     print("Starting the program...\n")
     app.register_blueprint(view)
     app.register_blueprint(api)
-    eventlet.monkey_patch()
     app.jinja_env.filters['datetimefilter'] = datetimefilter
     app.jinja_env.filters['datetimefilter2'] = datetimefilter2
 
