@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 import pexpect
 import re
 import threading
@@ -11,6 +12,7 @@ from application.modules.db_manager import DBManager
 from application.modules.file_io import FileIO
 
 mongo = DBManager.get_current_instance()
+
 
 class SSHThread(threading.Thread):
     __CMD_HOSTNAME = "echo $HOSTNAME"
@@ -30,83 +32,100 @@ class SSHThread(threading.Thread):
 
 
     def run(self):
-        s = pxssh.pxssh(timeout=30)
-
-        # Attempt SSH access
-        try:
-            if self.__password:    # for password authentication
-                s.login(self.__ipaddr, self.__username, self.__password, login_timeout=30)
-            else:           # for SSH-key based authentication
-                s.login(self.__ipaddr, self.__username, login_timeout=30)
-
-        # SSH login failure
-        except (pexpect.exceptions.EOF, pxssh.ExceptionPxssh) as e:
-            if e.args[0] == 'password refused':
-                app.logger.warning("SSH access to %s failed. Please check username or passord for login" % self.__ipaddr)
-
-            else:
-                app.logger.warning("SSH access to %s failed. Please check network connectivity, or check if ssh service is started on the machine" % self.__ipaddr)
-
-            # Check if the IP Address still exists in login.txt and DB when ssh access failed.
-            exists_in_file = FileIO.exists_in_file(self.__ipaddr)
-            exists_in_db = mongo.find_one({"ip_address": self.__ipaddr})
-
-            # If SSH access failed when the VM exists in both login.txt and DB,
-            # mark the status as "Unreachable" and increment the failure count by 1
-            if exists_in_file and exists_in_db:
-                AppManager.update_machine_obj_and_update_db_unreachable(self.__ipaddr)
-
-            # If the VM is in login.txt but not registered in DB, mark it as Unknown with N.A parameters
-            # and register it in DB = In case users manually add to login.txt but SSH login to the VM fails
-            elif exists_in_file and not exists_in_db:
-                AppManager.create_machine_obj_and_write_db_new(self.__ipaddr)
-
+        # Check IP reachability before attempting SSH
+        if self.__check_ip_reachability() != 0:
+            app.logger.warning("IP Address %s is not reachable" % self.__ipaddr)
             return
 
-        # After SSH login succeeds: Collect data, parse, and store to DB
-        try:
-            # get OS type and Release
-            output = self.__get_output(SSHThread.__CMD_DISTRIBUTION, s)
-            os_dist, release = self.__get_os(output)
+        else:
+            s = pxssh.pxssh(timeout=30)
 
-            # get hostname
-            output = self.__get_output(SSHThread.__CMD_HOSTNAME, s)
-            hostname = self.__get_hostname(output)
+            # Attempt SSH access
+            try:
+                if self.__password:    # for password authentication
+                    s.login(self.__ipaddr, self.__username, self.__password, login_timeout=30)
+                else:           # for SSH-key based authentication
+                    s.login(self.__ipaddr, self.__username, login_timeout=30)
 
-            # get MAC Addresss
-            output = self.__get_output(SSHThread.__CMD_MAC, s)
-            mac = self.__get_mac(output, self.__ipaddr)
+            # SSH login failure
+            except KeyboardInterrupt:
+                return
+            except (pexpect.exceptions.EOF, pxssh.ExceptionPxssh) as e:
+                if e.args[0] == 'password refused':
+                    app.logger.warning("SSH access to %s failed. Please check username or passord for login" % self.__ipaddr)
 
-            # get uptime
-            output = self.__get_output(SSHThread.__CMD_UPTIME, s)
-            uptime = self.__get_uptime(output)
+                else:
+                    app.logger.error(e)
 
-            # get CPU load average
-            output = self.__get_output(SSHThread.__CMD_CPU_LOAD, s)
-            cpu_load = self.__get_cpu(output)
+                # Check if the IP Address still exists in login.txt and DB when ssh access failed.
+                exists_in_file = FileIO.exists_in_file(self.__ipaddr)
+                exists_in_db = mongo.find_one({"ip_address": self.__ipaddr})
 
-            # get Memory Usage
-            output = self.__get_output(SSHThread.__CMD_MEMORY, s)
-            memory_usage = self.__get_memory(output)
+                # If SSH access failed when the VM exists in both login.txt and DB,
+                # mark the status as "Unreachable" and increment the failure count by 1
+                if exists_in_file and exists_in_db:
+                    AppManager.update_machine_obj_and_update_db_unreachable(self.__ipaddr)
 
-            # get Disk Usage
-            output = self.__get_output(SSHThread.__CMD_DISK, s)
-            disk_usage = self.__get_disk(output)
+                # If the VM is in login.txt but not registered in DB, mark it as Unknown with N.A parameters
+                # and register it in DB = In case users manually add to login.txt but SSH login to the VM fails
+                elif exists_in_file and not exists_in_db:
+                    AppManager.create_machine_obj_and_write_db_new(self.__ipaddr)
 
-            # Write to DB
-            output_list = [
-                self.__ipaddr, hostname, mac, os_dist, release, uptime, cpu_load,
-                memory_usage, disk_usage
-                ]
-            AppManager.update_machine_obj_and_update_db_ok(output_list)
+                return
 
-        except Exception as e:
-            app.logger.critical("UNKNOWN ERROR OCCURRED DURING THE SSH SESSION")
-            app.logger.critical(type(e))
-            app.logger.critical(e)
+            # After SSH login succeeds: Collect data, parse, and store to DB
+            try:
+                # get OS type and Release
+                output = self.__get_output(SSHThread.__CMD_DISTRIBUTION, s)
+                os_dist, release = self.__get_os(output)
 
-        finally:
-            s.logout()
+                # get hostname
+                output = self.__get_output(SSHThread.__CMD_HOSTNAME, s)
+                hostname = self.__get_hostname(output)
+
+                # get MAC Addresss
+                output = self.__get_output(SSHThread.__CMD_MAC, s)
+                mac = self.__get_mac(output, self.__ipaddr)
+
+                # get uptime
+                output = self.__get_output(SSHThread.__CMD_UPTIME, s)
+                uptime = self.__get_uptime(output)
+
+                # get CPU load average
+                output = self.__get_output(SSHThread.__CMD_CPU_LOAD, s)
+                cpu_load = self.__get_cpu(output)
+
+                # get Memory Usage
+                output = self.__get_output(SSHThread.__CMD_MEMORY, s)
+                memory_usage = self.__get_memory(output)
+
+                # get Disk Usage
+                output = self.__get_output(SSHThread.__CMD_DISK, s)
+                disk_usage = self.__get_disk(output)
+
+                # Write to DB
+                output_list = [
+                    self.__ipaddr, hostname, mac, os_dist, release, uptime, cpu_load,
+                    memory_usage, disk_usage
+                    ]
+                AppManager.update_machine_obj_and_update_db_ok(output_list)
+
+            except KeyboardInterrupt:
+                pass
+            except Exception as e:
+                app.logger.critical("UNKNOWN ERROR OCCURRED DURING THE SSH SESSION")
+                app.logger.critical(type(e))
+                app.logger.critical(e)
+            finally:
+                s.logout()
+
+
+    def get_ip_address(self):
+        return self.__ipaddr
+
+
+    def __check_ip_reachability(self):
+        return os.system("ping -c 1 -W 1 %s > /dev/null 2>&1" % self.__ipaddr)
 
 
     def __get_output(self, cmd, s):
@@ -133,15 +152,13 @@ class SSHThread(threading.Thread):
                     PATTERN = re.compile(r"VERSION=|\"")
                     release = re.sub(PATTERN, "", line)
                     return os_dist, release
-                else:
-                    continue
+
             elif os_dist == "CentOS":
                 if re.search('CentOS release', line):
                     tmp = line.split()
                     release = tmp[2]
                     return os_dist, release
-                else:
-                    continue
+
             else:
                 release = "Unknown"
                 return os_dist, release
@@ -174,11 +191,13 @@ class SSHThread(threading.Thread):
             h, m = divmod(m, 60)
             d, h = divmod(h, 24)
             break
+
         return "%dd %dh %dm %ds" % (d, h, m, s)
 
 
     def __get_cpu(self, output):
         cpu_load = {}
+        cpu_1, cpu_2, cpu_3 = "", "", ""
         for line in output.splitlines()[1:]:
             PATTERN = re.compile(r".+load average: ")
             if re.search(PATTERN, line):
@@ -187,9 +206,11 @@ class SSHThread(threading.Thread):
                 cpu_2 = line.split(',')[1].strip()
                 cpu_3 = line.split(',')[2].strip()
                 break
+
         cpu_load['1min'] = cpu_1
         cpu_load['5min'] = cpu_2
         cpu_load['15min'] = cpu_3
+
         return cpu_load
 
 
@@ -220,8 +241,7 @@ class SSHThread(threading.Thread):
                         "used": line[2],
                         "free": line[3]
                     }
-                else:
-                    continue
+
         elif lines[1].split()[4].strip() == "buff/cache":
             for line in lines[2:]:
                 line = line.split()
@@ -240,8 +260,7 @@ class SSHThread(threading.Thread):
                         "used": line[2],
                         "free": line[3]
                     }
-                else:
-                    continue
+
         return memory_usage
 
 
@@ -259,4 +278,5 @@ class SSHThread(threading.Thread):
                     "use%": line[4],
                     "mounted on": line[5]
                 })
+
         return disk_usage
