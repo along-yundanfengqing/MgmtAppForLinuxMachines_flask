@@ -1,6 +1,6 @@
 $(function () {
   $('#machine-list').on('click', 'img[id^=machine-img], a[id^=machine-hostname], a[id^=machine-ip]', function(){
-    var ipAddress = $(this).parent().find('a[id^=machine-ip]').text();
+    var ipAddress = $(this).parent().find('a[id^=machine-ip]').text().replace(" (AWS)", "");
     var index = $(this).attr("data-target").replace("#myModal_machine_data", "");
     $.ajax({
         type: "GET",

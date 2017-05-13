@@ -10,6 +10,7 @@ from application import app
 from application.modules.app_manager import AppManager
 from application.modules.db_manager import DBManager
 from application.modules.file_io import FileIO
+from application.modules.validation import Validation
 
 mongo = DBManager.get_current_instance()
 
@@ -51,12 +52,15 @@ class SSHThread(threading.Thread):
             # SSH login failure
             except KeyboardInterrupt:
                 return
+            except OSError:
+                return
             except (pexpect.exceptions.EOF, pxssh.ExceptionPxssh) as e:
                 if e.args[0] == 'password refused':
                     app.logger.warning("SSH access to %s failed. Please check username or password for login" % self.__ipaddr)
 
                 else:
-                    app.logger.error(e)
+                    if Validation.is_aws(self.__ipaddr):
+                        app.logger.warning("SSH access to %s failed. Please check network connectivity, or check if ssh service is started on the machine" % self.__ipaddr)
 
                 self.__update_cache_and_db()
                 return
@@ -113,7 +117,10 @@ class SSHThread(threading.Thread):
 
 
     def __check_ip_reachability(self):
-        return os.system("ping -c 1 -W 1 %s > /dev/null 2>&1" % self.__ipaddr)
+        if not Validation.is_aws(self.__ipaddr):
+            return os.system("ping -c 1 -W 1 %s > /dev/null 2>&1" % self.__ipaddr)
+        else:   # Skip checking for AWS instances as it depends on the security-group
+            return 0
 
 
     def __update_cache_and_db(self):
@@ -172,12 +179,9 @@ class SSHThread(threading.Thread):
         lines = output.splitlines()[1:]
         mac = ""
         for line in lines:
-            PATTERN = ipaddr + '/'
+            #PATTERN = ipaddr + '/'
             if "link/ether" in line:
                 mac = line.lstrip().split(" ")[1]
-            # return MAC Address only when associated with given IP address(In the case when multiple NICs exist)
-            # Note: This logic doesn't work when NAT is used (eg. accessing EC2 from the internet)
-            elif PATTERN in line:
                 return mac
 
 
