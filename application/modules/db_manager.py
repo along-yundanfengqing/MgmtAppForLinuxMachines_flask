@@ -94,7 +94,7 @@ class DBManager(object):
         if doc['aws']:
             doc['ec2'] = {
                 'instance_id': EC2Client.ip_instance_map.get(ipaddr, None),
-                'status': None
+                'state': None
             }
         doc['last_updated'] = last_updated
         self.update_one(
@@ -122,7 +122,7 @@ class DBManager(object):
         if doc['aws']:
             doc['ec2'] = {
                 'instance_id': EC2Client.ip_instance_map.get(ipaddr, None),
-                'status': "running"
+                'state': "running"
             }
         doc['last_updated'] = last_updated
         # Unmark the old Hostname(#Unknown) entry if exists after SSH succeeds
@@ -137,8 +137,8 @@ class DBManager(object):
         self.update_one({'ip_address': ipaddr}, {'$inc': {'fail_count': 1}})
 
 
-    def update_ec2_status(self, ipaddr, status):
-        self.update_one({'ip_address': ipaddr}, {'$set': {'ec2.status': status}})
+    def update_ec2_state(self, ipaddr, state):
+        self.update_one({'ip_address': ipaddr}, {'$set': {'ec2.state': state}})
 
     # Check mismatch between login.txt and database
     def check_mismatch(self):

@@ -72,7 +72,7 @@ class MachinesCache(object):
                     if machine.aws:
                         machine.ec2 = {
                             'instance_id': EC2Client.ip_instance_map.get(machine.ip_address, None),
-                            'status': "running"
+                            'state': "running"
                         }
                     machine.last_updated = last_updated
                     self.machine_obj_list[index] = machine      # update machine_list
@@ -108,11 +108,12 @@ class MachinesCache(object):
         app.logger.debug("Sent SocketIO message: created")
 
 
-    def update_ec2_status(self, ip_address, status):
+    def update_ec2_state(self, ip_address, state):
         for index, machine in enumerate(self.machine_obj_list):
             if machine.ip_address == ip_address:
-                machine.ec2['status'] = status
+                machine.ec2['state'] = state
                 self.machine_obj_list[index] = machine  # update machine_list
+                socketio.emit('message', {'data': 'ec2_state_updated', 'state': state})
                 return
 
 
@@ -158,7 +159,7 @@ class MachinesCache(object):
             if doc['aws']:
                 doc['ec2'] = {
                     'instance_id': machine.ec2.get('instance_id'),
-                    'status': machine.ec2.get('status')
+                    'state': machine.ec2.get('state')
                 }
 
             return doc

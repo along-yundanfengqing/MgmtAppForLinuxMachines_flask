@@ -26,6 +26,6 @@ class Machine(object):
         if self.aws:
             self.ec2 = {
                 'instance_id': None,
-                'status': None
+                'state': None
             }
 

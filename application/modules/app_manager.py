@@ -122,13 +122,13 @@ class AppManager(object):
     def start_ec2(ipaddr):
         ec2_instance = EC2Instance(ipaddr)
         eventlet.spawn_n(ec2_instance.start)
-        mongo.update_ec2_status(ipaddr, "starting")
-        machines_cache.update_ec2_status(ipaddr, "starting")
+        mongo.update_ec2_state(ipaddr, "starting")
+        machines_cache.update_ec2_state(ipaddr, "starting")
 
 
     @staticmethod
     def stop_ec2(ipaddr):
         ec2_instance = EC2Instance(ipaddr)
         eventlet.spawn_n(ec2_instance.stop)
-        mongo.update_ec2_status(ipaddr, "stopping")
-        machines_cache.update_ec2_status(ipaddr, "stopping")
+        mongo.update_ec2_state(ipaddr, "stopping")
+        machines_cache.update_ec2_state(ipaddr, "stopping")
