@@ -22,8 +22,8 @@
 
       <p class="text-info">Please select machines to delete</p>
       <form action="{{url_for('view.delete_machine')}}" method='POST'>
-          <div class="row text-center">
-              <div class="form-group">
+          <div class="form-group">
+               <div class="row display-flex text-center">
                   {% for machine in machines %}
                   {% if machines | length > 15 %}
                   <div class="col-xs-3 col-sm-2 col-md-1">

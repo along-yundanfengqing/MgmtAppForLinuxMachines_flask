@@ -1,0 +1,12 @@
+.display-flex {
+  display: flex;
+  flex-wrap: wrap;
+  overflow-wrap:break-word;
+}
+
+.display-flex.container:before,
+.display-flex.container:after,
+.display-flex.row:before,
+.display-flex.row:after {
+   content: normal;
+}
