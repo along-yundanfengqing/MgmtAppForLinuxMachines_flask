@@ -164,11 +164,11 @@ function insertUnknownMachineElement(ip_address, machine) {
                                   '</tr>' +
                                   '<tr>' +
                                     '<td>OS Distribution:</td>' +
-                                    '<td> N.A </td>' +
+                                    '<td> None </td>' +
                                   '</tr>' +
                                   '<tr>' +
                                     '<td>Release:</td>' +
-                                    '<td> N.A </td>' +
+                                    '<td> None </td>' +
                                   '</tr>' +
                                   '<tr>' +
                                     '<td>IP Address:</td>' +
@@ -176,11 +176,11 @@ function insertUnknownMachineElement(ip_address, machine) {
                                   '</tr>' +
                                   '<tr>' +
                                     '<td>MAC Address:</td>' +
-                                    '<td> N.A </td>' +
+                                    '<td> None </td>' +
                                   '</tr>' +
                                   '<tr>' +
                                     '<td>Uptime:</td>' +
-                                    '<td> N.A </td>' +
+                                    '<td> None </td>' +
                                   '</tr>' +
                                 '</tbody>' +
                               '</table>' +
@@ -188,16 +188,16 @@ function insertUnknownMachineElement(ip_address, machine) {
                       '</div>' +
                       '<div role="tabpanel" class="tab-pane" id="cpu' + index + '">' +
                           '<h5>CPU Load Average</h5>' +
-                          '<div class="table-responsive">N.A</div>' +
+                          '<div class="table-responsive">None</div>' +
                       '</div>' +
                       '<div role="tabpanel" class="tab-pane" id="memory' + index + '">' +
                           '<h5>Memory Usage</h5>' +
-                          '<div class="table-responsive">N.A</div>' +
+                          '<div class="table-responsive">None</div>' +
                       '</div>' +
 
                       '<div role="tabpanel" class="tab-pane" id="disk' + index + '">' +
                           '<h5>Disk Usage</h5>' +
-                          '<div class="table-responsive">N.A</div>' +
+                          '<div class="table-responsive">None</div>' +
                       '</div>' +
                     '</div>' +
                     '<div class ="text-right"></div>' +
