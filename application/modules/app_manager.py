@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import eventlet
 import json
 import os
 import pip
@@ -12,6 +13,7 @@ from application.modules.db_manager import DBManager
 from application.modules.file_io import FileIO
 from application.modules.machines import Machine
 from application.modules.machines_cache import MachinesCache
+from application.modules.aws_ec2 import EC2Instance
 
 machines_cache = MachinesCache.get_current_instance()
 mongo = DBManager.get_current_instance()
@@ -114,3 +116,19 @@ class AppManager(object):
     @staticmethod
     def delete_machine_obj(del_ip_list):
         machines_cache.delete(del_ip_list)
+
+
+    @staticmethod
+    def start_ec2(ipaddr):
+        ec2_instance = EC2Instance(ipaddr)
+        eventlet.spawn_n(ec2_instance.start)
+        mongo.update_ec2_status(ipaddr, "starting")
+        machines_cache.update_ec2_status(ipaddr, "starting")
+
+
+    @staticmethod
+    def stop_ec2(ipaddr):
+        ec2_instance = EC2Instance(ipaddr)
+        eventlet.spawn_n(ec2_instance.stop)
+        mongo.update_ec2_status(ipaddr, "stopping")
+        machines_cache.update_ec2_status(ipaddr, "stopping")

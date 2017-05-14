@@ -5,6 +5,7 @@ import sys
 
 # my modules
 from application import app
+from application.modules.aws_ec2 import EC2Client
 from application.modules.file_io import FileIO
 from application.modules.validation import Validation
 from application.modules.machines_cache import MachinesCache
@@ -82,14 +83,19 @@ class DBManager(object):
         doc['hostname'] = "#Unknown"
         doc['ip_address'] = ipaddr
         doc['ip_address_decimal'] = int(ipaddress.IPv4Address(ipaddr))
-        doc['mac_address'] = "N.A"
-        doc['os_distribution'] = "N.A"
-        doc['release'] = "N.A"
-        doc['uptime'] = "N.A"
-        doc['cpu_load_avg'] = "N.A"
-        doc['memory_usage'] = "N.A"
-        doc['disk_usage'] = "N.A"
+        doc['mac_address'] = None
+        doc['os_distribution'] = None
+        doc['release'] = None
+        doc['uptime'] = None
+        doc['cpu_load_avg'] = None
+        doc['memory_usage'] = None
+        doc['disk_usage'] = None
         doc['aws'] = Validation.is_aws(ipaddr)
+        if doc['aws']:
+            doc['ec2'] = {
+                'instance_id': EC2Client.ip_instance_map.get(ipaddr, None),
+                'status': None
+            }
         doc['last_updated'] = last_updated
         self.update_one(
             {'ip_address': ipaddr, 'hostname': "#Unknown"},
@@ -113,6 +119,11 @@ class DBManager(object):
         doc['memory_usage'] = memory_usage
         doc['disk_usage'] = disk_usage
         doc['aws'] = Validation.is_aws(ipaddr)
+        if doc['aws']:
+            doc['ec2'] = {
+                'instance_id': EC2Client.ip_instance_map.get(ipaddr, None),
+                'status': "running"
+            }
         doc['last_updated'] = last_updated
         # Unmark the old Hostname(#Unknown) entry if exists after SSH succeeds
         if self.find({'ip_address': ipaddr, 'hostname': "#Unknown"}):
@@ -126,6 +137,9 @@ class DBManager(object):
         self.update_one({'ip_address': ipaddr}, {'$inc': {'fail_count': 1}})
 
 
+    def update_ec2_status(self, ipaddr, status):
+        self.update_one({'ip_address': ipaddr}, {'$set': {'ec2.status': status}})
+
     # Check mismatch between login.txt and database
     def check_mismatch(self):
         docs = self.find({}, {'_id': 0, 'ip_address': 1, 'hostname': 1})
@@ -134,3 +148,4 @@ class DBManager(object):
             if not FileIO.exists_in_file(ipaddr):
                 self.delete_one({'ip_address': ipaddr})
                 machines_cache.delete(ipaddr)
+

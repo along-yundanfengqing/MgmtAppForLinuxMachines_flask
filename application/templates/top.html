@@ -93,8 +93,24 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h4 class="modal-title" id="myModalLabel">{{ machine.hostname }}</h4>
+              <div class="container-fluid">
+                  <div class="row">
+                    <div class="col-md-9">
+                        <h4 class="modal-title" id="myModalLabel">{{ machine.hostname }}</h4>
+                    </div>
+                    <div class="col-md-3">
+                      <div class ="text-right">
+                        {% if machine.aws == true and ('Unknown' in machine.status or machine.status == 'Unreachable') %}
+                            <a id="aws-ec2-manager" class="btn btn-success btn-sm" href="{{url_for('view.start_ec2', ipaddr=machine.ip_address)}}" role="button">Start Instance</a>
+                        {% elif machine.aws == true and machine.status == 'OK'%}
+                            <a id="aws-ec2-manager" class="btn btn-danger btn-sm" href="{{url_for('view.stop_ec2', ipaddr=machine.ip_address)}}" role="button">Stop Instance</a>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+              </div>
           </div>
+
           <div class="modal-body" id="modal-body{{loop.index}}">
               {% set delta =  now  - machine.last_updated %}
               <div class ="text-right">Last Updated:</div>
@@ -165,7 +181,7 @@
                     <div role="tabpanel" class="tab-pane" id="cpu{{loop.index}}">
                         <h5>CPU Load Average</h5>
                         <div class="table-responsive">
-                            {% if machine.cpu_load_avg != "N.A" %}
+                            {% if machine.cpu_load_avg != none %}
                             <table class="table table-hover">
                               <tbody>
                                 <th class="active"> 1 min </th>
@@ -194,7 +210,7 @@
                     <div role="tabpanel" class="tab-pane" id="memory{{loop.index}}">
                         <h5>Memory Usage</h5>
                         <div class="table-responsive">
-                            {% if machine.memory_usage != "N.A" %}
+                            {% if machine.memory_usage != none %}
                             <table class="table table-hover">
                                 {% if machine.memory_usage | length == 3 %}
                                 <tbody>
@@ -274,7 +290,7 @@
                     <div role="tabpanel" class="tab-pane" id="disk{{loop.index}}">
                         <h5>Disk Usage</h5>
                         <div class="table-responsive">
-                            {% if machine.disk_usage != "N.A" %}
+                            {% if machine.disk_usage != none %}
                             <table class="table table-hover">
                                 <tbody>
                                   <th class="active"> Filesystem </th>

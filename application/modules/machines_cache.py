@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from application import socketio, app
+from application.modules.aws_ec2 import EC2Client
 from application.modules.validation import Validation
 from application.modules.machines import Machine
 
@@ -68,6 +69,11 @@ class MachinesCache(object):
                     machine.memory_usage = memory_usage
                     machine.disk_usage = disk_usage
                     machine.aws = Validation.is_aws(ip_address)
+                    if machine.aws:
+                        machine.ec2 = {
+                            'instance_id': EC2Client.ip_instance_map.get(machine.ip_address, None),
+                            'status': "running"
+                        }
                     machine.last_updated = last_updated
                     self.machine_obj_list[index] = machine      # update machine_list
                     if ("Unknown" in old_status or "Unreachable" in old_status):
@@ -102,6 +108,14 @@ class MachinesCache(object):
         app.logger.debug("Sent SocketIO message: created")
 
 
+    def update_ec2_status(self, ip_address, status):
+        for index, machine in enumerate(self.machine_obj_list):
+            if machine.ip_address == ip_address:
+                machine.ec2['status'] = status
+                self.machine_obj_list[index] = machine  # update machine_list
+                return
+
+
     def convert_docs_to_machine_list(self, docs):
         tmp_machine_list = []
         for doc in docs:
@@ -118,7 +132,6 @@ class MachinesCache(object):
                 doc['cpu_load_avg'],
                 doc['memory_usage'],
                 doc['disk_usage'],
-
             )
 
             tmp_machine_list.append(machine)
@@ -142,6 +155,11 @@ class MachinesCache(object):
             doc['memory_usage'] = machine.memory_usage
             doc['disk_usage'] = machine.disk_usage
             doc['aws'] = Validation.is_aws(machine.ip_address)
+            if doc['aws']:
+                doc['ec2'] = {
+                    'instance_id': machine.ec2.get('instance_id'),
+                    'status': machine.ec2.get('status')
+                }
 
             return doc
 

@@ -220,3 +220,20 @@ def export_json():
             flash('Failed to export the JSON file', 'error')
 
     return redirect(url_for('view.show_top'))
+
+
+# Start EC2 Instance
+@view.route('/start_instance/<ipaddr>', methods=['GET', 'POST'])
+@login_required
+def start_ec2(ipaddr):
+    AppManager.start_ec2(ipaddr)
+    return redirect(url_for('view.show_top'))
+
+
+# Stop EC2 Instance
+@view.route('/stop_instance/<ipaddr>', methods=['GET', 'POST'])
+@login_required
+def stop_ec2(ipaddr):
+    AppManager.stop_ec2(ipaddr)
+    return redirect(url_for('view.show_top'))
+
