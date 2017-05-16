@@ -93,7 +93,7 @@ class DBManager(object):
         doc['aws'] = Validation.is_aws(ipaddr)
         if doc['aws']:
             doc['ec2'] = {
-                'instance_id': EC2Client.ip_instance_map.get(ipaddr, None),
+                'instance_id': EC2Client.ip_instance_map.get(ipaddr, EC2Client.get_instance_id(ipaddr)),
                 'state': None
             }
         doc['last_updated'] = last_updated

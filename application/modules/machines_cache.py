@@ -71,7 +71,7 @@ class MachinesCache(object):
                     machine.aws = Validation.is_aws(ip_address)
                     if machine.aws:
                         machine.ec2 = {
-                            'instance_id': EC2Client.ip_instance_map.get(machine.ip_address, None),
+                            'instance_id': EC2Client.ip_instance_map.get(ip_address, EC2Client.get_instance_id(ip_address)),
                             'state': "running"
                         }
                     machine.last_updated = last_updated
@@ -113,7 +113,7 @@ class MachinesCache(object):
             if machine.ip_address == ip_address:
                 machine.ec2['state'] = state
                 self.machine_obj_list[index] = machine  # update machine_list
-                socketio.emit('message', {'data': 'ec2_state_updated', 'state': state})
+                socketio.emit('message', {'data': 'ec2_state_updated', 'state': state, 'ip_address': ip_address})
                 return
 
 

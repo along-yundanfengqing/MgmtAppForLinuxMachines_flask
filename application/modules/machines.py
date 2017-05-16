@@ -2,6 +2,7 @@
 import ipaddress
 
 from application.modules.validation import Validation
+from application.modules.aws_ec2 import EC2Client
 
 class Machine(object):
     def __init__(self, ip_address, last_updated, status="Unknown (Waiting for the first SSH access)",
@@ -25,7 +26,7 @@ class Machine(object):
 
         if self.aws:
             self.ec2 = {
-                'instance_id': None,
+                'instance_id': EC2Client.get_instance_id(ip_address),
                 'state': None
             }
 
