@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import eventlet
+eventlet.monkey_patch()
 import pymongo
 import subprocess
 from datetime import datetime
@@ -226,7 +228,7 @@ def export_json():
 @view.route('/start_instance/<ipaddr>', methods=['GET', 'POST'])
 @login_required
 def start_ec2(ipaddr):
-    AppManager.start_ec2(ipaddr)
+    eventlet.spawn_n(AppManager.start_ec2, ipaddr)
     return redirect(url_for('view.show_top'))
 
 
@@ -234,6 +236,6 @@ def start_ec2(ipaddr):
 @view.route('/stop_instance/<ipaddr>', methods=['GET', 'POST'])
 @login_required
 def stop_ec2(ipaddr):
-    AppManager.stop_ec2(ipaddr)
+    eventlet.spawn_n(AppManager.stop_ec2, ipaddr)
     return redirect(url_for('view.show_top'))
 

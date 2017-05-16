@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import eventlet
 import json
 import os
 import pip
@@ -89,6 +88,7 @@ class AppManager(object):
         flat_installed_packages = [package.project_name for package in installed_packages]
         return 'butterfly' in flat_installed_packages
 
+
     # create a machine object and write a new entry(status Unknown) to MongoDB
     @staticmethod
     def create_machine_obj_and_write_db_new(ipaddr):
@@ -121,14 +121,26 @@ class AppManager(object):
     @staticmethod
     def start_ec2(ipaddr):
         ec2_instance = EC2Instance(ipaddr)
-        eventlet.spawn_n(ec2_instance.start)
-        mongo.update_ec2_state(ipaddr, "starting")
-        machines_cache.update_ec2_state(ipaddr, "starting")
+        # Start
+        ec2_instance.start()
+        mongo.update_ec2_state(ipaddr, "pending")
+        machines_cache.update_ec2_state(ipaddr, "pending")
+
+        # Wait
+        ec2_instance.wait_until_running()
+        mongo.update_ec2_state(ipaddr, "running")
+        machines_cache.update_ec2_state(ipaddr, "running")
 
 
     @staticmethod
     def stop_ec2(ipaddr):
         ec2_instance = EC2Instance(ipaddr)
-        eventlet.spawn_n(ec2_instance.stop)
+        # Stop
+        ec2_instance.stop()
         mongo.update_ec2_state(ipaddr, "stopping")
         machines_cache.update_ec2_state(ipaddr, "stopping")
+
+        # Wait
+        ec2_instance.wait_until_stopped()
+        mongo.update_ec2_state(ipaddr, "stopped")
+        machines_cache.update_ec2_state(ipaddr, "stopped")
