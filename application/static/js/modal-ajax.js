@@ -17,6 +17,28 @@ $(function () {
             // Last updated
             thisModal.find('#modal-body' + index + ' > div:nth-child(2)').text(lastUpdatedFormatted + ' (' + deltaInSec + ' seconds ago)');
 
+            // AWS State change
+            if (machine['aws'] && machine['ec2']['state'] === 'pending') {
+                // show 'start instance with .disabled'
+                thisModal.find('#aws-ec2-button' + index).addClass('disabled').text('Starting instance');
+            }
+
+            else if (machine['aws'] && machine['ec2']['state'] === 'stopping') {
+                // show 'stop instance with .disabled'
+                thisModal.find('#aws-ec2-button' + index).addClass('disabled').text('Stopping instance');
+            }
+
+            else if (machine['aws'] && machine['ec2']['state'] === 'running') {
+                // show 'stop instance'
+                thisModal.find('#aws-ec2-button' + index).removeClass('disabled btn-success').addClass('btn-danger').attr('href', '/stop_instance/' + machine.ip_address).text('Stop Instance');
+            }
+
+            else if (machine['aws'] && machine['ec2']['state'] === 'stopped') {
+                // show 'start instance'
+                thisModal.find('#aws-ec2-button' + index).removeClass('disabled btn-danger').addClass('btn-success').attr('href', '/start_instance/' + machine.ip_address).text('Start Instance');
+
+            }
+
             if (machine['status'] === 'OK'){
                 // Basic tab
                 thisModal.find('#basic' + index + ' tbody tr:nth-child(2) td:nth-child(2)').html('<img src="/static/images/status_ok.png"> OK');
