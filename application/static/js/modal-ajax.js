@@ -20,12 +20,12 @@ $(function () {
             // AWS State change
             if (machine['aws'] && machine['ec2']['state'] === 'pending') {
                 // show 'start instance with .disabled'
-                thisModal.find('#aws-ec2-button' + index).addClass('disabled').text('Starting instance');
+                thisModal.find('#aws-ec2-button' + index).removeClass('btn-danger').addClass('disabled btn-success').text('Starting instance');
             }
 
             else if (machine['aws'] && machine['ec2']['state'] === 'stopping') {
                 // show 'stop instance with .disabled'
-                thisModal.find('#aws-ec2-button' + index).addClass('disabled').text('Stopping instance');
+                thisModal.find('#aws-ec2-button' + index).removeClass('btn-success').addClass('disabled btn-danger').text('Stopping instance');
             }
 
             else if (machine['aws'] && machine['ec2']['state'] === 'running') {
