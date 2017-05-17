@@ -64,6 +64,9 @@ class SSHThread(threading.Thread):
 
                 self.__update_cache_and_db()
                 return
+            except Exception as e:
+                print(type(e))
+                return
 
             # After SSH login succeeds: Collect data, parse, and store to DB
             try:
