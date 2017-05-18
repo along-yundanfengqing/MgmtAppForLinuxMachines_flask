@@ -18,7 +18,13 @@ $(function () {
             thisModal.find('#modal-body' + index + ' > div:nth-child(2)').text(lastUpdatedFormatted + ' (' + deltaInSec + ' seconds ago)');
 
             // AWS State change
-            if (machine['aws'] && machine['ec2']['state'] === 'pending') {
+            if (machine['aws'] && machine['ec2']['state'] === null) {
+                // Initial Unknown status. Add aws button
+                thisModal.find('#aws-ec2-button' + index).remove();
+                thisModal.find('.container-fluid .text-right').prepend('<a id="aws-ec2-button' + index + '" class="btn btn-success btn-sm" href="/start_instance/' + machine.ip_address + '" role="button">Start Instance</a>');
+            }
+
+            else if (machine['aws'] && machine['ec2']['state'] === 'pending') {
                 // show 'start instance with .disabled'
                 thisModal.find('#aws-ec2-button' + index).removeClass('btn-danger').addClass('disabled btn-success').text('Starting instance');
             }
@@ -39,7 +45,8 @@ $(function () {
 
             }
 
-            if (machine['status'] === 'OK'){
+
+            else if (machine['status'] === 'OK'){
                 // Basic tab
                 thisModal.find('#basic' + index + ' tbody tr:nth-child(2) td:nth-child(2)').html('<img src="/static/images/status_ok.png"> OK');
                 thisModal.find('#basic' + index + ' tbody tr:nth-child(3) td:nth-child(2)').text(machine['os_distribution']);
@@ -92,14 +99,13 @@ $(function () {
                 }
             }
 
-            else if(machine['status'] === 'Unreachable'){
+            else if (machine['status'] === 'Unreachable'){
               thisModal.find('#basic' + index + ' tbody tr:nth-child(2) td:nth-child(2)').html('<img src="/static/images/status_unreachable.png"> Unreachable (SSH access failed ' + machine['fail_count'] + ' times)');
               thisModal.find('form button').remove();
             }
-            else{ // Unknown
-              thisModal.find('#basic' + index + ' tbody tr:nth-child(2) td:nth-child(2)').html('<img src="/static/images/status_unknown.png"> Unknown (Waiting for the first SSH access)');
-              thisModal.find('form button').remove();
-            }
+            //else { // Unknown
+            //  thisModal.find('#basic' + index + ' tbody tr:nth-child(2) td:nth-child(2)').html('<img src="/static/images/status_unknown.png"> Unknown (Waiting for the first SSH access)');
+            //}
         }
     });
   });

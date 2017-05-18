@@ -161,7 +161,17 @@ function insertUnknownMachineElement(ip_address, machine) {
         '<div class="modal-dialog">' +
           '<div class="modal-content">' +
             '<div class="modal-header">' +
-              '<h4 class="modal-title" id="myModalLabel">#Unknown</h4>' +
+                '<div class="container-fluid">' +
+                  '<div class="row">' +
+                    '<div class="col-md-8">' +
+                      '<h4 class="modal-title" id="myModalLabel">#Unknown</h4>' +
+                   '</div>' +
+                    '<div class="col-md-4">' +
+                      '<div class ="text-right">' +
+                      '</div>' +
+                    '</div>' +
+                  '</div>' +
+              '</div>' +
             '</div>' +
             '<div class="modal-body" id="modal-body' + index + '">' +
                 '<div class ="text-right">Last Updated:</div>' +
