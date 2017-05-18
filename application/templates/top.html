@@ -36,6 +36,12 @@
           {% else %}
           <div class="col-xs-4 col-sm-3 col-md-2" id="machine-{{ machine.ip_address }}">
           {% endif %}
+                {% if machine.aws == true and machine.ec2.state == "pending" %}
+              <img id="ec2-waiting-{{ machine.ip_address }}" src="/static/images/ajax-loader2.gif" class="img-waiting"/><span class="txt-waiting">starting...</span>
+                {% elif  machine.aws == true and machine.ec2.state == "stopping" %}
+              <img id="ec2-waiting-{{ machine.ip_address }}" src="/static/images/ajax-loader2.gif" class="img-waiting"/><span class="txt-waiting">stopping...</span>
+                {% endif %}
+
                 {% if machine.os_distribution == "Ubuntu" %}
                   {% if machine.fail_count < 2 %}
                     <img id="machine-img-{{ machine.ip_address }}" class="img-responsive" src="{{ url_for('static', filename='images/ubuntu.png') }}" data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}">
@@ -95,10 +101,10 @@
           <div class="modal-header">
               <div class="container-fluid">
                   <div class="row">
-                    <div class="col-md-9">
+                    <div class="col-md-8">
                         <h4 class="modal-title" id="myModalLabel">{{ machine.hostname }}</h4>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                       <div class ="text-right">
                         {% if machine.aws == true and ('Unknown' in machine.status or machine.status == 'Unreachable') %}
                             <a id="aws-ec2-button{{loop.index}}" class="btn btn-success btn-sm" href="{{url_for('view.start_ec2', ipaddr=machine.ip_address)}}" role="button">Start Instance</a>

@@ -66,6 +66,29 @@ $(function () {
                 $('img[id="machine-img-' + msg.ip_address + '"]').attr('src', imgName.replace(".png", "_unreachable.png"));
             }
         }
+
+        // EC2 instance's state transits among pending/running/starting/stopping
+        else if (msg.data === "ec2_state_updated") {
+            if (msg.state === "pending") {
+                $('div[id="machine-' + msg.ip_address + '"]').prepend('<img id="ec2-waiting-' + msg.ip_address + '" src="/static/images/ajax-loader2.gif" class="img-waiting"/><span class="txt-waiting">starting...</span>');
+
+            }
+
+            else if (msg.state === "running") {
+                $('img[id="ec2-waiting-' + msg.ip_address + '"]').remove();
+                $('.txt-waiting').remove();
+            }
+
+            else if (msg.state === "stopping") {
+                $('div[id="machine-' + msg.ip_address + '"]').prepend('<img id="ec2-waiting-' + msg.ip_address + '" src="/static/images/ajax-loader2.gif" class="img-waiting"/><span class="txt-waiting">stopping...</span>');
+            }
+
+            else if (msg.state === "stopped") {
+                $('img[id="ec2-waiting-' + msg.ip_address + '"]').remove();
+                $('.txt-waiting').remove();
+            }
+
+        }
     });
 });
 

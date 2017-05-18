@@ -10,3 +10,16 @@
 .display-flex.row:after {
    content: normal;
 }
+
+.img-waiting {
+  position: absolute;
+  top: 15px;
+  left: 20px;
+ }
+
+ .txt-waiting {
+  position: absolute;
+  top: 15px;
+  left: 60px;
+  color: #DE0000;
+ }
