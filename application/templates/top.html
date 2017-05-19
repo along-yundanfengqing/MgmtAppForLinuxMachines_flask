@@ -32,9 +32,9 @@
       {% else %}
         {% for machine in machines %}
           {% if machines | length > 15 %}
-          <div class="col-xs-3 col-sm-2 col-md-1" id="machine-{{ machine.ip_address }}">
+          <div class="col-xs-3 col-sm-2 col-md-1" id="machine-grid-{{ machine.ip_address }}">
           {% else %}
-          <div class="col-xs-4 col-sm-3 col-md-2" id="machine-{{ machine.ip_address }}">
+          <div class="col-xs-4 col-sm-3 col-md-2" id="machine-grid-{{ machine.ip_address }}">
           {% endif %}
                 {% if machine.aws == true and machine.ec2.state == "pending" %}
               <img id="ec2-waiting-{{ machine.ip_address }}" src="/static/images/ajax-loader2.gif" class="img-waiting"/><span class="txt-waiting">starting...</span>

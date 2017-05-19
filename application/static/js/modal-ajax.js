@@ -1,5 +1,5 @@
 $(function () {
-  $('#machine-list').on('click', 'img[id^=machine-img], a[id^=machine-hostname], a[id^=machine-ip]', function(){
+  $('#machine-list').on('click', 'div[id^=machine-grid], img[id^=machine-img], a[id^=machine-hostname], a[id^=machine-ip]', function(){
     var ipAddress = $(this).parent().find('a[id^=machine-ip]').text().replace(" (AWS)", "");
     var index = $(this).attr("data-target").replace("#myModal_machine_data", "");
     $.ajax({
@@ -26,12 +26,12 @@ $(function () {
 
             else if (machine['aws'] && machine['ec2']['state'] === 'pending') {
                 // show 'start instance with .disabled'
-                thisModal.find('#aws-ec2-button' + index).removeClass('btn-danger').addClass('disabled btn-success').text('Starting instance');
+                thisModal.find('#aws-ec2-button' + index).removeClass('btn-danger').addClass('disabled btn-success').text('Starting Instance');
             }
 
             else if (machine['aws'] && machine['ec2']['state'] === 'stopping') {
                 // show 'stop instance with .disabled'
-                thisModal.find('#aws-ec2-button' + index).removeClass('btn-success').addClass('disabled btn-danger').text('Stopping instance');
+                thisModal.find('#aws-ec2-button' + index).removeClass('btn-success').addClass('disabled btn-danger').text('Stopping Instance');
             }
 
             else if (machine['aws'] && machine['ec2']['state'] === 'running') {
@@ -46,7 +46,7 @@ $(function () {
             }
 
 
-            else if (machine['status'] === 'OK'){
+            if (machine['status'] === 'OK'){
                 // Basic tab
                 thisModal.find('#basic' + index + ' tbody tr:nth-child(2) td:nth-child(2)').html('<img src="/static/images/status_ok.png"> OK');
                 thisModal.find('#basic' + index + ' tbody tr:nth-child(3) td:nth-child(2)').text(machine['os_distribution']);

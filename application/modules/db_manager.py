@@ -47,7 +47,7 @@ class DBManager(object):
             app.logger.error("Unable to connect to %s:%s" % (self.__database_ip, self.__port))
             sys.exit(1)
         except Exception as e:
-            app.logger.critical(e)
+            app.logger.critical(type(e))
             sys.exit(1)
 
 

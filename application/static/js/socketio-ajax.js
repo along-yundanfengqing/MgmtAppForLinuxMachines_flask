@@ -55,7 +55,7 @@ $(function () {
             var modal02ID = "#myModal_export_json" + index;
             var numOfMachines = parseInt($('.badge').text());
             $('.badge').text(numOfMachines - 1);
-            $('div[id="machine-' + msg.ip_address + '"]').remove();
+            $('div[id="machine-grid-' + msg.ip_address + '"]').remove();
             $(modal01ID).remove();
             $(modal02ID).remove();
         }
@@ -70,7 +70,7 @@ $(function () {
         // EC2 instance's state transits among pending/running/starting/stopping
         else if (msg.data === "ec2_state_updated") {
             if (msg.state === "pending") {
-                $('div[id="machine-' + msg.ip_address + '"]').prepend('<img id="ec2-waiting-' + msg.ip_address + '" src="/static/images/ajax-loader2.gif" class="img-waiting"/><span class="txt-waiting">starting...</span>');
+                $('div[id="machine-grid-' + msg.ip_address + '"]').prepend('<img id="ec2-waiting-' + msg.ip_address + '" src="/static/images/ajax-loader2.gif" class="img-waiting"/><span class="txt-waiting">starting...</span>');
 
             }
 
@@ -80,7 +80,7 @@ $(function () {
             }
 
             else if (msg.state === "stopping") {
-                $('div[id="machine-' + msg.ip_address + '"]').prepend('<img id="ec2-waiting-' + msg.ip_address + '" src="/static/images/ajax-loader2.gif" class="img-waiting"/><span class="txt-waiting">stopping...</span>');
+                $('div[id="machine-grid-' + msg.ip_address + '"]').prepend('<img id="ec2-waiting-' + msg.ip_address + '" src="/static/images/ajax-loader2.gif" class="img-waiting"/><span class="txt-waiting">stopping...</span>');
             }
 
             else if (msg.state === "stopped") {
@@ -146,7 +146,7 @@ function insertUnknownMachineElement(ip_address, machine) {
 
     // Top page machine icon
     $('#machine-list div:nth-child(' + indexToInsert + ')').before(
-        '<div class="col-xs-4 col-sm-3 col-md-2" id="machine-' + ip_address + '">' +
+        '<div class="col-xs-4 col-sm-3 col-md-2" id="machine-grid-' + ip_address + '">' +
         '<img id="machine-img-' + ip_address + '" class="img-responsive" src="/static/images/other.png" data-toggle="modal" data-target="#myModal_machine_data' + index + '">' +
         '<h4><a href="#" data-toggle="modal" data-target="#myModal_machine_data' + index + '" id="machine-hostname-#Unknown-' + index + '">#Unknown</a></h4>' +
         '<h5><a href="#" data-toggle="modal" data-target="#myModal_machine_data' + index + '" id="machine-ip-' + ip_address + '-' + index + '">' + ip_address_aws + '</a></h5>' +
