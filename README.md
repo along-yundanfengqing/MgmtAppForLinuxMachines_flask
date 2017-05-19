@@ -13,7 +13,7 @@ Management Application for Linux Machines
 <br>
 
 ## 1. Introduction  
-This is a full stack web application for managing Linux machines which:   
+This is a full stack web application for managing remote Linux machines which:   
 1) automatically and periodically collects basic system performance data from various remote Linux machines   
 2) presents machine data and status on the central GUI management portal  
 3) provides management functions through GUI and/or RESTful API interfaces  
@@ -21,24 +21,36 @@ This is a full stack web application for managing Linux machines which:
 As it was developed with an approach of Responsive Web Design, administrators can access to the GUI from any devices such as laptops, tablets, and mobile phones.  
 By using this application, administrators can manage their various Linux machines (Ubuntu, Red Hat, Debian, CentOS etc.) on Docker containers, AWS cloud, and/or on-premise physical/virtual environment from the central management portal without manually logging in to each machine from the console.
 
-![Program Overview](application/static/images/ApplicationOverview.png)  
+![Application Overview](application/static/images/ApplicationOverview.png)  
 
 For more details, please see the demo documentation [here](#5-documentation).  
 All features are demonstrated with screenshots in the document.
 
-**Key Features**
-- Login verification using salted password hashing
-- Supports multiple Linux distributions (Ubuntu, Red Hat, Debian, and CentOS)
-- Supports multiple environment (Docker containers, AWS cloud, and/or on-premise)
-- Supports multiple user devices (laptops, tablets, and mobile devices)
-- Presents basic machine data on the central management portal  
-   (Status, Hostname, IP Address, MAC Address, OS/Version, uptime, CPU load, memory usage, disk usage) 
-- Registers/Deletes managed machines from GUI, a text file, and/or RESTful API
-- Exposes machine data via RESTful API, and/or as JSON files
-- Tracks machine status and display it with icons  
-- Incident alarms with icons   
-- SSH access to managed machines from web browsers (*Only for local machine setup)   
+**Key Features** 
+- Supports various environment
+    + Multiple Linux distributions (Ubuntu, Red Hat, Debian, and CentOS)
+    + Multiple environment (Docker containers, AWS cloud, and/or on-premise)
+    + Multiple user devices (laptops, tablets, and mobile devices)
 
+- User account/session management
+    + Create new users
+    + Login/logout
+    + Login verification using salted password hashing
+
+- GUI
+    + Responsive management portal
+    + Presents machine data on modal dialogs  
+      (Status, Hostname, IP Address, MAC Address, OS/Version, uptime, CPU load, memory usage, disk usage)  
+    + Registers/deletes machines
+    + Exports machine data as JSON files
+    + Incident alarms with icons 
+    + SSH access to machines from web browsers
+    + Starts/Stops EC2 instances
+
+- RESTful API
+    + Provides machine data in JSON (GET)
+    + Registers/deletes machines (POST/DELETE)
+    + Adds/deletes users (POST/DELETE)
 
 **Technology Stack**  
 - Front-end  
@@ -53,6 +65,7 @@ All features are demonstrated with screenshots in the document.
     + JSON
     + RESTful API
     + SocketIO
+    + AWS SDK for Python(Boto3)
     + Docker containers (Docker Engine + Docker Compose)
     + Shell Script
 
@@ -78,12 +91,13 @@ Following python modules are required.
 - pexpect
 - eventlet
 - pytz
+- boto3
 - butterfly (Optional)
 
 To install:
 
 ```
-$ sudo pip install flask flask-login flask-wtf flask-socketio pymongo pexpect eventlet pytz butterfly
+$ sudo pip install flask flask-login flask-wtf flask-socketio pymongo pexpect eventlet pytz boto3 butterfly
 ```
 
 > [Butterfly](https://github.com/paradoxxxzero/butterfly) is an xterm compatible external terminal application that runs in your browser.  
@@ -91,12 +105,12 @@ $ sudo pip install flask flask-login flask-wtf flask-socketio pymongo pexpect ev
 
 
 ## 4. Try it out
-This program requires any physical/virtual infrastructure with Linux machines to be managed, and a MongoDB server for storing the machine data.   
-You can execute the program either by:
+This application requires any physical/virtual infrastructure with Linux machines to be managed, and a MongoDB server for storing the machine data.   
+You can execute the application either by:
 
 **Option 1. Using test environment with docker containers**    
-    This program provides test environment with docker containers for the demonstration purpose.
-    A shell script provided with the program automatically deploys the following containers on your local machine:  
+    This application provides test environment with docker containers for the demonstration purpose.
+    A shell script provided with the application automatically deploys the following containers on your local machine:  
 - MongoDB server * 1  
 - Linux machines * 10 (Ubuntu * 5, CentOS * 3, Debian * 2)
 
@@ -168,7 +182,7 @@ Hostname | Container name  | IP Address  | Username | Password | OS/Version
 #### Step 4. Destroy the demo environment
 The shell script shutdowns and deletes all containers and settings on your local machine.
 
-1. Stop the program (CTRL + C)
+1. Stop the application (CTRL + C)
 2. Run docker_destroy.sh from the program directory
 
         $ ./docker_destroy.sh
@@ -176,11 +190,16 @@ The shell script shutdowns and deletes all containers and settings on your local
 
 
 ### [Option 2] Try with your own infrastructure
-1. Prepare a MongoDB server which can be accessed from the machine this program will be executed
+1. Prepare a MongoDB server which can be accessed from the machine this application will be executed
 2. Prepare your infrastructure with linux servers and/or virtual machines (SSH access must be permitted on each machine)   
-    If you manage EC2 instances on AWS, please place .pem file under ~/.ssh/ and run below command.
+    If you manage EC2 instances on AWS:  
+    (1) Place .pem file under ~/.ssh/ and run below command.
 
         $ ssh-add ~/.ssh/YOUR_KEY_PAIR_NAME.pem
+
+    (2) Configure credentials under ~/.aws/credentials 
+        http://boto3.readthedocs.io/en/latest/guide/quickstart.html#configuration
+
 3. Change the application configuration (config.py)
 
     Parameter               | Description
@@ -197,7 +216,7 @@ The shell script shutdowns and deletes all containers and settings on your local
      
 
 4. (Optional) Add IP Address, username (and password) of each Linux machine in the text file specified as LOGIN_FILENAME. You can also operate this step later through GUI 
-5. Start the python program (run.py)
+5. Start the application (run.py)
 
         $ cd ~/PATH_TO_THE_PROGRAM_DIRECTORY
         $ python run.py
