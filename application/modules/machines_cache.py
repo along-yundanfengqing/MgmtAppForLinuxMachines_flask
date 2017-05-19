@@ -151,7 +151,7 @@ class MachinesCache(object):
             doc['mac_address'] = machine.mac_address
             doc['os_distribution'] = machine.os_distribution
             doc['release'] = machine.release
-            doc['uiptime'] = machine.uptime
+            doc['uptime'] = machine.uptime
             doc['cpu_load_avg'] = machine.cpu_load_avg
             doc['memory_usage'] = machine.memory_usage
             doc['disk_usage'] = machine.disk_usage

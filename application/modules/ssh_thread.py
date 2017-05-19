@@ -107,6 +107,9 @@ class SSHThread(threading.Thread):
 
             except KeyboardInterrupt:
                 pass
+            except OSError as e:
+                app.logger.error(type(e))
+                return
             except Exception as e:
                 app.logger.critical("UNKNOWN ERROR OCCURRED DURING THE SSH SESSION")
                 app.logger.critical(type(e))
