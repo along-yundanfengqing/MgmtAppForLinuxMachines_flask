@@ -25,8 +25,12 @@ class Machine(object):
         self.last_updated = last_updated
 
         if self.aws:
+            if self.status == 'OK':
+                ec2_state = "running"
+            else:
+                ec2_state = None
+
             self.ec2 = {
                 'instance_id': EC2Client.get_instance_id(ip_address),
-                'state': None
+                'state': ec2_state
             }
-
