@@ -36,45 +36,37 @@
           {% else %}
           <div class="col-xs-4 col-sm-3 col-md-2" id="machine-grid-{{ machine.ip_address }}">
           {% endif %}
-                {% if machine.aws == true and machine.ec2.state == "pending" %}
-              <img id="ec2-waiting-{{ machine.ip_address }}" src="/static/images/ajax-loader2.gif" class="img-waiting"/><span class="txt-waiting">starting...</span>
-                {% elif  machine.aws == true and machine.ec2.state == "stopping" %}
-              <img id="ec2-waiting-{{ machine.ip_address }}" src="/static/images/ajax-loader2.gif" class="img-waiting"/><span class="txt-waiting">stopping...</span>
-                {% endif %}
 
-                {% if machine.os_distribution == "Ubuntu" %}
-                  {% if machine.fail_count < 2 %}
-                    <img id="machine-img-{{ machine.ip_address }}" class="img-responsive" src="{{ url_for('static', filename='images/ubuntu.png') }}" data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}">
-                  {% else %}
-                    <img id="machine-img-{{ machine.ip_address }}" class="img-responsive" src="{{ url_for('static', filename='images/ubuntu_unreachable.png') }}" data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}">
-                  {% endif %}
-                {% elif machine.os_distribution == "CentOS" %}
-                  {% if machine.fail_count < 2 %}
-                    <img id="machine-img-{{ machine.ip_address }}" class="img-responsive" src="{{ url_for('static', filename='images/centos.png') }}" data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}">
-                  {% else %}
-                    <img id="machine-img-{{ machine.ip_address }}" class="img-responsive" src="{{ url_for('static', filename='images/centos_unreachable.png') }}" data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}">
-                  {% endif %}
-                {% elif machine.os_distribution == "Debian" %}
-                  {% if machine.fail_count < 2 %}
-                    <img id="machine-img-{{ machine.ip_address }}" class="img-responsive" src="{{ url_for('static', filename='images/debian.png') }}" data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}">
-                  {% else %}
-                    <img id="machine-img-{{ machine.ip_address }}" class="img-responsive" src="{{ url_for('static', filename='images/debian_unreachable.png') }}" data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}">
-                  {% endif %}
-                {% elif machine.os_distribution == "Redhat" %}
-                  {% if machine.fail_count < 2 %}
-                    <img id="machine-img-{{ machine.ip_address }}" class="img-responsive" src="{{ url_for('static', filename='images/redhat.png') }}" data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}">
-                  {% else %}
-                    <img id="machine-img-{{ machine.ip_address }}" class="img-responsive" src="{{ url_for('static', filename='images/redhat_unreachable.png') }}" data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}">
-                  {% endif %}
-                {% else %}
-                    <img id="machine-img-{{ machine.ip_address }}" class="img-responsive" src="{{ url_for('static', filename='images/other.png') }}" data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}">
-                {% endif %}
+            {% if machine.aws == true and machine.ec2.state == "pending" %}
+              {% set ec2_state_message = "starting..." %}
+            {% elif machine.aws == true and machine.ec2.state == "stopping" %}
+              {% set ec2_state_message = "stopping..." %}
+            {% endif %}
+
+            {% if machine.aws == true and (machine.ec2.state == "pending" or machine.ec2.state == "stopping") %}
+            <img id="ec2-waiting-{{ machine.ip_address }}" src="/static/images/ajax-loader2.gif" class="img-waiting"/><span class="txt-waiting">{{ ec2_state_message }}</span>
+            {% endif %}
+
+            {% if machine.os_distribution == none%}
+              {% set img_name_base = "other" %}
+            {% else %}
+              {% set img_name_base = machine.os_distribution.lower() %}
+            {% endif %}
+
+            {% if machine.os_distribution != none and machine.status == "Unreachable" %}
+              {% set img_name = img_name_base + "_unreachable.png" %}
+            {% else %}
+              {% set img_name = img_name_base + ".png" %}
+            {% endif %}
+
+            <img id="machine-img-{{ machine.ip_address }}" class="img-responsive" src="{{ url_for('static', filename='images/' + img_name ) }}" data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}">
             <h4><a href="#" data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}" id="machine-hostname-{{ machine.hostname }}-{{loop.index}}">{{ machine.hostname }}</a></h4>
             {% if machine.aws == True %}
-              <h5><a href="#" data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}" id="machine-ip-{{ machine.ip_address }}-{{loop.index}}">{{ machine.ip_address }} (AWS)</a></h5>
+              {% set ip_address = machine.ip_address + " (AWS)"%}
             {% else %}
-              <h5><a href="#" data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}" id="machine-ip-{{ machine.ip_address }}-{{loop.index}}">{{ machine.ip_address }}</a></h5>
+              {% set ip_address = machine.ip_address %}
             {% endif %}
+            <h5><a href="#" data-toggle="modal" data-target="#myModal_machine_data{{loop.index}}" id="machine-ip-{{ machine.ip_address }}-{{loop.index}}">{{ ip_address }}</a></h5>
           </div>
         {% endfor %}
       {%  endif %}

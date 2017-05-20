@@ -24,31 +24,33 @@
       <form action="{{url_for('view.delete_machine')}}" method='POST'>
           <div class="form-group">
                <div class="row display-flex text-center">
-                  {% for machine in machines %}
+                {% for machine in machines %}
                   {% if machines | length > 15 %}
-                  <div class="col-xs-3 col-sm-2 col-md-1">
+                    <div class="col-xs-3 col-sm-2 col-md-1">
                   {% else %}
-                  <div class="col-xs-4 col-sm-3 col-md-2">
-                  {% endif %}
+                    <div class="col-xs-4 col-sm-3 col-md-2">
+                    {% endif %}
                       <input type="checkbox" id="myCheckbox{{loop.index}}" name = "checkbox" value="{{ machine.ip_address}}"/>
                       <label for="myCheckbox{{loop.index}}">
-                          {% if machine.os_distribution == "Ubuntu" %}
-                            <img class="img-responsive img-rounded" src="{{ url_for('static', filename='images/ubuntu.png') }}">
-                          {% elif machine.os_distribution == "CentOS" %}
-                            <img class="img-responsive img-rounded" src="{{ url_for('static', filename='images/centos.png') }}">
-                          {% elif machine.os_distribution == "Debian" %}
-                            <img class="img-responsive img-rounded" src="{{ url_for('static', filename='images/debian.png') }}">
-                          {% elif machine.os_distribution == "Redhat" %}
-                            <img class="img-responsive img-rounded" src="{{ url_for('static', filename='images/redhat.png') }}">
-                          {% else %}
-                            <img class="img-responsive img-rounded" src="{{ url_for('static', filename='images/other.png') }}">
-                          {% endif %}
-                          <h4 class="colored">{{ machine.hostname }}</h4>
-                          {% if machine.aws == True %}
-                            <h5 class="colored">{{ machine.ip_address }} (AWS)</h5>
-                          {% else %}
-                            <h5 class="colored">{{ machine.ip_address }}</h5>
-                          {% endif %}
+                    {% if machine.os_distribution == none%}
+                      {% set img_name_base = "other" %}
+                    {% else %}
+                      {% set img_name_base = machine.os_distribution.lower() %}
+                    {% endif %}
+
+                    {% if machine.os_distribution != none and machine.status == "Unreachable" %}
+                      {% set img_name = img_name_base + "_unreachable.png" %}
+                    {% else %}
+                      {% set img_name = img_name_base + ".png" %}
+                    {% endif %}
+                      <img class="img-responsive img-rounded" src="{{ url_for('static', filename='images/' + img_name ) }}">
+                      <h4 class="colored">{{ machine.hostname }}</h4>
+                      {% if machine.aws == True %}
+                        {% set ip_address = machine.ip_address + " (AWS)"%}
+                      {% else %}
+                        {% set ip_address = machine.ip_address %}
+                      {% endif %}
+                      <h5 class="colored">{{ ip_address }}</h5>
                       </label>
                   </div>
                 {% endfor %}
