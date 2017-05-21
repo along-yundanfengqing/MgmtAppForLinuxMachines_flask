@@ -5,6 +5,7 @@ import re
 
 # my modules
 from application import app
+from application.modules.validation import Validation
 
 
 class FileIO(object):
@@ -24,6 +25,10 @@ class FileIO(object):
                         continue
 
                     ipaddr = login_data[0].strip()
+                    if not Validation.is_valid_ipv4(ipaddr):
+                        app.logger.error("%s in %s is an invalid IP Address" % (ipaddr, cls.__LOGIN_FILENAME ))
+                        continue
+
                     username = login_data[1].strip()
                     try:
                         password = login_data[2].strip()
