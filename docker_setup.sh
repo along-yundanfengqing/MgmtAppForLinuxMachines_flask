@@ -42,7 +42,7 @@ fi
 
 ##################################################
 # Command for adding a container for testing
-# docker run -itdP --privileged -h vm11 --name=vm11 --net mgmtappforlinuxmachines_mynetwork --ip 172.30.0.101 yugokato/ubuntu_template /bin/bash
+# docker run -itdP --privileged -h vm11 --name=vm11 --net flask_mynetwork --ip 172.30.0.101 yugokato/ubuntu_template /bin/bash
 # * network name changes depnd on the name of the program directory. You can check the network name with 'docker network ls' command.
 
 # Command for stopping a container
