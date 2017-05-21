@@ -58,7 +58,7 @@ def show_signup():
 @view.route('/', methods=['GET', 'POST'])
 def root():
     if current_user:
-        return redirect(url_for('view.show_top'))
+        return redirect(url_for('view.show_home'))
 
     return redirect(url_for('view.show_login'))
 
@@ -73,7 +73,7 @@ def show_login():
             user_obj = User(user['username'])
             login_user(user_obj, remember=form.remember_me.data)
             flash('Logged in successfully as a user "%s"' % current_user.username, 'success')
-            return redirect(url_for("view.show_top"))
+            return redirect(url_for("view.show_home"))
         flash("Username or password is not correct", 'error')
 
     return render_template('login.html', form=form)
@@ -88,10 +88,10 @@ def logout():
     return redirect(url_for('view.show_login'))
 
 
-# Top page
-@view.route('/top')
+#Home page
+@view.route('/home')
 @login_required
-def show_top():
+def show_home():
     machines = machines_cache.get()
 
     if not machines:    # In case machines_cache is empty, retrieve data from database
@@ -102,7 +102,7 @@ def show_top():
             machines = machines_cache.convert_docs_to_machine_list(docs)
 
     now = datetime.utcnow()
-    return render_template('top.html', current_user=current_user, machines=machines, now=now, butterfly=butterfly)
+    return render_template('home.html', current_user=current_user, machines=machines, now=now, butterfly=butterfly)
 
 
 # Register a new machine page
@@ -141,7 +141,7 @@ def add_machine(ipaddr="", username="", password="", error1="", error2="", error
                 app.logger.info("- ADDED - %s", ipaddr)
             else:
                 flash('Failed to added the new machine with IP Address "%s". ' % ipaddr, 'error')
-            return redirect(url_for('view.show_top'))
+            return redirect(url_for('view.show_home'))
 
     return render_template(
         'add_machine.html', ipaddr=ipaddr, username=username, password="",
@@ -169,7 +169,7 @@ def delete_machine():
             del_ip = ", ".join([ip for ip in del_list])
             flash('Deleted the machine with IP Address "%s" from both %s and the database' % (del_ip, login_file), 'success')
             app.logger.info("- DELETED - %s", del_ip)
-            return redirect(url_for('view.show_top'))
+            return redirect(url_for('view.show_home'))
         else:
             flash('Select machines to delete', 'error')
 
@@ -200,7 +200,7 @@ def open_terminal():
                 "butterfly.server.py", "--unsecure", "--motd=/dev/null",
                 "--cmd=ssh %s@%s" % (username, ipaddr), "--one-shot"])
 
-    return redirect(url_for('view.show_top'))
+    return redirect(url_for('view.show_home'))
 
 
 # Export JSON files
@@ -221,7 +221,7 @@ def export_json():
         else:
             flash('Failed to export the JSON file', 'error')
 
-    return redirect(url_for('view.show_top'))
+    return redirect(url_for('view.show_home'))
 
 
 # Start EC2 Instance
@@ -229,7 +229,7 @@ def export_json():
 @login_required
 def start_ec2(ipaddr):
     eventlet.spawn_n(AppManager.start_ec2, ipaddr)
-    return redirect(url_for('view.show_top'))
+    return redirect(url_for('view.show_home'))
 
 
 # Stop EC2 Instance
@@ -237,5 +237,5 @@ def start_ec2(ipaddr):
 @login_required
 def stop_ec2(ipaddr):
     eventlet.spawn_n(AppManager.stop_ec2, ipaddr)
-    return redirect(url_for('view.show_top'))
+    return redirect(url_for('view.show_home'))
 
