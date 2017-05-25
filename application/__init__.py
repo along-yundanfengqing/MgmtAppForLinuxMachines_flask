@@ -10,11 +10,11 @@ socketio = SocketIO(app)
 
 # my modules
 from application.modules import set_logging
-from application.modules.api import api
+from application.api import api
 from application.modules.bg_thread_manager import BackgroundThreadManager
 from application.modules.db_manager import DBManager
 from application.modules.machines_cache import MachinesCache
-from application.modules.views import view
+from application.views import view
 
 
 def datetimefilter(value, format="%B %d, %Y / %H:%M:%S"):

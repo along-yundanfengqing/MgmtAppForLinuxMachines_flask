@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from werkzeug.security import check_password_hash, generate_password_hash
 
-class User(object):
+class UserObj(object):
     def __init__(self, username):
         self.username = username
 

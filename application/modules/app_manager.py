@@ -34,7 +34,7 @@ class AppManager(object):
     @staticmethod
     def del_machine(del_ip_list):
         del_result = mongo.remove(del_ip_list)
-        if del_result['ok'] == 1 and del_result['n'] > 0:
+        if del_result > 0:
             FileIO.del_vm_from_file(del_ip_list)
             AppManager.delete_machine_obj(del_ip_list)
         return del_result
