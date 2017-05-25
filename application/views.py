@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import eventlet
 eventlet.monkey_patch()
-import pymongo
 import subprocess
 from datetime import datetime
 from flask import Blueprint, flash, redirect, render_template, request, url_for
@@ -30,12 +29,11 @@ login_manager.login_message_category = 'error'
 
 @login_manager.user_loader
 def load_user(username):
-    user = mongo.find_user({'username': username})
+    user = mongo.find_user(username)
     if user:
         return UserObj(user['username'])
     else:
         return None
-
 
 
 # signup page
@@ -44,11 +42,11 @@ def show_signup():
     form = SignupForm(request.form)
     if request.method == 'POST' and form.validate():
         username = form.username.data
-        hash_password = UserObj.hash_password(form.password.data)
-        if mongo.find_user({"username": username}):
+        hashed_password = UserObj.hash_password(form.password.data)
+        if mongo.find_user(username):
             flash('Username "%s" already exists in the database' % username, 'error')
         else:
-            mongo.add_user({"username": username, "password": hash_password})
+            mongo.add_user(username, hashed_password)
             app.logger.warning("- ADDED ACCOUNT - %s", username)
             flash("Created a user account (%s)" % username, 'success')
             return redirect(url_for('view.show_login'))
@@ -70,7 +68,7 @@ def root():
 def show_login():
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate():
-        user = mongo.find_user({'username': form.username.data})
+        user = mongo.find_user(form.username.data)
         if user and UserObj.validate_login(user['password'], form.password.data):
             user_obj = UserObj(user['username'])
             login_user(user_obj, remember=form.remember_me.data)
@@ -97,7 +95,8 @@ def show_home():
     machines = machines_cache.get()
 
     if not machines:    # In case machines_cache is empty, retrieve data from database
-        docs = mongo.find({}, {'_id': 0}).order_by('hostname', 'ip_address_decimal')
+        docs = mongo.find({}).order_by('hostname', 'ip_address_decimal')
+
         if docs:
             machines = machines_cache.convert_docs_to_machine_list(docs)
 
@@ -155,7 +154,7 @@ def delete_machine():
     machines = machines_cache.get()
 
     if not machines:    # In case machine_list in memory is empty, retrieve data from database
-        docs = mongo.find({}, {'_id': 0}).order_by('hostname', 'ip_address_decimal')
+        docs = mongo.find({}).order_by('hostname', 'ip_address_decimal')
         if docs:
             machines = machines_cache.convert_docs_to_machine_list(docs)
 
@@ -209,7 +208,7 @@ def export_json():
     if machines_cache.get(ipaddr) in machines_cache.machine_obj_list:
         doc = machines_cache.convert_machine_to_doc(ipaddr)
     else:
-        doc = mongo.find_one({'ip_address': ipaddr}, {'_id': 0})
+        doc = mongo.find_one({'ip_address': ipaddr})
 
     if request.method == 'POST':
         filename = request.form['InputFilename']

@@ -52,7 +52,8 @@ class SSHThread(threading.Thread):
             # SSH login failure
             except KeyboardInterrupt:
                 return
-            except OSError:
+            except OSError as e:
+                print(type(e))
                 return
             except (pexpect.exceptions.EOF, pxssh.ExceptionPxssh) as e:
                 if e.args[0] == 'password refused':

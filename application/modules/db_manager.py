@@ -41,7 +41,7 @@ class DBManager(object):
 
 
     def find(self, *args):
-        return MachineData.objects(__raw__=args)
+        return MachineData.objects(__raw__=args[0])
 
 
     def find_one(self, *args):
@@ -55,20 +55,20 @@ class DBManager(object):
         return MachineData.objects(__raw__={'ip_address': {'$in': del_ip_list}}).delete()
 
 
-    def find_user(self, data):
+    def find_user(self, username):
         try:
-            return User.objects.get(username=data['username'])
+            return User.objects.get(username=username)
         except DoesNotExist:
             return None
 
 
-    def add_user(self, data):
-        user = User(username=data['username'], password=data['password'])
+    def add_user(self, username, hashed_password):
+        user = User(username=username, password=hashed_password)
         user.save()
 
 
-    def delete_user(self, data):
-        return User.objects(username=data['username']).delete()
+    def delete_user(self, username):
+        return User.objects(username=username).delete()
 
 
     # When registered from GUI or RESTful API

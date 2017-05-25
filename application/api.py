@@ -23,9 +23,9 @@ def get_machine_api(hostname):
         doc = machines_cache.convert_machine_to_doc(hostname)
     else:
         if Validation.is_valid_ipv4(hostname):
-            doc = mongo.find_one({'ip_address': hostname}, {'_id': 0})
+            doc = mongo.find_one({'ip_address': hostname})
         else:
-            doc = mongo.find_one({'hostname': hostname}, {'_id': 0})
+            doc = mongo.find_one({'hostname': hostname})
     if doc:
         return jsonify(data=doc)
 
@@ -40,7 +40,7 @@ def get_all_api():
     if machines_cache.get():
         docs = machines_cache.convert_machine_to_doc()
     else:
-        docs = mongo.find({}, {'_id': 0}).order_by('hostname', 'ip_address_decimal')
+        docs = mongo.find({}).order_by('hostname', 'ip_address_decimal')
     # return all machines except Hostname = #Unknown
     if docs:
         return jsonify(data=[doc for doc in docs if doc['hostname'] != '#Unknown'])
@@ -179,7 +179,7 @@ def add_user_api():
         return make_response(jsonify(result={'success': False, 'error': "User already exists"}), 422)
     else:
         hash_password = UserObj.hash_password(password)
-        mongo.add_user({"username": username, "password": hash_password})
+        mongo.add_user(username, hash_password)
         app.logger.warning("- ADDED ACCOUNT - %s", username)
         return jsonify(result={'success': True, 'added_users': 1})
 
@@ -187,7 +187,7 @@ def add_user_api():
 # for tests only
 @api.route('/api/users/delete/<username>', methods=['DELETE'])
 def delete_user_api(username):
-    del_result = mongo.delete_user({"username": username})
+    del_result = mongo.delete_user(username)
     app.logger.warning("- DELETED ACCOUNT - %s", username)
     if del_result > 0:
         return jsonify(result={'success': True, 'deleted users': del_result})

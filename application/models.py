@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import ipaddress
 from mongoengine import Document, DynamicDocument
-from mongoengine import BooleanField, DateTimeField, gDictField, IntField, ListField, LongField, StringField
+from mongoengine import BooleanField, DateTimeField, DictField, IntField, ListField, LongField, StringField
 
 # my modules
 from application import app
