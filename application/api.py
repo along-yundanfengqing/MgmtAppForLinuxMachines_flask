@@ -175,7 +175,7 @@ def add_user_api():
     username = request.get_json()['Username']
     password = request.get_json()['Password']
 
-    if mongo.find_user({'username': username}):
+    if mongo.find_user(username):
         return make_response(jsonify(result={'success': False, 'error': "User already exists"}), 422)
     else:
         hash_password = UserObj.hash_password(password)
