@@ -52,7 +52,8 @@ class DBManager(object):
 
 
     def remove(self, del_ip_list):
-        return MachineData.objects(__raw__={'ip_address': {'$in': del_ip_list}}).delete()
+        #return MachineData.objects(__raw__={'ip_address': {'$in': del_ip_list}}).delete()
+        return MachineData.objects(ip_address__in=del_ip_list).delete()
 
 
     def find_user(self, username):
