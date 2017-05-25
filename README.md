@@ -87,7 +87,7 @@ Following python modules are required.
 - flask-login
 - flask-wtf
 - flask-socketio
-- pymongo
+- mongoengine
 - pexpect
 - eventlet
 - pytz
@@ -97,7 +97,7 @@ Following python modules are required.
 To install:
 
 ```
-$ sudo pip install flask flask-login flask-wtf flask-socketio pymongo pexpect eventlet pytz boto3 butterfly
+$ sudo pip install flask flask-login flask-wtf flask-socketio mongoengine pexpect eventlet pytz boto3 butterfly
 ```
 
 > [Butterfly](https://github.com/paradoxxxzero/butterfly) is an xterm compatible external terminal application that runs in your browser.  
@@ -176,7 +176,7 @@ Hostname | Container name  | IP Address  | Username | Password | OS/Version
  vm10    | vm10            | 172.30.0.10 | centos   | centos   | CentOS 6.7
  _N.A_   | mongo           | 172.30.0.99 | _N.A_    | _N.A_    | MongoDB 3.2  
  
- \* MongoDB: port = TCP/27017, db = LinuxServer, collection = vm
+ \* MongoDB: port = TCP/27017, db = LinuxMachines, collection = machines, users
 
 
 #### Step 4. Destroy the demo environment
