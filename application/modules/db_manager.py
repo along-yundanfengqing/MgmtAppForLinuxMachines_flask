@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
-import ipaddress
-import pymongo
 import sys
 
-# my modules
+from mongoengine import connect
+from mongoengine.queryset import DoesNotExist
+
 from application import app
-from application.modules.aws_ec2 import EC2Client
+from application.models import MachineData, User
 from application.modules.file_io import FileIO
-from application.modules.validation import Validation
 from application.modules.machines_cache import MachinesCache
 
 machines_cache = MachinesCache.get_current_instance()
+
 
 class DBManager(object):
 
@@ -19,12 +19,8 @@ class DBManager(object):
     def __init__(self):
         self.__database_name = app.config['MONGO_DATABASE_NAME']
         self.__database_ip = app.config['MONGO_HOST']
-        self.__collection_name = app.config['MONGO_COLLECTION_NAME']
         self.__port = app.config['MONGO_PORT']
         self.db = self.__connect_db()
-        self.db.collection = self.db[self.__collection_name]
-        self.db.collection.create_index([('ip_address', pymongo.ASCENDING), ('hostname', pymongo.ASCENDING)])
-        self.db.collection.create_index([('hostname', pymongo.ASCENDING), ('ip_address_decimal', pymongo.ASCENDING)])
 
 
     @classmethod
@@ -36,116 +32,92 @@ class DBManager(object):
 
     def __connect_db(self):
         try:
-            app.logger.info("Checking the connectivity to the database(%s)...." % self.__database_ip)
-            uri = "mongodb://%s:%d" % (self.__database_ip, self.__port)
-            client = pymongo.MongoClient(uri, serverSelectionTimeoutMS=3000)
-            mongo_db = pymongo.database.Database(client, self.__database_name)
-            if client.server_info():
-                app.logger.info("...OK")
-                return mongo_db
-        except pymongo.errors.ServerSelectionTimeoutError as e:
-            app.logger.error("Unable to connect to %s:%s" % (self.__database_ip, self.__port))
-            sys.exit(1)
+            app.logger.info(("Checking the connectivity to the database(%s)...." % self.__database_ip))
+            connect(self.__database_name, host=self.__database_ip, port=self.__port, serverSelectionTimeoutMS=3000)
+            app.logger.info("...OK")
         except Exception as e:
             app.logger.critical(type(e))
             sys.exit(1)
 
 
     def find(self, *args):
-        return self.db.collection.find(*args)
+        return MachineData.objects(__raw__=args)
 
 
     def find_one(self, *args):
-        return self.db.collection.find_one(*args)
-
-
-    def update(self, *args, **kwargs):
-        return self.db.collection.update_one(*args, **kwargs)
-
-
-    def update_one(self, *args, **kwargs):
-        return self.db.collection.update_one(*args, **kwargs)
+        try:
+            return MachineData.objects.get(__raw__=args[0])
+        except DoesNotExist:
+            return False
 
 
     def remove(self, del_ip_list):
-        return self.db.collection.remove({'ip_address': {'$in': del_ip_list}})
+        return MachineData.objects(__raw__={'ip_address': {'$in': del_ip_list}}).delete()
 
 
-    def delete_one(self, *args):
-        return self.db.collection.delete_one(*args)
+    def find_user(self, data):
+        try:
+            return User.objects.get(username=data['username'])
+        except DoesNotExist:
+            return None
+
+
+    def add_user(self, data):
+        user = User(username=data['username'], password=data['password'])
+        user.save()
+
+
+    def delete_user(self, data):
+        return User.objects(username=data['username']).delete()
 
 
     # When registered from GUI or RESTful API
     def write_new(self, ipaddr, last_updated):
-        doc = {}
-        doc['status'] = "Unknown (Waiting for the first SSH access)"
-        doc['fail_count'] = 0
-        doc['hostname'] = "#Unknown"
-        doc['ip_address'] = ipaddr
-        doc['ip_address_decimal'] = int(ipaddress.IPv4Address(ipaddr))
-        doc['mac_address'] = None
-        doc['os_distribution'] = None
-        doc['release'] = None
-        doc['uptime'] = None
-        doc['cpu_load_avg'] = None
-        doc['memory_usage'] = None
-        doc['disk_usage'] = None
-        doc['aws'] = Validation.is_aws(ipaddr)
-        if doc['aws']:
-            doc['ec2'] = {
-                'instance_id': EC2Client.ip_instance_map.get(ipaddr, EC2Client.get_instance_id(ipaddr)),
-                'state': None
-            }
-        doc['last_updated'] = last_updated
-        self.update_one(
-            {'ip_address': ipaddr, 'hostname': "#Unknown"},
-            {'$set': doc}, upsert=True)
+        machine = MachineData(
+            hostname="#Unknown",
+            ip_address=ipaddr,
+            status="Unknown (Waiting for the first SSH access)",
+            fail_count=0,
+            last_updated=last_updated
+        )
+        machine.save()  # call clean()
 
 
     # When SSH succeeds to new or existing machines
     def update_status_ok(self, machine_data, last_updated):
         ipaddr, hostname, mac, os_dist, release, uptime, cpu_load, memory_usage, disk_usage = machine_data
-        doc = {}
-        doc['status'] = "OK"
-        doc['fail_count'] = 0
-        doc['hostname'] = hostname
-        doc['ip_address'] = ipaddr
-        doc['ip_address_decimal'] = int(ipaddress.IPv4Address(ipaddr))
-        doc['mac_address'] = mac
-        doc['os_distribution'] = os_dist
-        doc['release'] = release
-        doc['uptime'] = uptime
-        doc['cpu_load_avg'] = cpu_load
-        doc['memory_usage'] = memory_usage
-        doc['disk_usage'] = disk_usage
-        doc['aws'] = Validation.is_aws(ipaddr)
-        if doc['aws']:
-            doc['ec2'] = {
-                'instance_id': EC2Client.ip_instance_map.get(ipaddr, None),
-                'state': "running"
-            }
-        doc['last_updated'] = last_updated
-        # Unmark the old Hostname(#Unknown) entry if exists after SSH succeeds
-        if self.find({'ip_address': ipaddr, 'hostname': "#Unknown"}):
-            self.delete_one({'ip_address': ipaddr, 'hostname': "#Unknown"})
-        self.update({'ip_address': ipaddr}, {'$set': doc}, upsert=True)
+
+        MachineData.objects(ip_address=ipaddr).update(
+            upsert=True,
+            hostname=hostname,
+            status="OK",
+            fail_count=0,
+            mac_address=mac,
+            os_distribution=os_dist,
+            release=release,
+            uptime=uptime,
+            cpu_load_avg=cpu_load,
+            memory_usage=memory_usage,
+            disk_usage=disk_usage,
+            last_updated=last_updated
+        )
 
 
     # When SSH fails to existing machines whose status was previously ok
     def update_status_unreachable(self, ipaddr):
-        self.update_one({'ip_address': ipaddr}, {'$set': {'status': 'Unreachable'}})
-        self.update_one({'ip_address': ipaddr}, {'$inc': {'fail_count': 1}})
+        MachineData.objects(ip_address=ipaddr).update_one(set__status="Unreachable")
+        MachineData.objects(ip_address=ipaddr).update_one(inc__fail_count=1)
 
 
     def update_ec2_state(self, ipaddr, state):
-        self.update_one({'ip_address': ipaddr}, {'$set': {'ec2.state': state}})
+        MachineData.objects(ip_address=ipaddr).update_one(set__ec2__state=state)
+
 
     # Check mismatch between login.txt and database
     def check_mismatch(self):
-        docs = self.find({}, {'_id': 0, 'ip_address': 1, 'hostname': 1})
-        for doc in docs:
-            ipaddr = doc['ip_address']
+        machines_data = MachineData.objects
+        for machine_data in machines_data:
+            ipaddr = machine_data.ip_address
             if not FileIO.exists_in_file(ipaddr):
-                self.delete_one({'ip_address': ipaddr})
+                MachineData.objects(ip_address=ipaddr).delete()
                 machines_cache.delete(ipaddr)
-

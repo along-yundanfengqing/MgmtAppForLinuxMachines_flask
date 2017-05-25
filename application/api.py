@@ -1,16 +1,14 @@
 # -*- coding: utf-8 -*-
-from flask import abort, Blueprint, jsonify, make_response, request
 import pymongo
+from flask import abort, Blueprint, jsonify, make_response, request
 
-# my modules
 from application import app
 from application.modules.app_manager import AppManager
 from application.modules.db_manager import DBManager
-from application.modules.validation import Validation
 from application.modules.file_io import FileIO
 from application.modules.machines_cache import MachinesCache
-from application.modules.users import User
-
+from application.modules.users import UserObj
+from application.modules.validation import Validation
 
 api = Blueprint('api', __name__)
 machines_cache = MachinesCache.get_current_instance()
@@ -42,9 +40,7 @@ def get_all_api():
     if machines_cache.get():
         docs = machines_cache.convert_machine_to_doc()
     else:
-        docs = mongo.find({}, {'_id': 0}).sort(
-            [['hostname', pymongo.ASCENDING], ['ip_address', pymongo.ASCENDING]]
-            )
+        docs = mongo.find({}, {'_id': 0}).order_by('hostname', 'ip_address_decimal')
     # return all machines except Hostname = #Unknown
     if docs:
         return jsonify(data=[doc for doc in docs if doc['hostname'] != '#Unknown'])
@@ -140,11 +136,11 @@ def register_machine_api_02():
 def delete_machine_api_01(ipaddresses):
     del_list = [x for x in ipaddresses.split(",") if FileIO.exists_in_file(x)]
     del_result = AppManager.del_machine(del_list)
-    if del_result['ok'] == 1 and del_result['n'] > 0:
+    if del_result > 0:
         del_ip_list = ", ".join([ip for ip in del_list])
         app.logger.info("- DELETED - %s", del_ip_list)
-        return jsonify(result={'success': True, 'deleted machines': del_result['n']})
-    return make_response(jsonify(result={'success': False, 'deleted machines': del_result['n']}), 422)
+        return jsonify(result={'success': True, 'deleted machines': del_result})
+    return make_response(jsonify(result={'success': False, 'deleted machines': del_result}), 422)
 
 
 # Delete machines via RESTful API (by using -d option)
@@ -163,11 +159,11 @@ def delete_machine_api_02():
     del_list = [x for x in del_list if FileIO.exists_in_file(x)]
 
     del_result = AppManager.del_machine(del_list)
-    if del_result['ok'] == 1 and del_result['n'] > 0:
+    if del_result > 0:
         del_ip_list = ", ".join([ip for ip in del_list])
         app.logger.info("- DELETED - %s", del_ip_list)
-        return jsonify(result={'success': True, 'deleted machines': del_result['n']})
-    return make_response(jsonify(result={'success': False, 'deleted machines': del_result['n']}), 422)
+        return jsonify(result={'success': True, 'deleted machines': del_result})
+    return make_response(jsonify(result={'success': False, 'deleted machines': del_result}), 422)
 
 
 # for tests only
@@ -179,11 +175,11 @@ def add_user_api():
     username = request.get_json()['Username']
     password = request.get_json()['Password']
 
-    if mongo.db.users.find_one({"username": username}):
+    if mongo.find_user({'username': username}):
         return make_response(jsonify(result={'success': False, 'error': "User already exists"}), 422)
     else:
-        hash_password = User.hash_password(password)
-        mongo.db.users.insert_one({"username": username, "password": hash_password})
+        hash_password = UserObj.hash_password(password)
+        mongo.add_user({"username": username, "password": hash_password})
         app.logger.warning("- ADDED ACCOUNT - %s", username)
         return jsonify(result={'success': True, 'added_users': 1})
 
@@ -191,11 +187,11 @@ def add_user_api():
 # for tests only
 @api.route('/api/users/delete/<username>', methods=['DELETE'])
 def delete_user_api(username):
-    del_result = mongo.db.users.remove({"username": username})
+    del_result = mongo.delete_user({"username": username})
     app.logger.warning("- DELETED ACCOUNT - %s", username)
-    if del_result['ok'] == 1 and del_result['n'] > 0:
-        return jsonify(result={'success': True, 'deleted users': del_result['n']})
-    return make_response(jsonify(result={'success': False, 'deleted users': del_result['n']}), 422)
+    if del_result > 0:
+        return jsonify(result={'success': True, 'deleted users': del_result})
+    return make_response(jsonify(result={'success': False, 'deleted users': del_result}), 422)
 
 
 @app.errorhandler(404)

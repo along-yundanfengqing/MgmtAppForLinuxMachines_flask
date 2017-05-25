@@ -13,7 +13,7 @@ from application.modules.app_manager import AppManager
 from application.modules.db_manager import DBManager
 from application.modules.file_io import FileIO
 from application.modules.form import LoginForm, SignupForm
-from application.modules.users import User
+from application.modules.users import UserObj
 from application.modules.validation import Validation
 from application.modules.machines_cache import MachinesCache
 
@@ -30,10 +30,12 @@ login_manager.login_message_category = 'error'
 
 @login_manager.user_loader
 def load_user(username):
-    user = mongo.db.users.find_one({"username": username})
-    if not user:
+    user = mongo.find_user({'username': username})
+    if user:
+        return UserObj(user['username'])
+    else:
         return None
-    return User(user['username'])
+
 
 
 # signup page
@@ -42,11 +44,11 @@ def show_signup():
     form = SignupForm(request.form)
     if request.method == 'POST' and form.validate():
         username = form.username.data
-        hash_password = User.hash_password(form.password.data)
-        if mongo.db.users.find_one({"username": username}):
+        hash_password = UserObj.hash_password(form.password.data)
+        if mongo.find_user({"username": username}):
             flash('Username "%s" already exists in the database' % username, 'error')
         else:
-            mongo.db.users.insert_one({"username": username, "password": hash_password})
+            mongo.add_user({"username": username, "password": hash_password})
             app.logger.warning("- ADDED ACCOUNT - %s", username)
             flash("Created a user account (%s)" % username, 'success')
             return redirect(url_for('view.show_login'))
@@ -68,9 +70,9 @@ def root():
 def show_login():
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate():
-        user = mongo.db.users.find_one({"username": form.username.data})
-        if user and User.validate_login(user['password'], form.password.data):
-            user_obj = User(user['username'])
+        user = mongo.find_user({'username': form.username.data})
+        if user and UserObj.validate_login(user['password'], form.password.data):
+            user_obj = UserObj(user['username'])
             login_user(user_obj, remember=form.remember_me.data)
             flash('Logged in successfully as a user "%s"' % current_user.username, 'success')
             return redirect(url_for("view.show_home"))
@@ -95,9 +97,7 @@ def show_home():
     machines = machines_cache.get()
 
     if not machines:    # In case machines_cache is empty, retrieve data from database
-        docs = mongo.find({}, {'_id': 0}).sort(
-            [["hostname", pymongo.ASCENDING], ["ip_address_decimal", pymongo.ASCENDING]]
-        )
+        docs = mongo.find({}, {'_id': 0}).order_by('hostname', 'ip_address_decimal')
         if docs:
             machines = machines_cache.convert_docs_to_machine_list(docs)
 
@@ -155,9 +155,7 @@ def delete_machine():
     machines = machines_cache.get()
 
     if not machines:    # In case machine_list in memory is empty, retrieve data from database
-        docs = mongo.find({}, {'_id': 0}).sort(
-            [["hostname", pymongo.ASCENDING], ["ip_address_decimal", pymongo.ASCENDING]]
-        )
+        docs = mongo.find({}, {'_id': 0}).order_by('hostname', 'ip_address_decimal')
         if docs:
             machines = machines_cache.convert_docs_to_machine_list(docs)
 
