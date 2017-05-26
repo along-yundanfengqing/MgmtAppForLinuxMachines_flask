@@ -93,7 +93,7 @@ class AppManager(object):
     @staticmethod
     def create_machine_obj_and_write_db_new(ipaddr):
         created_time = datetime.utcnow()
-        machine = Machine(ipaddr, created_time)        # create a machine object
+        machine = Machine(ip_address=ipaddr, last_updated=created_time)        # create a machine object
         mongo.write_new(ipaddr, created_time)          # Write to MongoDB
         machines_cache.add(machine)
 

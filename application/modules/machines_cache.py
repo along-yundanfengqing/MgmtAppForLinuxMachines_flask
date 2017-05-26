@@ -82,8 +82,20 @@ class MachinesCache(object):
                     return
 
         # machine does not exist in machine_list
-        machine = Machine(ip_address, last_updated, 'OK', 0, hostname, mac_address, os_distribution,
-                          release, uptime, cpu_load_avg, memory_usage, disk_usage)
+        machine = Machine(
+            hostname=hostname,
+            ip_address=ip_address,
+            status='OK',
+            fail_count=0,
+            mac_address=mac_address,
+            os_distribution=os_distribution,
+            release=release,
+            uptime=uptime,
+            cpu_load_avg=cpu_load_avg,
+            memory_usage=memory_usage,
+            disk_usage=disk_usage,
+            last_updated=last_updated
+        )
         self.machine_obj_list.append(machine)
         socketio.emit('message', {'data': 'created'})
         app.logger.debug("Sent SocketIO message: created")
@@ -102,7 +114,12 @@ class MachinesCache(object):
                     return
 
         # machine does not exist in machine_list
-        machine = Machine(ip_address, last_updated, 'Unreachable', 1)
+        machine = Machine(
+            ip_address=ip_address,
+            status='Unreachable',
+            fail_count=1,
+            last_updated=last_updated
+        )
         self.machine_obj_list.append(machine)
         socketio.emit('message', {'data': 'created'})
         app.logger.debug("Sent SocketIO message: created")
@@ -121,18 +138,18 @@ class MachinesCache(object):
         tmp_machine_list = []
         for doc in docs:
             machine = Machine(
-                doc['ip_address'],
-                doc['last_updated'],
-                doc['status'],
-                doc['fail_count'],
-                doc['hostname'],
-                doc['mac_address'],
-                doc['os_distribution'],
-                doc['release'],
-                doc['uptime'],
-                doc['cpu_load_avg'],
-                doc['memory_usage'],
-                doc['disk_usage'],
+                hostname=doc['hostname'],
+                ip_address=doc['ip_address'],
+                status=doc['status'],
+                fail_count=doc['fail_count'],
+                mac_address=doc['mac_address'],
+                os_distribution=doc['os_distribution'],
+                release=doc['release'],
+                uptime=doc['uptime'],
+                cpu_load_avg=doc['cpu_load_avg'],
+                memory_usage=doc['memory_usage'],
+                disk_usage=doc['disk_usage'],
+                last_updated=doc['last_updated']
             )
 
             tmp_machine_list.append(machine)
@@ -143,11 +160,11 @@ class MachinesCache(object):
         if ip_address:
             doc = {}
             machine = self.get(ip_address)
+
+            doc['hostname'] = machine.hostname
             doc['ip_address'] = machine.ip_address
-            doc['last_updated'] = machine.last_updated
             doc['status'] = machine.status
             doc['fail_count'] = machine.fail_count
-            doc['hostname'] = machine.hostname
             doc['mac_address'] = machine.mac_address
             doc['os_distribution'] = machine.os_distribution
             doc['release'] = machine.release
@@ -161,11 +178,12 @@ class MachinesCache(object):
                     'instance_id': machine.ec2.get('instance_id'),
                     'state': machine.ec2.get('state')
                 }
+            doc['last_updated'] = machine.last_updated
 
             return doc
 
         else:
-            return [self.convert_machine_to_doc(machine.ip_address)  for machine in self.get()]
+            return [self.convert_machine_to_doc(machine.ip_address) for machine in self.get()]
 
 
     def clear(self):    # Unused
