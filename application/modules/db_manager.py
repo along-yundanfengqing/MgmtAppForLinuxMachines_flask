@@ -88,20 +88,38 @@ class DBManager(object):
     def update_status_ok(self, machine_data, last_updated):
         ipaddr, hostname, mac, os_dist, release, uptime, cpu_load, memory_usage, disk_usage = machine_data
 
-        MachineData.objects(ip_address=ipaddr).update(
-            upsert=True,
-            hostname=hostname,
-            status="OK",
-            fail_count=0,
-            mac_address=mac,
-            os_distribution=os_dist,
-            release=release,
-            uptime=uptime,
-            cpu_load_avg=cpu_load,
-            memory_usage=memory_usage,
-            disk_usage=disk_usage,
-            last_updated=last_updated
-        )
+        # check if exists
+        try:
+            machine = MachineData.objects.get(ip_address=ipaddr)
+            machine.update(
+                hostname=hostname,
+                status="OK",
+                fail_count=0,
+                mac_address=mac,
+                os_distribution=os_dist,
+                release=release,
+                uptime=uptime,
+                cpu_load_avg=cpu_load,
+                memory_usage=memory_usage,
+                disk_usage=disk_usage,
+                last_updated=last_updated
+            )
+        except DoesNotExist:
+            machine = MachineData(
+                hostname=hostname,
+                ip_address=ipaddr,
+                status="OK",
+                fail_count=0,
+                mac_address=mac,
+                os_distribution=os_dist,
+                release=release,
+                uptime=uptime,
+                cpu_load_avg=cpu_load,
+                memory_usage=memory_usage,
+                disk_usage=disk_usage,
+                last_updated=last_updated
+            )
+            machine.save()  # call clean
 
 
     # When SSH fails to existing machines whose status was previously ok
