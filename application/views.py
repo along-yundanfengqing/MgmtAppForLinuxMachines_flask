@@ -95,10 +95,7 @@ def show_home():
     machines = machines_cache.get()
 
     if not machines:    # In case machines_cache is empty, retrieve data from database
-        docs = mongo.find({}).order_by('hostname', 'ip_address_decimal')
-
-        if docs:
-            machines = machines_cache.convert_docs_to_machine_list(docs)
+        machines = mongo.find({}).order_by('hostname', 'ip_address_decimal')
 
     now = datetime.utcnow()
     return render_template('home.html', current_user=current_user, machines=machines, now=now, butterfly=butterfly)
@@ -154,9 +151,7 @@ def delete_machine():
     machines = machines_cache.get()
 
     if not machines:    # In case machine_list in memory is empty, retrieve data from database
-        docs = mongo.find({}).order_by('hostname', 'ip_address_decimal')
-        if docs:
-            machines = machines_cache.convert_docs_to_machine_list(docs)
+        machines = mongo.find({}).order_by("+hostname", "+ip_address_decimal")
 
     if request.method == 'POST':
         del_list_u = request.form.getlist('checkbox')
@@ -170,7 +165,7 @@ def delete_machine():
         else:
             flash('Select machines to delete', 'error')
 
-    return render_template('delete_machine.html', ipaddr="", machines=machines)
+    return render_template('delete_machine.html', machines=machines)
 
 
 # SSH with butterfly application
@@ -205,7 +200,7 @@ def open_terminal():
 @login_required
 def export_json():
     ipaddr = request.form['ipaddr']
-    if machines_cache.get(ipaddr) in machines_cache.machine_obj_list:
+    if machines_cache.get(ipaddr):
         doc = machines_cache.convert_machine_to_doc(ipaddr)
     else:
         machine_data = mongo.find_one({'ip_address': ipaddr})
