@@ -47,9 +47,11 @@ class AppManager(object):
         JSON_DIR = BASE_DIR + "/application/json_files"
         JSON_FILEPATH = os.path.join(JSON_DIR, JSON_FILENAME)
 
+        doc['last_updated'] = doc['last_updated'].isoformat()
+        doc.pop('_id', None)
+        
         try:
             with open(JSON_FILEPATH, 'w') as f:
-                doc['last_updated'] = doc['last_updated'].isoformat()
                 json.dump(doc, f, indent=4)
                 return True, JSON_DIR
         except Exception as e:

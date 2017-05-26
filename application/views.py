@@ -208,7 +208,8 @@ def export_json():
     if machines_cache.get(ipaddr) in machines_cache.machine_obj_list:
         doc = machines_cache.convert_machine_to_doc(ipaddr)
     else:
-        doc = mongo.find_one({'ip_address': ipaddr})
+        machine_data = mongo.find_one({'ip_address': ipaddr})
+        doc = machine_data.to_mongo().to_dict()
 
     if request.method == 'POST':
         filename = request.form['InputFilename']
