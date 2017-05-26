@@ -49,7 +49,7 @@ class AppManager(object):
 
         doc['last_updated'] = doc['last_updated'].isoformat()
         doc.pop('_id', None)
-        
+
         try:
             with open(JSON_FILEPATH, 'w') as f:
                 json.dump(doc, f, indent=4)
