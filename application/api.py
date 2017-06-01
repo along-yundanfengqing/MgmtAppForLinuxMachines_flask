@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import pymongo
 from flask import abort, Blueprint, jsonify, make_response, request
 
 from application import app
