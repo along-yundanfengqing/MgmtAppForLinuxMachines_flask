@@ -209,8 +209,8 @@ The shell script shutdowns and deletes all containers and settings on your local
      APPLICATION_PORT       | TCP port of the application
      BG_THREAD_TIMER        | An interval for looping SSH access to machines (seconds)
      LOGIN_FILENAME         | Filename of the text file of managed linux machines list 
-     MONGO_HOST             | IP address for the MongoDB server
-     MONGO_PORT             | TCP port for the MongoDB server
+     MONGO_DATABASE_HOST    | IP address for the MongoDB server
+     MONGO_DATABASE_PORT    | TCP port for the MongoDB server
      MONGO_DATABASE_NAME    | Database name of MongoDB
      MONGO_COLLECTION_NAME  | Collection name of MongoDB
      
