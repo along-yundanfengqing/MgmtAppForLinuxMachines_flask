@@ -22,6 +22,9 @@ class DBManager(object):
         self.__port = app.config['MONGO_PORT']
         self.db = self.__connect_db()
 
+        if app.config['DEBUG']:
+            MachineData.drop_collection()
+
 
     @classmethod
     def get_current_instance(cls):
