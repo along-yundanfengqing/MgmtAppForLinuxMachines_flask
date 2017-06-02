@@ -35,7 +35,7 @@ class FileIO(object):
                     except Exception:   # no password
                         login_data.append(None)
 
-                    login_list.append([ipaddr, username, password])
+                    login_list.append((ipaddr, username, password))
 
             if len(login_list) > 0:
                 return login_list
