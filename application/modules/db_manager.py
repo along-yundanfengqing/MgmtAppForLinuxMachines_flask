@@ -18,8 +18,8 @@ class DBManager(object):
 
     def __init__(self):
         self.__database_name = app.config['MONGO_DATABASE_NAME']
-        self.__database_ip = app.config['MONGO_HOST']
-        self.__port = app.config['MONGO_PORT']
+        self.__database_ip = app.config['MONGO_DATABASE_HOST']
+        self.__port = app.config['MONGO_DATABASE_PORT']
         self.db = self.__connect_db()
 
         if app.config['DEBUG']:
