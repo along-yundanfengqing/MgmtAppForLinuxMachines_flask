@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-import os
 import pexpect
 import re
+import subprocess
 import threading
 from pexpect import pxssh
 
@@ -60,8 +60,7 @@ class SSHThread(threading.Thread):
                     app.logger.warning("SSH access to %s failed. Please check username or password for login" % self.__ipaddr)
 
                 else:
-                    if Validation.is_aws(self.__ipaddr):
-                        app.logger.warning("SSH access to %s failed. Please check network connectivity, or check if ssh service is started on the machine" % self.__ipaddr)
+                    app.logger.warning("SSH access to %s failed. Please check network connectivity, or check if ssh service is started on the machine" % self.__ipaddr)
 
                 self.__update_cache_and_db()
                 return
@@ -125,7 +124,8 @@ class SSHThread(threading.Thread):
 
     def __check_ip_reachability(self):
         if not Validation.is_aws(self.__ipaddr):
-            return os.system("ping -c 1 -W 1 %s > /dev/null 2>&1" % self.__ipaddr)
+            return subprocess.Popen(['ping', '-c', '1', '-W', '1', self.__ipaddr], stdout=subprocess.PIPE).wait()
+
         else:   # Skip checking for AWS instances as it depends on the security-group
             return 0
 
