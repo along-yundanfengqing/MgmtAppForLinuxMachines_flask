@@ -76,8 +76,7 @@ class AppManager(object):
         PEM_PATH = None
         ls = os.listdir(SSH_DIR)
         for item in ls:
-            PATTERN = re.compile(r".*\.pem")
-            if re.search(PATTERN, item.strip()):
+            if item.endswith(".pem"):
                 PEM_PATH = "%s/%s" % (SSH_DIR, item)
 
         return PEM_PATH, SSH_DIR
