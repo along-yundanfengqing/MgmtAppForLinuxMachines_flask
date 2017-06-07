@@ -218,7 +218,7 @@ def export_json():
 
 
 # Start EC2 Instance
-@view.route('/start_instance/<ipaddr>', methods=['GET', 'POST'])
+@view.route('/start_ec2/<ipaddr>', methods=['GET', 'POST'])
 @login_required
 def start_ec2(ipaddr):
     eventlet.spawn_n(AppManager.start_ec2, ipaddr)
@@ -226,7 +226,7 @@ def start_ec2(ipaddr):
 
 
 # Stop EC2 Instance
-@view.route('/stop_instance/<ipaddr>', methods=['GET', 'POST'])
+@view.route('/stop_ec2/<ipaddr>', methods=['GET', 'POST'])
 @login_required
 def stop_ec2(ipaddr):
     eventlet.spawn_n(AppManager.stop_ec2, ipaddr)
