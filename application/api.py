@@ -22,9 +22,11 @@ def get_machine_api(hostname):
         doc = machines_cache.convert_machine_to_doc(hostname)
     else:
         if Validation.is_valid_ipv4(hostname):
-            doc = mongo.find_one({'ip_address': hostname})
+            machine = mongo.find_one({'ip_address': hostname})
         else:
-            doc = mongo.find_one({'hostname': hostname})
+            machine = mongo.find_one({'hostname': hostname})
+        doc = machine.to_mongo().to_dict()
+        doc.pop('_id')      # remove '_id' field
     if doc:
         return jsonify(data=doc)
 
@@ -39,10 +41,12 @@ def get_all_api():
     if machines_cache.get():
         docs = machines_cache.convert_machine_to_doc()
     else:
-        docs = mongo.find({}).order_by('hostname', 'ip_address_decimal')
+        machines = mongo.find({}).order_by('hostname', 'ip_address_decimal')
+        docs = [machine.to_mongo().to_dict() for machine in machines if machine['hostname'] != '#Unknown']
+        [doc.pop('_id') for doc in docs]    # remove '_id' field
     # return all machines except Hostname = #Unknown
     if docs:
-        return jsonify(data=[doc for doc in docs if doc['hostname'] != '#Unknown'])
+        return jsonify(data=docs)
     abort(404)
 
 
