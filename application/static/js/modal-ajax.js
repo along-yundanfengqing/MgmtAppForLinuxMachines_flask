@@ -10,8 +10,8 @@ $(function () {
             var machine = data['data'];
             var thisModal = $('#myModal_machine_data' + index);
             var now = new Date().getTime();
-            var lastUpdated = Date.parse(machine['last_updated']);
-            var lastUpdatedFormatted = getFormattedDatetime(new Date(lastUpdated));
+            var lastUpdated = new Date(machine['last_updated']);
+            var lastUpdatedFormatted = getFormattedDatetime(lastUpdated);
             var deltaInSec = Math.ceil((now - lastUpdated)/1000);
 
             // Last updated
