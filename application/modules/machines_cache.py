@@ -183,7 +183,7 @@ class MachinesCache(object):
             return doc
 
         else:
-            return [self.convert_machine_to_doc(machine.ip_address) for machine in self.get()]
+            return [self.convert_machine_to_doc(machine.ip_address) for machine in self.get() if machine.hostname != "#Unknown"]
 
 
     def clear(self):    # Unused

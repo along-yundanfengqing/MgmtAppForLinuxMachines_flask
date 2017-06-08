@@ -18,6 +18,7 @@ mongo = DBManager.get_current_instance()
 # eg. curl -i http://localhost:5000/api/machines/172.30.0.1
 @api.route('/api/machines/<hostname>', methods=['GET'])
 def get_machine_api(hostname):
+    doc = None
     if machines_cache.get(hostname) in machines_cache.machine_obj_list:
         doc = machines_cache.convert_machine_to_doc(hostname)
     else:
@@ -25,8 +26,10 @@ def get_machine_api(hostname):
             machine = mongo.find_one({'ip_address': hostname})
         else:
             machine = mongo.find_one({'hostname': hostname})
-        doc = machine.to_mongo().to_dict()
-        doc.pop('_id')      # remove '_id' field
+
+        if machine:
+            doc = machine.to_mongo().to_dict()
+            doc.pop('_id')      # remove '_id' field
     if doc:
         return jsonify(data=doc)
 
