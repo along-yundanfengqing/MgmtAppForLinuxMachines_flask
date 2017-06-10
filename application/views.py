@@ -37,7 +37,7 @@ def load_user(username):
 
 
 # signup page
-@view.route('/signup', methods=['GET', 'POST'])
+@view.route('/portal/signup', methods=['GET', 'POST'])
 def show_signup():
     form = SignupForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -64,7 +64,7 @@ def root():
 
 
 # login page
-@view.route('/login', methods=['GET', 'POST'])
+@view.route('/portal/login', methods=['GET', 'POST'])
 def show_login():
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -80,7 +80,7 @@ def show_login():
 
 
 # logout
-@view.route('/logout')
+@view.route('/portal/logout')
 @login_required
 def logout():
     flash('Logged out from a user "%s"' % current_user.username, 'success')
@@ -89,7 +89,8 @@ def logout():
 
 
 #Home page
-@view.route('/home')
+@view.route('/'
+            'portal/home')
 @login_required
 def show_home():
     machines = machines_cache.get()
@@ -102,7 +103,7 @@ def show_home():
 
 
 # Register a new machine page
-@view.route('/register', methods=['GET', 'POST'])
+@view.route('/portal/register', methods=['GET', 'POST'])
 @login_required
 def add_machine(ipaddr="", username="", password="", error1="", error2="", error3=""):
     if request.method == 'POST':
@@ -145,7 +146,7 @@ def add_machine(ipaddr="", username="", password="", error1="", error2="", error
 
 
 # Delete machines page
-@view.route('/delete', methods=['GET', 'POST'])
+@view.route('/portal/delete', methods=['GET', 'POST'])
 @login_required
 def delete_machine():
     machines = machines_cache.get()
@@ -169,7 +170,7 @@ def delete_machine():
 
 
 # SSH with butterfly application
-@view.route('/terminal', methods=['GET', 'POST'])
+@view.route('/portal/terminal', methods=['GET', 'POST'])
 @login_required
 def open_terminal():
     if request.method == 'POST':
@@ -196,7 +197,7 @@ def open_terminal():
 
 
 # Export JSON files
-@view.route('/export_json', methods=['GET', 'POST'])
+@view.route('/portal/export_json', methods=['GET', 'POST'])
 @login_required
 def export_json():
     ipaddr = request.form['ipaddr']
@@ -218,7 +219,7 @@ def export_json():
 
 
 # Start EC2 Instance
-@view.route('/start_ec2/<ipaddr>', methods=['GET', 'POST'])
+@view.route('/portal/start_ec2/<ipaddr>', methods=['GET', 'POST'])
 @login_required
 def start_ec2(ipaddr):
     eventlet.spawn_n(AppManager.start_ec2, ipaddr)
@@ -226,7 +227,7 @@ def start_ec2(ipaddr):
 
 
 # Stop EC2 Instance
-@view.route('/stop_ec2/<ipaddr>', methods=['GET', 'POST'])
+@view.route('/portal/stop_ec2/<ipaddr>', methods=['GET', 'POST'])
 @login_required
 def stop_ec2(ipaddr):
     eventlet.spawn_n(AppManager.stop_ec2, ipaddr)
