@@ -79,7 +79,7 @@ def register_machine_api_01(ipaddr, username, password):
     elif (not is_duplicate) and is_valid_ipaddr and is_valid_username and is_valid_password:
         if AppManager.add_machine(ipaddr, username, password):
             app.logger.info("- ADDED - %s", ipaddr)
-            return make_response(jsonify(result={'success': True}), 201)
+            return make_response(jsonify(result={'success': True, 'added machines': 1}), 201)
     return make_response(jsonify(result={'success': False, 'reason': error_list}), 422)
 
 
@@ -132,7 +132,7 @@ def register_machine_api_02():
         all_success = False
 
     if all_success:
-        return make_response(jsonify(result={'success': True}), 201)
+        return make_response(jsonify(result={'success': True, 'added machines': len(add_machines)}), 201)
     return make_response(jsonify(result={'success': False, 'reason': errors}), 422)
 
 
@@ -194,8 +194,8 @@ def add_user_api():
 @api.route('/api/users/delete/<username>', methods=['DELETE'])
 def delete_user_api(username):
     del_result = mongo.delete_user(username)
-    app.logger.warning("- DELETED ACCOUNT - %s", username)
     if del_result > 0:
+        app.logger.warning("- DELETED ACCOUNT - %s", username)
         return jsonify(result={'success': True, 'deleted users': del_result})
     return make_response(jsonify(result={'success': False, 'deleted users': del_result}), 422)
 
