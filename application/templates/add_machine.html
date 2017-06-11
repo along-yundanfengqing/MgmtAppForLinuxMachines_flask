@@ -21,17 +21,23 @@
         <div class="form-group" >
           <label for="InputIPAddress">IP Address</label>
           <input type="text" class="form-control" name = "ip_address" placeholder="IP Address" value="{{ipaddr}}">
-          <p id="ipaddress-error" class="text-danger">{{error1}}</p>
+            {% if error1 %}
+              <p id="ipaddress-error" class="text-danger">{{error1}}</p>
+            {% endif %}
         </div>
         <div class="form-group">
           <label for="InputUsername">Username</label>
           <input type="text" class="form-control" name="username" placeholder="Username" value="{{username}}">
-          <p id="username-error" class="text-danger">{{error2}}</p>
+            {% if error2 %}
+              <p id="username-error" class="text-danger">{{error2}}</p>
+            {% endif %}
         </div>
         <div class="form-group">
           <label for="InputPassword">Password (Optional for SSH-key based login)</label>
           <input type="password" class="form-control" name="password" placeholder="Password">
-          <p id="password-error" class="text-danger">{{error3}}</p>
+            {% if error3 %}
+              <p id="password-error" class="text-danger">{{error3}}</p>
+            {% endif %}
         </div>
         <button type="submit" class="btn btn-primary">Register</button>
       </form>

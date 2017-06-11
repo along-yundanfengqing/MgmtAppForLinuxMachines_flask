@@ -125,7 +125,7 @@ def add_machine(ipaddr="", username="", password="", error1="", error2="", error
             username = ""
             error2 = "Please enter a valid username"
         if not is_valid_password:
-            error3 = "Please enter a valid passowrd"
+            error3 = "Please enter a valid password"
         if is_duplicate:     # IP Address already exists in the login file
             flash('The IP Address "%s" already exists in %s' % (ipaddr, login_file), 'error')
             ipaddr = username = password = error1 = error2 = error3 = ""
