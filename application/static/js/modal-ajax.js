@@ -21,7 +21,7 @@ $(function () {
             if (machine['aws'] && machine['ec2']['state'] === null) {
                 // Initial Unknown status. Add aws button
                 thisModal.find('#aws-ec2-button' + index).remove();
-                thisModal.find('.container-fluid .text-right').prepend('<a id="aws-ec2-button' + index + '" class="btn btn-success btn-sm" href="/start_ec2/' + machine.ip_address + '" role="button">Start Instance</a>');
+                thisModal.find('.container-fluid .text-right').prepend('<a id="aws-ec2-button' + index + '" class="btn btn-success btn-sm" href="/portal/start_ec2/' + machine.ip_address + '" role="button">Start Instance</a>');
             }
 
             else if (machine['aws'] && machine['ec2']['state'] === 'pending') {
@@ -36,12 +36,12 @@ $(function () {
 
             else if (machine['aws'] && machine['ec2']['state'] === 'running') {
                 // show 'stop instance'
-                thisModal.find('#aws-ec2-button' + index).removeClass('disabled btn-success').addClass('btn-danger').attr('href', '/stop_ec2/' + machine.ip_address).text('Stop Instance');
+                thisModal.find('#aws-ec2-button' + index).removeClass('disabled btn-success').addClass('btn-danger').attr('href', '/portal/stop_ec2/' + machine.ip_address).text('Stop Instance');
             }
 
             else if (machine['aws'] && machine['ec2']['state'] === 'stopped') {
                 // show 'start instance'
-                thisModal.find('#aws-ec2-button' + index).removeClass('disabled btn-danger').addClass('btn-success').attr('href', '/start_ec2/' + machine.ip_address).text('Start Instance');
+                thisModal.find('#aws-ec2-button' + index).removeClass('disabled btn-danger').addClass('btn-success').attr('href', '/portal/start_ec2/' + machine.ip_address).text('Start Instance');
 
             }
 
