@@ -89,8 +89,7 @@ def logout():
 
 
 #Home page
-@view.route('/'
-            'portal/home')
+@view.route('/portal/home')
 @login_required
 def show_home():
     machines = machines_cache.get()
@@ -107,9 +106,9 @@ def show_home():
 @login_required
 def add_machine(ipaddr="", username="", password="", error1="", error2="", error3=""):
     if request.method == 'POST':
-        ipaddr = request.form['InputIPAddress']
-        username = request.form['InputUsername']
-        password = request.form['InputPassword']
+        ipaddr = request.form['ip_address']
+        username = request.form['username']
+        password = request.form['password']
         if not password:
             password = None
 
