@@ -107,6 +107,8 @@ class DBManager(object):
                 disk_usage=disk_usage,
                 last_updated=last_updated
             )
+            if machine.aws and machine.ec2['state'] is None:
+                self.update_ec2_state(ipaddr, "running")
         except DoesNotExist:
             machine = MachineData(
                 hostname=hostname,
