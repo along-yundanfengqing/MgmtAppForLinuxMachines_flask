@@ -8,7 +8,8 @@ Management Application for Linux Machines
 4. [Try it out](#4-try-it-out)
     - [With test infrastructure with Docker containers (Demo purpose only)](#1-with-the-test-docker-environment-demo-purpose-only)
     - [With your own infrastructure](#2-if-you-run-with-your-own-infrastructure)
-5. [Documentation](#5-documentation)
+5. [API Endpoints](#5-api-endpoints)
+6. [Documentation](#6-documentation)
 
 <br>
 
@@ -64,7 +65,7 @@ All features are demonstrated with screenshots in the document.
     + MongoDB
     + JSON
     + RESTful API
-    + SocketIO
+    + socket.io
     + AWS SDK for Python(Boto3)
     + Docker containers (Docker Engine + Docker Compose)
     + Shell Script
@@ -212,7 +213,6 @@ The shell script shutdowns and deletes all containers and settings on your local
      MONGO_DATABASE_HOST    | IP address for the MongoDB server
      MONGO_DATABASE_PORT    | TCP port for the MongoDB server
      MONGO_DATABASE_NAME    | Database name of MongoDB
-     MONGO_COLLECTION_NAME  | Collection name of MongoDB
      
 
 4. (Optional) Add IP Address, username (and password) of each Linux machine in the text file specified as LOGIN_FILENAME. You can also operate this step later through GUI 
@@ -224,8 +224,26 @@ The shell script shutdowns and deletes all containers and settings on your local
 6. Access to `http://<APPLICATION_HOST>:<APPLICATION_PORT>` from any web browser  
 
 
+## 5. API Endpoints
+Web API Base URL: http://<APPLICATION_HOST>:<APPLICATION_PORT>  
 
-## 5. Documentation
+METHOD   | ENDPOINT                     | Usage
+----     | ----                         | ----
+GET      | /api/machines                | Get all machine data except hostname is #Unknown
+GET      | /api/machines/{ip_address}   | Get machine data with the IP Address
+GET      | /api/machines/{hostname}     | Get machine data with the hostname
+POST     | /api/machines/add            | Register machines. Use a list([ ]) of {"IP Address": "ip_address", "Username": "username", "Password": "password"} as a body data
+POST     | /api/machines/add/{ip_address}:{hostname}             | Register a machine (for SSH-key based authentication)
+POST     | /api/machines/add/{ip_address}:{hostname}:{password}  | Register a machine (for password authentication)
+DELETE   | /api/machines/delete         | Delete machines. Use {"IP Address": ["ip1", "ip2", "ip3", ...]} as a body data}
+DELETE   | /api/machines/delete/{ip_addresses}          | Delete machines. Separate IP Address with a comma for deleting multiple machines
+GET      | /api/users                   | Get all users
+POST     | /api/users/add               | Add a user. Use {"Username": "username", "Password": "password"} as a body data
+DELETE   | /api/users/delete/{username} | Delete a user
+
+
+
+## 6. Documentation
 See the demo documentation [here](https://1drv.ms/b/s!AkRAr6rw0sUWgShAMcE-nZJyUIz5) for more details.  
 All features are demonstrated with screenshots.
 
