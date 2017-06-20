@@ -20,6 +20,7 @@ class SSHThread(threading.Thread):
     __CMD_DISTRIBUTION = "cat /etc/*-release"
     __CMD_MAC = "ip addr"
     __CMD_UPTIME = "cat /proc/uptime"
+    __CMD_CPU_INFO = "cat /proc/cpuinfo"
     __CMD_CPU_LOAD = "uptime"
     __CMD_MEMORY = "free -h"
     __CMD_DISK = "df -Ph"
@@ -86,6 +87,10 @@ class SSHThread(threading.Thread):
                 output = self.__get_output(SSHThread.__CMD_UPTIME, s)
                 uptime = self.__get_uptime(output)
 
+                # get CPU info (CPU model, CPU Mhz, CPU cores, )
+                output = self.__get_output(SSHThread.__CMD_CPU_INFO, s)
+                cpu_info = self.__get_cpu_info(output)
+
                 # get CPU load average
                 output = self.__get_output(SSHThread.__CMD_CPU_LOAD, s)
                 cpu_load = self.__get_cpu(output)
@@ -100,7 +105,7 @@ class SSHThread(threading.Thread):
 
                 # Write to DB
                 output_list = [
-                    self.__ipaddr, hostname, mac, os_dist, release, uptime, cpu_load,
+                    self.__ipaddr, hostname, mac, os_dist, release, uptime, cpu_info, cpu_load,
                     memory_usage, disk_usage
                     ]
                 AppManager.update_machine_obj_and_update_db_ok(output_list)
@@ -208,6 +213,23 @@ class SSHThread(threading.Thread):
             break
 
         return "%dd %dh %dm %ds" % (d, h, m, s)
+
+
+    def __get_cpu_info(self, output):
+        cpu_info = {}
+        for line in output.splitlines():
+            try:
+                key, value = line.split(":")[0].rstrip(), line.split(":")[1].lstrip()
+                if key == "model name":
+                    cpu_info['model_name'] = value
+                if key == "cpu MHz":
+                    cpu_info['cpu_mhz'] = value
+                if key == "cpu cores":
+                    cpu_info['cpu_cores'] = value
+            except IndexError:
+                continue
+
+        return cpu_info
 
 
     def __get_cpu(self, output):

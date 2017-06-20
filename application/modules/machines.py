@@ -6,8 +6,8 @@ from application.modules.aws_ec2 import EC2Client
 
 class Machine(object):
     def __init__(self, hostname="#Unknown", ip_address=None, status="Unknown (Waiting for the first SSH access)",
-                 fail_count=0, mac_address=None, os_distribution=None, release=None,
-                 uptime=None, cpu_load_avg=None, memory_usage=None, disk_usage=None, last_updated=None):
+                 fail_count=0, mac_address=None, os_distribution=None, release=None, uptime=None,
+                 cpu_info=None, cpu_load_avg=None, memory_usage=None, disk_usage=None, last_updated=None):
 
         self.hostname = hostname
         self.ip_address = ip_address
@@ -18,6 +18,7 @@ class Machine(object):
         self.os_distribution = os_distribution
         self.release = release
         self.uptime = uptime
+        self.cpu_info = cpu_info
         self.cpu_load_avg = cpu_load_avg
         self.memory_usage = memory_usage
         self.disk_usage = disk_usage

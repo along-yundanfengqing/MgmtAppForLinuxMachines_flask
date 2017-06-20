@@ -55,9 +55,9 @@ $(function () {
                 thisModal.find('#basic' + index + ' tbody tr:nth-child(7) td:nth-child(2)').text(machine['uptime']);
 
                 // CPU tab
-                thisModal.find('#cpu' + index + ' tbody tr:nth-child(2) td:nth-child(1)').text(machine['cpu_load_avg']['1min']);
-                thisModal.find('#cpu' + index + ' tbody tr:nth-child(3) td:nth-child(1)').text(machine['cpu_load_avg']['5min']);
-                thisModal.find('#cpu' + index + ' tbody tr:nth-child(4) td:nth-child(1)').text(machine['cpu_load_avg']['15min']);
+                thisModal.find('#cpu' + index + ' table[id="cpu-load-avg"] tr:nth-child(2) td:nth-child(1)').text(machine['cpu_load_avg']['1min']);
+                thisModal.find('#cpu' + index + ' table[id="cpu-load-avg"] tr:nth-child(3) td:nth-child(1)').text(machine['cpu_load_avg']['5min']);
+                thisModal.find('#cpu' + index + ' table[id="cpu-load-avg"] tr:nth-child(4) td:nth-child(1)').text(machine['cpu_load_avg']['15min']);
 
                 // Memory tab
                 if (Object.keys(machine['memory_usage']).length === 3){

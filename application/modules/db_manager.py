@@ -89,7 +89,7 @@ class DBManager(object):
 
     # When SSH succeeds to new or existing machines
     def update_status_ok(self, machine_data, last_updated):
-        ipaddr, hostname, mac, os_dist, release, uptime, cpu_load, memory_usage, disk_usage = machine_data
+        ipaddr, hostname, mac, os_dist, release, uptime, cpu_info, cpu_load, memory_usage, disk_usage = machine_data
 
         # check if exists
         try:
@@ -103,6 +103,7 @@ class DBManager(object):
                 release=release,
                 uptime=uptime,
                 cpu_load_avg=cpu_load,
+                cpu_info=cpu_info,
                 memory_usage=memory_usage,
                 disk_usage=disk_usage,
                 last_updated=last_updated
@@ -120,6 +121,7 @@ class DBManager(object):
                 release=release,
                 uptime=uptime,
                 cpu_load_avg=cpu_load,
+                cpu_info=cpu_info,
                 memory_usage=memory_usage,
                 disk_usage=disk_usage,
                 last_updated=last_updated

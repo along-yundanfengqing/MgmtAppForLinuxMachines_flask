@@ -220,6 +220,8 @@ function insertUnknownMachineElement(ip_address, machine) {
                           '</div>' +
                       '</div>' +
                       '<div role="tabpanel" class="tab-pane" id="cpu' + index + '">' +
+                          '<h5>CPU Information</h5>' +
+                          '<div class="table-responsive">None</div>' +
                           '<h5>CPU Load Average</h5>' +
                           '<div class="table-responsive">None</div>' +
                       '</div>' +

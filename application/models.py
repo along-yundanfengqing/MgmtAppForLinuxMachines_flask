@@ -25,6 +25,7 @@ class MachineData(DynamicDocument):
     os_distribution = StringField(default=None)
     release = StringField(default=None)
     uptime = StringField(default=None)
+    cpu_info = DictField(default=None)
     cpu_load_avg = DictField(default=None)
     memory_usage = DictField(default=None)
     disk_usage = ListField(default=None)

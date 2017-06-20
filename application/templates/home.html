@@ -177,10 +177,36 @@
                     </div>
 
                     <div role="tabpanel" class="tab-pane" id="cpu{{loop.index}}">
+                        <h5>CPU Information</h5>
+                        <div class="table-responsive">
+                            {% if machine.cpu_info != none %}
+                            <table id="cpu-info" class="table table-hover">
+                              <tbody>
+                                <th class="active"> Items </th>
+                                <th class="active"> Parameters </th>
+                                <tr>
+                                    <td>Model:</td>
+                                    <td>{{ machine.cpu_info['model_name'] }}</td>
+                                </tr>
+                                <tr>
+                                    <td>MHz:</td>
+                                    <td>{{ machine.cpu_info['cpu_mhz'] }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Cores:</td>
+                                    <td>{{ machine.cpu_info['cpu_cores'] }}</td>
+                                </tr>
+                              </tbody>
+                            </table>
+                            {% else %}
+                                {{ machine.cpu_info }}
+                            {% endif %}
+                        </div>
+
                         <h5>CPU Load Average</h5>
                         <div class="table-responsive">
                             {% if machine.cpu_load_avg != none %}
-                            <table class="table table-hover">
+                            <table id="cpu-load-avg" class="table table-hover">
                               <tbody>
                                 <th class="active"> 1 min </th>
                                 <th class="active"> 5 min </th>
@@ -202,7 +228,6 @@
                                 {{ machine.cpu_load_avg }}
                             {% endif %}
                         </div>
-
                     </div>
 
                     <div role="tabpanel" class="tab-pane" id="memory{{loop.index}}">

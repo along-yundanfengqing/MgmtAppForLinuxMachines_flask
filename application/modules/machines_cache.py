@@ -52,7 +52,7 @@ class MachinesCache(object):
 
     def update_ok(self, machine_data, last_updated):
         ip_address, hostname, mac_address, os_distribution, release, uptime, \
-        cpu_load_avg, memory_usage, disk_usage = machine_data
+        cpu_info, cpu_load_avg, memory_usage, disk_usage = machine_data
 
         if len(self.machine_obj_list) > 0:
             for index, machine in enumerate(self.machine_obj_list):
@@ -65,6 +65,7 @@ class MachinesCache(object):
                     machine.os_distribution = os_distribution
                     machine.release = release
                     machine.uptime = uptime
+                    machine.cpu_info = cpu_info
                     machine.cpu_load_avg = cpu_load_avg
                     machine.memory_usage = memory_usage
                     machine.disk_usage = disk_usage
@@ -91,6 +92,7 @@ class MachinesCache(object):
             os_distribution=os_distribution,
             release=release,
             uptime=uptime,
+            cpu_info=cpu_info,
             cpu_load_avg=cpu_load_avg,
             memory_usage=memory_usage,
             disk_usage=disk_usage,
@@ -146,6 +148,7 @@ class MachinesCache(object):
                 os_distribution=doc['os_distribution'],
                 release=doc['release'],
                 uptime=doc['uptime'],
+                cpu_info=doc['cpu_info'],
                 cpu_load_avg=doc['cpu_load_avg'],
                 memory_usage=doc['memory_usage'],
                 disk_usage=doc['disk_usage'],
@@ -169,6 +172,7 @@ class MachinesCache(object):
             doc['os_distribution'] = machine.os_distribution
             doc['release'] = machine.release
             doc['uptime'] = machine.uptime
+            doc['cpu_info'] = machine.cpu_info
             doc['cpu_load_avg'] = machine.cpu_load_avg
             doc['memory_usage'] = machine.memory_usage
             doc['disk_usage'] = machine.disk_usage
