@@ -15,11 +15,11 @@ def set_logging():
 
     logging.basicConfig(format=log_format, level=logging_level_app)
 
-    if sys.version_info[0] == 3:
-        # console log handler
-        console_log_handler = logging.StreamHandler()
-        console_log_handler.setFormatter(logging.Formatter(log_format))
-        app.logger.addHandler(console_log_handler)
+    #if sys.version_info[0] == 3:
+    # console log handler
+    console_log_handler = logging.StreamHandler()
+    console_log_handler.setFormatter(logging.Formatter(log_format))
+    app.logger.addHandler(console_log_handler)
 
     # logging to a file
     file_handler = RotatingFileHandler("application/log/error.log", maxBytes=logging_max_bytes, backupCount=1)
