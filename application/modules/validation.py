@@ -11,11 +11,19 @@ class Validation(object):
 
     @staticmethod
     def is_valid_ipv4(ipaddr):
-        try:
-            socket.inet_pton(socket.AF_INET, ipaddr)
-            return True
-        except socket.error:
+        match = re.match("^(\d{0,3})\.(\d{0,3})\.(\d{0,3})\.(\d{0,3})$", ipaddr)
+        if not match:
             return False
+
+        octets = []
+        for number in match.groups():
+            octets.append(int(number))
+        if octets[0] < 1:     # First octet = 0
+            return False
+        for number in octets:
+            if number > 255 or number < 0:
+                return False
+        return True
 
 
     @staticmethod
@@ -25,7 +33,7 @@ class Validation(object):
 
     @staticmethod
     def is_valid_password(password):
-        return password is None or re.match(r"^[a-zA-Z0-9!@#\$%\^&\*\(\)\-\+\=_\?\{\}\[\]\<\>\/:;\"\']+$", password)
+        return password is None or ' ' not in password
 
 
     # check if the IP Address is from AWS cloud
