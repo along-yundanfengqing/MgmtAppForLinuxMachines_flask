@@ -16,21 +16,21 @@ mongo = DBManager.get_current_instance()
 
 class BackgroundThreadManager(object):
     # Start the backgroud thread for SSH access and DB write/read
-    @classmethod
-    def start(cls):
-        th = threading.Thread(target=cls.__repeat_bg_thread)
+    @staticmethod
+    def start():
+        th = threading.Thread(target=BackgroundThreadManager.__repeat_bg_thread)
         th.daemon = True
         th.start()
 
 
     # repeat the background process
-    @classmethod
-    def __repeat_bg_thread(cls):
+    @staticmethod
+    def __repeat_bg_thread():
         try:
-            cls.__start_ssh_threads()
+            BackgroundThreadManager.__start_ssh_threads()
             # loop the background thread (default = every 30 seconds)
             timer = app.config['BG_THREAD_TIMER']
-            th = threading.Timer(timer, cls.__repeat_bg_thread)
+            th = threading.Timer(timer, BackgroundThreadManager.__repeat_bg_thread)
             th.daemon = True
             th.start()
         except Exception as e:
@@ -39,8 +39,8 @@ class BackgroundThreadManager(object):
             thread.interrupt_main()
 
 
-    @classmethod
-    def __start_ssh_threads(cls):
+    @staticmethod
+    def __start_ssh_threads():
         socketio.emit('message', {'data': 'started'})
         app.logger.debug("Sent SocketIO message: started")
         app.logger.info("Started collecting data via SSH")
