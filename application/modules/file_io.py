@@ -33,7 +33,7 @@ class FileIO(object):
                     try:
                         password = login_data[2].strip()
                     except Exception:   # no password
-                        login_data.append(None)
+                        password = None
 
                     login_list.append((ipaddr, username, password))
 
