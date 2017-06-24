@@ -2,6 +2,7 @@ import logging
 
 # Application
 DEBUG = False
+TESTING = False
 SECRET_KEY = "super_secret_key"
 APPLICATION_HOST = "127.0.0.1"
 APPLICATION_PORT = 5000

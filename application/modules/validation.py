@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import re
 import socket
+
+# my modules
 from application import app
 
 class Validation(object):
