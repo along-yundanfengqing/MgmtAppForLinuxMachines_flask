@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from application import socketio, app
+from application import app, socketio
 from application.modules.aws_ec2 import EC2Client
 from application.modules.validation import Validation
 from application.modules.machines import Machine
