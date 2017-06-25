@@ -20,6 +20,7 @@ class FileIOTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        logging.disable(logging.CRITICAL)
         assert(Validation.check_internet_connection())
 
     @classmethod
@@ -27,7 +28,6 @@ class FileIOTests(unittest.TestCase):
         pass
 
     def setUp(self):
-        logging.disable(logging.CRITICAL)
         with open(LOGIN_FILE_PATH, 'w') as f:
             f.write(test_data)
 

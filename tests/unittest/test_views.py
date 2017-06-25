@@ -1,6 +1,7 @@
 import uuid
 import unittest
 from application import app
+from application.models import MachineData
 
 test_username = "test_user"
 test_password = "test_password"
@@ -13,7 +14,7 @@ class ViewTests(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        pass
+        MachineData.drop_collection()
 
     def setUp(self):
         self.client = app.test_client()
