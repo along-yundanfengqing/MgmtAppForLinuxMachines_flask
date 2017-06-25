@@ -7,9 +7,8 @@ from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 
 # my modules
-from application import app
+from application import app, mongo
 from application.modules.app_manager import AppManager
-from application.modules.db_manager import DBManager
 from application.modules.file_io import FileIO
 from application.modules.form import LoginForm, SignupForm
 from application.modules.users import UserObj
@@ -19,7 +18,6 @@ from application.modules.machines_cache import MachinesCache
 
 view = Blueprint('view', __name__)
 machines_cache = MachinesCache.get_current_instance()
-mongo = DBManager.get_current_instance()
 butterfly = AppManager.is_butterfly_installed()
 login_file = app.config['LOGIN_FILENAME']
 login_manager = LoginManager(app)

@@ -7,15 +7,14 @@ import signal
 from datetime import datetime
 
 # my modules
-from application import app
-from application.modules.db_manager import DBManager
+from application import app, mongo
 from application.modules.file_io import FileIO
 from application.modules.machines import Machine
 from application.modules.machines_cache import MachinesCache
 from application.modules.aws_ec2 import EC2Instance
 
 machines_cache = MachinesCache.get_current_instance()
-mongo = DBManager.get_current_instance()
+
 
 class AppManager(object):
     # Register a machine to (login.txt, database, cache)

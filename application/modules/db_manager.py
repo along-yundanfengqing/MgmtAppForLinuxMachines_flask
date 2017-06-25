@@ -14,10 +14,11 @@ machines_cache = MachinesCache.get_current_instance()
 
 class DBManager(object):
 
-    current_instance = None
-
     def __init__(self):
-        self.__database_name = app.config['MONGO_DATABASE_NAME']
+        if app.testing:
+            self.__database_name = app.config['MONGO_DATABASE_NAME'] + "_test"
+        else:
+            self.__database_name = app.config['MONGO_DATABASE_NAME']
         self.__database_ip = app.config['MONGO_DATABASE_HOST']
         self.__port = app.config['MONGO_DATABASE_PORT']
         self.db = self.__connect_db()
@@ -26,20 +27,15 @@ class DBManager(object):
             MachineData.drop_collection()
 
 
-    @classmethod
-    def get_current_instance(cls):
-        if DBManager.current_instance is None:
-            DBManager.current_instance = DBManager()
-        return DBManager.current_instance
-
-
     def __connect_db(self):
         try:
             app.logger.info(("Checking the connectivity to the database(%s)...." % self.__database_ip))
-            connect(self.__database_name, host=self.__database_ip, port=self.__port, serverSelectionTimeoutMS=3000)
+            db =  connect(self.__database_name, host=self.__database_ip, port=self.__port, serverSelectionTimeoutMS=3000)
+            db.server_info()
             app.logger.info("...OK")
+            return db
         except Exception as e:
-            app.logger.critical(type(e))
+            app.logger.error("Unable to connect to %s" % self.__database_ip)
             sys.exit(1)
 
 
@@ -51,7 +47,7 @@ class DBManager(object):
         try:
             return MachineData.objects.get(__raw__=args[0])
         except DoesNotExist:
-            return False
+            return None
 
 
     def remove(self, del_ip_list):

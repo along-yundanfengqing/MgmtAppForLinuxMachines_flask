@@ -7,8 +7,7 @@ from flask_socketio import SocketIO
 # my modules
 from application.factory import create_app
 
-app = create_app()
-socketio = SocketIO(app)
+
 
 def datetimefilter(value, format="%B %d, %Y / %H:%M:%S"):
     tz = pytz.timezone('US/Pacific') # timezone you want to convert to from UTC
@@ -25,9 +24,15 @@ def datetimefilter2(value, format="%Y%m%d_%H.%M.%S"):
     local_dt = value.astimezone(tz)
     return local_dt.strftime(format)
 
+def set_logging():
+    from application.modules.set_logging import set_logging
+
+
+def init_db():
+    from application.modules.db_manager import DBManager
+    return DBManager()
 
 def start():
-    print("Starting the program...\n")
     from application.views import view
     from application.api import api
     app.register_blueprint(view)
@@ -35,11 +40,11 @@ def start():
     app.jinja_env.filters['datetimefilter'] = datetimefilter
     app.jinja_env.filters['datetimefilter2'] = datetimefilter2
 
-    from application.modules.set_logging import set_logging
-    from application.modules.db_manager import DBManager
     from application.modules.machines_cache import MachinesCache
 
+app = create_app()
+set_logging()
 
-
-
+socketio = SocketIO(app)
+mongo = init_db()
 start()

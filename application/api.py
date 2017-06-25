@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 from flask import abort, Blueprint, jsonify, make_response, request
 
-from application import app
+from application import app, mongo
 from application.modules.app_manager import AppManager
-from application.modules.db_manager import DBManager
 from application.modules.file_io import FileIO
 from application.modules.machines_cache import MachinesCache
 from application.modules.users import UserObj
@@ -11,7 +10,6 @@ from application.modules.validation import Validation
 
 api = Blueprint('api', __name__)
 machines_cache = MachinesCache.get_current_instance()
-mongo = DBManager.get_current_instance()
 
 # Expose each machine's data via REST API
 # eg. curl -i http://localhost:5000/api/machines/vm01

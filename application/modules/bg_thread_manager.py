@@ -6,12 +6,9 @@ except ImportError:
 import threading
 
 # my modules
-from application import app, socketio
+from application import app, mongo, socketio
 from application.modules.file_io import FileIO
 from application.modules.ssh_thread import SSHThread
-from application.modules.db_manager import DBManager
-
-mongo = DBManager.get_current_instance()
 
 
 class BackgroundThreadManager(object):

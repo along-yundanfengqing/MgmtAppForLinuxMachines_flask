@@ -6,13 +6,10 @@ import threading
 from pexpect import pxssh
 
 # my modules
-from application import app
+from application import app, mongo
 from application.modules.app_manager import AppManager
-from application.modules.db_manager import DBManager
 from application.modules.file_io import FileIO
 from application.modules.validation import Validation
-
-mongo = DBManager.get_current_instance()
 
 
 class SSHThread(threading.Thread):
