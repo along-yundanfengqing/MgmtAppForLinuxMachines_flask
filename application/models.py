@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import ipaddress
 from mongoengine import Document, DynamicDocument
-from mongoengine import BooleanField, DateTimeField, DictField, IntField, ListField, LongField, StringField
+from mongoengine import BooleanField, ComplexDateTimeField, DictField, IntField, ListField, LongField, StringField
 
 # my modules
 from application import app
@@ -31,7 +31,7 @@ class MachineData(DynamicDocument):
     disk_usage = ListField(default=None)
     aws = BooleanField(default=None)
     ec2 = DictField(default=None)
-    last_updated = DateTimeField(required=True)
+    last_updated = ComplexDateTimeField(required=True)
     meta = {
         'collection': app.config['MONGO_COLLECTION_NAME'],
         'indexes': [
