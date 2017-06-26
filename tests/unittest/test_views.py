@@ -1,7 +1,12 @@
+import os
 import uuid
 import unittest
 from application import app
 from application.models import MachineData
+
+BASE_DIR = os.getcwd()
+LOGIN_FILE_NAME = "test_login.txt"
+LOGIN_FILE_PATH = os.path.join(BASE_DIR, "tests/unittest", LOGIN_FILE_NAME)
 
 test_username = "test_user"
 test_password = "test_password"
@@ -15,6 +20,8 @@ class ViewTests(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         MachineData.drop_collection()
+        with open(LOGIN_FILE_PATH, 'w') as f:
+            f.write("")
 
     def setUp(self):
         self.client = app.test_client()
