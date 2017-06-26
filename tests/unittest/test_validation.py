@@ -1,4 +1,5 @@
 import unittest
+from application import app
 from application.modules.validation import Validation
 
 
@@ -7,6 +8,7 @@ class ValidationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         assert(Validation.check_internet_connection())
+        assert(app.testing)
 
     @classmethod
     def tearDownClass(cls):

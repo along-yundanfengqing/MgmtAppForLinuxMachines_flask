@@ -10,7 +10,7 @@ class ViewTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        pass
+        assert(app.testing)
 
     @classmethod
     def tearDownClass(cls):

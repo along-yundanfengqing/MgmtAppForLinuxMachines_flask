@@ -1,6 +1,7 @@
 import logging
 import os
 import unittest
+from application import app
 from application.modules.file_io import FileIO
 from application.modules.validation import Validation
 
@@ -21,6 +22,7 @@ class FileIOTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         logging.disable(logging.CRITICAL)
+        assert (app.testing)
         assert(Validation.check_internet_connection())
 
     @classmethod
