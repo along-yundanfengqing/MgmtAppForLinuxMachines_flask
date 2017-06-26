@@ -242,6 +242,96 @@ POST     | /api/users/add               | Add a user. Use {"Username": "username
 DELETE   | /api/users/delete/{username} | Delete a user
 
 
+#### sample JSON data
+```
+$ curl http://localhost:5000/api/machines/vm01
+{
+  "data": {
+    "hostname": "vm01", 
+    "ip_address": "172.30.0.1", 
+    "status": "OK", 
+    "fail_count": 0, 
+    "mac_address": "02:42:ac:1e:00:01", 
+    "os_distribution": "Ubuntu", 
+    "release": "14.04.4 LTS, Trusty Tahr", 
+    "uptime": "2d 2h 18m 28s", 
+    "cpu_info": {
+      "model_name": "Intel(R) Core(TM) i5-4250U CPU @ 1.30GHz", 
+      "cpu_mhz": "1899.999", 
+      "cpu_cores": "1"
+    }, 
+    "cpu_load_avg": {
+      "1min": "1.66", 
+      "5min": "0.99", 
+      "15min": "0.75"
+    }, 
+    "memory_usage": {
+      "mem": {
+        "total": "2.0G", 
+        "used": "639M", 
+        "free": "1.3G", 
+        "shared": "181M", 
+        "buffers": "132M", 
+        "cached": "249M"
+      }, 
+      "buffers/cache": {
+        "used": "257M", 
+        "free": "1.7G"
+      }, 
+      "swap": {
+        "total": "1.4G", 
+        "used": "0B", 
+        "free": "1.4G"
+      }
+    }, 
+    "disk_usage": [
+      {
+        "filesystem": "none", 
+        "size": "193G", 
+        "used": "1.7G", 
+        "avail": "182G", 
+        "use%": "1%", 
+        "mounted_on": "/"
+      }, 
+      {
+        "filesystem": "tmpfs", 
+        "size": "1002M", 
+        "used": "0", 
+        "avail": "1002M", 
+        "use%": "0%", 
+        "mounted_on": "/dev"
+      }, 
+      {
+        "filesystem": "tmpfs", 
+        "size": "1002M", 
+        "used": "0", 
+        "avail": "1002M", 
+        "use%": "0%", 
+        "mounted_on": "/sys/fs/cgroup"
+      }, 
+      {
+        "filesystem": "/dev/sda1", 
+        "size": "193G", 
+        "used": "1.7G", 
+        "avail": "182G", 
+        "use%": "1%", 
+        "mounted_on": "/etc/hosts"
+      }, 
+      {
+        "filesystem": "shm", 
+        "size": "64M", 
+        "used": "0", 
+        "avail": "64M", 
+        "use%": "0%", 
+        "mounted_on": "/dev/shm"
+      }
+    ], 
+    "aws": false, 
+    "last_updated": "Mon, 26 Jun 2017 22:47:12 GMT"
+  }
+}
+```
+
 
 ## 6. Documentation
 See the demo documentation [here](https://1drv.ms/b/s!AkRAr6rw0sUWgShAMcE-nZJyUIz5) for more details.  
