@@ -24,7 +24,7 @@ By using this application, administrators can manage their various Linux machine
 
 ![Application Overview](application/static/images/ApplicationOverview.png)  
 
-For more details, please see the demo documentation [here](#5-documentation).  
+For more details, please see the demo documentation [here](#6-documentation).  
 All features are demonstrated with screenshots in the document.
 
 **Key Features** 
